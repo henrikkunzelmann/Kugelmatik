@@ -1,0 +1,32 @@
+﻿using System;
+using System.IO;
+using System.Net;
+
+namespace KugelmatikLibrary.Protocol
+{
+    public struct PacketAllSteppers : IPacket
+    {
+        public PacketType Type
+        {
+            get { return PacketType.AllSteppers; }
+        }
+
+        public ushort Height;
+        public byte WaitTime;
+
+        public PacketAllSteppers(ushort height, byte waitTime)
+        {
+            this.Height = height;
+            this.WaitTime = waitTime;
+        }
+
+        public void Write(BinaryWriter writer)
+        {
+            if (writer == null)
+                throw new ArgumentNullException("writer");
+
+            writer.Write(Height);
+            writer.Write(WaitTime);
+        }
+    }
+}
