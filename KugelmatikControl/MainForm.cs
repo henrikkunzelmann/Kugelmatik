@@ -85,7 +85,7 @@ namespace KugelmatikControl
         {
             // Ping und Daten schicken
             Kugelmatik.SendPing();
-            //Kugelmatik.SendData();
+            Kugelmatik.SendData();
 
             if (tickCount % 5 == 0)
                 Kugelmatik.ResendPendingPackets();
