@@ -732,8 +732,8 @@ namespace KugelmatikLibrary
                                     continue; // Höhe ignorieren
 
                                 byte waitTime = reader.ReadByte();
-                                stepper.WaitTime = waitTime;
                                 stepper.Height = height;
+                                stepper.WaitTime = waitTime;
                             }
                         RemovePacketToAcknowlegde(revision);
                         break;

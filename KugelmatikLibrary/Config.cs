@@ -35,9 +35,9 @@ namespace KugelmatikLibrary
         public StepMode ClusterStepMode { get; set; }
 
         [Category("Cluster Config")]
-        [DescriptionAttribute("Setzt Delay-Time für Cluster. (in Mikrosekunden)")]
+        [DescriptionAttribute("Setzt Tick-Time für Cluster. (in Mikrosekunden)")]
         [Range(50, 15000)]
-        public int ClusterDelayTime { get; set; }
+        public int ClusterTickTime { get; set; }
 
         [Category("Cluster Config")]
         [DescriptionAttribute("Setzt Use-Break für Cluster.")]
@@ -92,7 +92,7 @@ namespace KugelmatikLibrary
             VerbosePacketReceive = true;
             FixedIP = "";
             ClusterStepMode = StepMode.Half;
-            ClusterDelayTime = 1000;
+            ClusterTickTime = 1000;
             AcknowlegdeTime = 20;
             WaitTime = 0;
             IgnorePacketsWhenOffline = true;

@@ -23,7 +23,7 @@ namespace KugelmatikLibrary.Protocol
                 throw new ArgumentNullException("writer");
 
             writer.Write((byte)Config.StepMode);
-            writer.Write(Config.DelayTime);
+            writer.Write(Config.TickTime);
             writer.Write((byte)(Config.UseBreak ? 1 : 0));
         }
     }

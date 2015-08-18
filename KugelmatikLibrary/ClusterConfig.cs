@@ -9,13 +9,13 @@ namespace KugelmatikLibrary
     public class ClusterConfig : IEquatable<ClusterConfig>
     {
         public StepMode StepMode { get; private set; }
-        public int DelayTime { get; private set; }
+        public int TickTime { get; private set; }
         public bool UseBreak { get; private set; }
 
         public ClusterConfig()
         {
             StepMode = StepMode.Half;
-            DelayTime = 4000;
+            TickTime = 4000;
             UseBreak = false;
         }
 
@@ -25,7 +25,7 @@ namespace KugelmatikLibrary
                 throw new ArgumentNullException("config");
 
             StepMode = config.ClusterStepMode;
-            DelayTime = config.ClusterDelayTime;
+            TickTime = config.ClusterTickTime;
             UseBreak = config.ClusterUseBreak;
         }
 
@@ -35,7 +35,7 @@ namespace KugelmatikLibrary
                 throw new ArgumentOutOfRangeException("delayTime");
 
             this.StepMode = stepMode;
-            this.DelayTime = delayTime;
+            this.TickTime = delayTime;
             this.UseBreak = useBreak;
         }
 
@@ -65,7 +65,7 @@ namespace KugelmatikLibrary
         {
             if (other == null)
                 return false;
-            return StepMode == other.StepMode && DelayTime == other.DelayTime && UseBreak == other.UseBreak;
+            return StepMode == other.StepMode && TickTime == other.TickTime && UseBreak == other.UseBreak;
         }
 
         public override int GetHashCode()
@@ -74,7 +74,7 @@ namespace KugelmatikLibrary
             {
                 int hash = 13;
                 hash = (hash * 7) + StepMode.GetHashCode();
-                hash = (hash * 7) + DelayTime.GetHashCode();
+                hash = (hash * 7) + TickTime.GetHashCode();
                 hash = (hash * 7) + UseBreak.GetHashCode();
                 return hash;
             }
