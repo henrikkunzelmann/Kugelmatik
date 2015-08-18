@@ -784,12 +784,14 @@ void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, c
 						data[offsetData++] = stepper->WaitTime;
 					}
 			
+				if (offsetData > sizeof(data))
+					error(1, "buffer overflow");
 				ether.makeUdpReply(data, sizeof(data), PROTOCOL_PORT); 
 			}
 			break;
 		case PacketInfo:
 			{
-				char data[HEADER_SIZE + 7];
+				char data[HEADER_SIZE + 8];
 				data[0] = 'K';
 				data[1] = 'K';
 				data[2] = 'S';
@@ -809,6 +811,8 @@ void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, c
 				data[offsetData++] = useBreak ? 1 : 0;
 			
 				ether.makeUdpReply(data, sizeof(data), PROTOCOL_PORT);
+				if (offsetData > sizeof(data))
+					error(1, "buffer overflow");
 			}
 			break;
 		case PacketConfig:
