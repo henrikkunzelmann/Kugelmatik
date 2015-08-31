@@ -49,6 +49,7 @@ namespace KugelmatikControl.PingPong
         private void resetButton_Click(object sender, EventArgs e)
         {
             Game = new Game(Kugelmatik);
+            this.Focus();
         }
     }
 }

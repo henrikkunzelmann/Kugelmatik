@@ -53,7 +53,7 @@ namespace KugelmatikControl.PingPong
         {
             ball = new PointF(Width / 2 - BallSize / 2, Height / 2 - BallSize / 2);
 
-            const double ballSpeedMultiplier = 0.5;
+            const double ballSpeedMultiplier = 0.1;
             double ballDirection = (Math.PI / 2) * random.Next(0, 4) + Math.PI / 4;
 
             ballSpeed = new PointF((float)(ballSpeedMultiplier * Math.Cos(ballDirection)), (float)(ballSpeedMultiplier * Math.Sin(ballDirection)));
@@ -74,8 +74,10 @@ namespace KugelmatikControl.PingPong
         public void Update()
         {
             if (PlayerTop.IsComputer)
+            {
                 if (ball.Y < Height / 2 && ballSpeed.Y < 0)
                     MoveComputerPlayer(PlayerTop);
+            }
             else
             {
                 if (Game.IsKeyDown(Keys.A) && PlayerTop.Position > 0)
@@ -85,8 +87,10 @@ namespace KugelmatikControl.PingPong
             }
 
             if (PlayerBottom.IsComputer)
+            {
                 if (ball.Y > Height / 2 && ballSpeed.Y > 0)
                     MoveComputerPlayer(PlayerBottom);
+            }
             else
             {
                 if (Game.IsKeyDown(Keys.J) && PlayerBottom.Position > 0)
@@ -142,8 +146,8 @@ namespace KugelmatikControl.PingPong
 
         public void DrawToKugelmatik()
         {
-            const ushort minHeight = 200;
-            const ushort maxHeight = 100;
+            const ushort minHeight = 100;
+            const ushort maxHeight = 1000;
 
             const int offsetX = 2;
             const int offsetY = 2;
@@ -159,6 +163,7 @@ namespace KugelmatikControl.PingPong
             int ballY = (int)Math.Round(ball.Y, MidpointRounding.AwayFromZero);
 
             Game.Kugelmatik.SetRectangle(offsetX + ballX, offsetY + ballY, BallSize, BallSize, maxHeight);
+            Game.Kugelmatik.SendData();
         }
     }
 }
