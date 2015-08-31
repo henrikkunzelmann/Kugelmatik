@@ -249,7 +249,7 @@ namespace KugelmatikControl
 
         private void logToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            ShowForm(configForm, () => logForm = new LogForm());
+            ShowForm(logForm, () => logForm = new LogForm());
         }
 
         private void stopToolStripMenuItem1_Click(object sender, EventArgs e)
@@ -275,6 +275,12 @@ namespace KugelmatikControl
         private void heightViewToolStripMenuItem_Click(object sender, EventArgs e)
         {
             ShowForm(heightViewForm, () => heightViewForm = new HeightViewForm(Kugelmatik));
+        }
+
+        private void resetRevisionToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            foreach (Cluster cluster in Kugelmatik.EnumerateClusters())
+                cluster.SendPacket(new KugelmatikLibrary.Protocol.PacketResetRevision(), false);
         }
     }
 }

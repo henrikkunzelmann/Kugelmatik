@@ -97,6 +97,9 @@
     <Compile Include="LogForm.Designer.cs">
       <DependentUpon>LogForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="NoScrollingPanel.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="PingPong\Game.cs" />
     <Compile Include="PingPong\PingPongForm.cs">
       <SubType>Form</SubType>

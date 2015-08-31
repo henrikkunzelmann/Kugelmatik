@@ -55,10 +55,11 @@
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.updateTimer = new System.Windows.Forms.Timer(this.components);
-            this.clustersPanel = new System.Windows.Forms.Panel();
+            this.clustersPanel = new NoScrollingPanel();
             this.statusStrip = new System.Windows.Forms.StatusStrip();
             this.networkStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.choreographyStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
+            this.resetRevisionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.statusStrip.SuspendLayout();
             this.SuspendLayout();
@@ -139,7 +140,8 @@
             this.toolStripSeparator2,
             this.homeToolStripMenuItem,
             this.stopToolStripMenuItem1,
-            this.configToolStripMenuItem});
+            this.configToolStripMenuItem,
+            this.resetRevisionToolStripMenuItem});
             this.sendToolStripMenuItem.Name = "sendToolStripMenuItem";
             this.sendToolStripMenuItem.Size = new System.Drawing.Size(45, 20);
             this.sendToolStripMenuItem.Text = "Send";
@@ -147,54 +149,54 @@
             // dataToolStripMenuItem
             // 
             this.dataToolStripMenuItem.Name = "dataToolStripMenuItem";
-            this.dataToolStripMenuItem.Size = new System.Drawing.Size(142, 22);
+            this.dataToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.dataToolStripMenuItem.Text = "Data";
             this.dataToolStripMenuItem.Click += new System.EventHandler(this.dataToolStripMenuItem_Click);
             // 
             // moveAllTo0ToolStripMenuItem
             // 
             this.moveAllTo0ToolStripMenuItem.Name = "moveAllTo0ToolStripMenuItem";
-            this.moveAllTo0ToolStripMenuItem.Size = new System.Drawing.Size(142, 22);
+            this.moveAllTo0ToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.moveAllTo0ToolStripMenuItem.Text = "Move all to 0";
             this.moveAllTo0ToolStripMenuItem.Click += new System.EventHandler(this.moveAllTo0ToolStripMenuItem_Click);
             // 
             // infoToolStripMenuItem
             // 
             this.infoToolStripMenuItem.Name = "infoToolStripMenuItem";
-            this.infoToolStripMenuItem.Size = new System.Drawing.Size(142, 22);
+            this.infoToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.infoToolStripMenuItem.Text = "Info";
             this.infoToolStripMenuItem.Click += new System.EventHandler(this.infoToolStripMenuItem_Click);
             // 
             // getDataToolStripMenuItem
             // 
             this.getDataToolStripMenuItem.Name = "getDataToolStripMenuItem";
-            this.getDataToolStripMenuItem.Size = new System.Drawing.Size(142, 22);
+            this.getDataToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.getDataToolStripMenuItem.Text = "Get data";
             this.getDataToolStripMenuItem.Click += new System.EventHandler(this.getDataToolStripMenuItem_Click);
             // 
             // toolStripSeparator2
             // 
             this.toolStripSeparator2.Name = "toolStripSeparator2";
-            this.toolStripSeparator2.Size = new System.Drawing.Size(139, 6);
+            this.toolStripSeparator2.Size = new System.Drawing.Size(149, 6);
             // 
             // homeToolStripMenuItem
             // 
             this.homeToolStripMenuItem.Name = "homeToolStripMenuItem";
-            this.homeToolStripMenuItem.Size = new System.Drawing.Size(142, 22);
+            this.homeToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.homeToolStripMenuItem.Text = "Home";
             this.homeToolStripMenuItem.Click += new System.EventHandler(this.homeToolStripMenuItem_Click);
             // 
             // stopToolStripMenuItem1
             // 
             this.stopToolStripMenuItem1.Name = "stopToolStripMenuItem1";
-            this.stopToolStripMenuItem1.Size = new System.Drawing.Size(142, 22);
+            this.stopToolStripMenuItem1.Size = new System.Drawing.Size(152, 22);
             this.stopToolStripMenuItem1.Text = "Stop";
             this.stopToolStripMenuItem1.Click += new System.EventHandler(this.stopToolStripMenuItem1_Click);
             // 
             // configToolStripMenuItem
             // 
             this.configToolStripMenuItem.Name = "configToolStripMenuItem";
-            this.configToolStripMenuItem.Size = new System.Drawing.Size(142, 22);
+            this.configToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.configToolStripMenuItem.Text = "Config";
             this.configToolStripMenuItem.Click += new System.EventHandler(this.configToolStripMenuItem_Click);
             // 
@@ -296,6 +298,13 @@
             this.choreographyStatusLabel.Size = new System.Drawing.Size(83, 17);
             this.choreographyStatusLabel.Text = "Choreography";
             // 
+            // resetRevisionToolStripMenuItem
+            // 
+            this.resetRevisionToolStripMenuItem.Name = "resetRevisionToolStripMenuItem";
+            this.resetRevisionToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.resetRevisionToolStripMenuItem.Text = "Reset revision";
+            this.resetRevisionToolStripMenuItem.Click += new System.EventHandler(this.resetRevisionToolStripMenuItem_Click);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -348,6 +357,7 @@
         private System.Windows.Forms.StatusStrip statusStrip;
         private System.Windows.Forms.ToolStripStatusLabel networkStatusLabel;
         private System.Windows.Forms.ToolStripStatusLabel choreographyStatusLabel;
+        private System.Windows.Forms.ToolStripMenuItem resetRevisionToolStripMenuItem;
     }
 }
 
