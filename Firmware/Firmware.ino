@@ -12,10 +12,11 @@
 #define DEBUG
 #define ENABLE_LOG true // aktiviert den Log der im EEPROM Speicher erzeugt wird
 
-#define BUILD_VERSION 8
+#define BUILD_VERSION 9
 
 #define LAN_ID 0x11 // ID des Boards im LAN, wird benutzt um die Mac-Adresse zu generieren
 static byte ethernetMac[] = { 0x74, 0x69, 0x69, 0x2D, 0x30, LAN_ID }; // Mac-Adresse des Boards
+
 
 #define TICK_TIME 2000
 #define HOME_TIME 5000
@@ -47,6 +48,7 @@ static byte ethernetMac[] = { 0x74, 0x69, 0x69, 0x2D, 0x30, LAN_ID }; // Mac-Adr
 // Includes
 #include <avr/pgmspace.h>
 #include <avr/wdt.h>
+#include <limits.h>
 #include <EtherCard.h>
 #include <EEPROM.h>
 #include <I2C.h>
@@ -578,8 +580,8 @@ void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, c
                         if (checkRevision(stepper->LastRevision, revision))
                         {
                             stepper->LastRevision = revision;
-							stepper->CurrentSteps = MAX_STEPS;
-                            stepper->GotoSteps = 0;
+							stepper->CurrentSteps = 0;
+                            stepper->GotoSteps = -MAX_STEPS;
                             stepper->CurrentStepIndex = 0;
 							stepper->WaitTime = 0;
 							stepper->TickCount = 0;
@@ -624,8 +626,10 @@ void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, c
             break;
         case PacketResetRevision:
             for (int i = 0; i < MCP_COUNT; i++)
-                for (int j = 0; j < STEPPER_COUNT; j++)
-                    (&mcps[i].Steppers[j])->LastRevision = 0;
+                for (int j = 0; j < STEPPER_COUNT; j++) {
+	                StepperData* stepper = &mcps[i].Steppers[j];
+	                stepper->LastRevision = 0;
+                }
             break;
         case PacketFix:
             if (len < HEADER_SIZE + 5)
@@ -667,6 +671,11 @@ void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, c
 							toogleGreenLed();
                         updateSteppers(true);
                         usdelay(FIX_TIME); // langsam bewegen
+						
+						// Pakete empfangen
+						#if RECEIVE_PACKETS_BUSY
+							ether.packetLoop(ether.packetReceive());
+						#endif
                     }
 					
 					// zweiter Teil kann extra gestoppt werden
@@ -791,7 +800,7 @@ void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, c
 			break;
 		case PacketInfo:
 			{
-				char data[HEADER_SIZE + 8];
+				char data[HEADER_SIZE + 12];
 				data[0] = 'K';
 				data[1] = 'K';
 				data[2] = 'S';
@@ -803,6 +812,21 @@ void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, c
 				data[offsetData++] = BUILD_VERSION;
 				
 				data[offsetData++] = busyCommandRunning ? 1 : 0;
+				
+				int highestRevision = INT_MIN;
+				for (int i = 0; i < MCP_COUNT; i++)
+					for (int j = 0; j < STEPPER_COUNT; j++)  {
+						StepperData* stepper = &mcps[i].Steppers[j];
+						
+						if (stepper->LastRevision > highestRevision)
+							highestRevision = stepper->LastRevision;
+					}
+				
+				if (configRevision > highestRevision)
+					highestRevision = configRevision;
+					
+				writeInt(data, offsetData, highestRevision);
+				offsetData += 4;
 				
 				data[offsetData++] = stepMode;
 				writeInt(data, offsetData, tickTime);
@@ -1000,11 +1024,10 @@ void loop()
 	
 		// schauen ob wir die Stepper updaten müssen
 		unsigned long time = micros();
-		int frameTime = 0;
-		if (time > procStart) // gegen Ungenauigkeit von micros() entgegen wirken (sonst könnte es passieren, dass frameTime negativ wird)
-			frameTime = time - procStart;
+		if (time < procStart) // overflow von micros() handeln
+			break;
 		
-		if (frameTime >= tickTime)
+		if (time - procStart >= tickTime)
 			break;
 	}
     interrupts();
