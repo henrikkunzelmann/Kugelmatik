@@ -116,13 +116,17 @@ namespace KugelmatikLibrary
             {
                 if (ping != value)
                 {
-                    lastPing = Environment.TickCount;
                     ping = value;
                     if (OnPingChange != null)
                         OnPingChange(this, new EventArgs());
                 }
             }
         }
+
+        /// <summary>
+        /// Wird aufgerufen wenn das Cluster verbunden ist.
+        /// </summary>
+        public event EventHandler OnConnected;
 
         /// <summary>
         /// Wird aufgerufen wenn sich der Ping-Wert ändert.
@@ -246,10 +250,14 @@ namespace KugelmatikLibrary
 
             // Ping senden und ein ResetRevision Paket senden damit die Revision wieder zurück gesetzt wird
             SendPing();
-            SendPacket(new PacketResetRevision(), true);
-            // Daten abfragen
-            SendGetData();
-            SendInfo();
+
+            OnConnected += (sender, args) =>
+            {
+                SendPacket(new PacketResetRevision(), true);
+                // Daten abfragen
+                SendGetData();
+                SendInfo();
+            };
         }
 
         ~Cluster()
@@ -653,18 +661,20 @@ namespace KugelmatikLibrary
                     return;
                 }
 
-			    lock (locker)
-				{
+                lock (locker)
+                {
                     HandlePacket(packet);
-				}
-
-                socket.BeginReceive(ReceivePacket, null);
+                }
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Log.Error(e.ToString());
                 if (Debugger.IsAttached)
                     Debugger.Break();
+            }
+            finally
+            {
+                socket.BeginReceive(ReceivePacket, null);
             }
         }
 
@@ -696,6 +706,11 @@ namespace KugelmatikLibrary
                     case PacketType.Ping:
                         if (packet.Length < HeaderSize + sizeof(long))
                             throw new InvalidDataException("Packet is not long enough.");
+
+                        int timeSpan = Environment.TickCount - lastPing;
+                        if (timeSpan > 1000 * 10)
+                            if (OnConnected != null)
+                                OnConnected(this, EventArgs.Empty);
 
                         lastPing = Environment.TickCount;
 
@@ -751,6 +766,14 @@ namespace KugelmatikLibrary
                             isRunningBusyCommand = reader.ReadByte() > 0;
                         }
 
+                        int highestRevision = 0;
+                        if (buildVersion >= 9)
+                        {
+                            if (packet.Length < HeaderSize + 12)
+                                throw new InvalidDataException("Packet is not long enough.");
+                            highestRevision = reader.ReadInt32();
+                        }
+
                         byte stepMode = reader.ReadByte();
                         if (!Enum.IsDefined(typeof(StepMode), stepMode))
                             throw new InvalidDataException("Unkown step mode");
@@ -765,7 +788,7 @@ namespace KugelmatikLibrary
                             useBreak = reader.ReadByte() > 0;
                         }
 
-                        Info = new ClusterInfo(buildVersion, isRunningBusyCommand, new ClusterConfig((StepMode)stepMode, delayTime, useBreak));
+                        Info = new ClusterInfo(buildVersion, isRunningBusyCommand, highestRevision, new ClusterConfig((StepMode)stepMode, delayTime, useBreak));
                         RemovePacketToAcknowlegde(revision);
                         break;
                     default:

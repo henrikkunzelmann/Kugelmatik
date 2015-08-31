@@ -23,15 +23,21 @@ namespace KugelmatikLibrary
         public bool IsRunningBusyCommand { get; private set; }
 
         /// <summary>
+        /// Gibt die größte Revision des Clusters zurück.
+        /// </summary>
+        public int HighestRevision { get; private set; }
+
+        /// <summary>
         /// Gibt die Einstellungen des Clusters zurück.
         /// </summary>
         [TypeConverter(typeof(ExpandableObjectConverter))]
         public ClusterConfig Config { get; private set; }
 
-        public ClusterInfo(byte buildVersion, bool isRunningBusyCommand, ClusterConfig config)
+        public ClusterInfo(byte buildVersion, bool isRunningBusyCommand, int highestRevision, ClusterConfig config)
         {
             this.BuildVersion = buildVersion;
             this.IsRunningBusyCommand = isRunningBusyCommand;
+            this.HighestRevision = highestRevision;
             this.Config = config;
         }
 
@@ -62,6 +68,7 @@ namespace KugelmatikLibrary
                 return false;
             return BuildVersion == other.BuildVersion 
                 && IsRunningBusyCommand == other.IsRunningBusyCommand
+                && HighestRevision == other.HighestRevision
                 && Config == other.Config;
         }
 
@@ -70,9 +77,10 @@ namespace KugelmatikLibrary
             unchecked
             {
                 int hash = 13;
-                hash = (hash * 7) + BuildVersion.GetHashCode();
-                hash = (hash * 7) + IsRunningBusyCommand.GetHashCode();
-                hash = (hash * 7) + Config.GetHashCode();
+                hash = hash * 7 + BuildVersion.GetHashCode();
+                hash = hash * 7 + IsRunningBusyCommand.GetHashCode();
+                hash = hash * 7 + HighestRevision.GetHashCode();
+                hash = hash * 7 + Config.GetHashCode();
                 return hash;
             }
         }
