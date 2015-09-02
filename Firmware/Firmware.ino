@@ -287,7 +287,7 @@ void initAllMCPs()
 // gibt true zurück wenn revision neuer ist als lastRevision
 boolean checkRevision(int lastRevision, int revision)
 {
-    if (lastRevision > 0 && revision < 0) // Overflow handeln
+    if (lastRevision >= 0 && revision < 0) // Overflow handeln
         return true;
     return revision > lastRevision;
 }

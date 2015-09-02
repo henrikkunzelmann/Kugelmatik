@@ -13,11 +13,19 @@ namespace KugelmatikLibrary.Protocol
         /// <summary>
         /// Gibt die Zeit zurück, an dem das Paket abgesendet wurde.
         /// </summary>
-        public readonly long Time;
+        public long Time;
 
         public PacketPing(long time)
         {
             this.Time = time;
+        }
+
+        public void Read(BinaryReader reader)
+        {
+            if (reader == null)
+                throw new ArgumentNullException("reader");
+
+            Time = reader.ReadInt64();
         }
 
         public void Write(BinaryWriter writer)

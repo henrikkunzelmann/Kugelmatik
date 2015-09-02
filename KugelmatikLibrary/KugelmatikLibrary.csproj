@@ -62,6 +62,7 @@
     <Compile Include="Protocol\PacketAllSteppersArray.cs" />
     <Compile Include="Protocol\PacketAllSteppers.cs" />
     <Compile Include="Protocol\PacketConfig.cs" />
+    <Compile Include="Protocol\PacketFactory.cs" />
     <Compile Include="Protocol\PacketStop.cs" />
     <Compile Include="Protocol\PacketBlinkRed.cs" />
     <Compile Include="Protocol\PacketBlinkGreen.cs" />
@@ -79,6 +80,7 @@
     <Compile Include="Protocol\PacketType.cs" />
     <Compile Include="Protocol\PacketPing.cs" />
     <Compile Include="Protocol\PacketTypeHelper.cs" />
+    <Compile Include="Protocol\StepperPosition.cs" />
     <Compile Include="Range.cs" />
     <Compile Include="SineWave.cs" />
     <Compile Include="StepMode.cs" />

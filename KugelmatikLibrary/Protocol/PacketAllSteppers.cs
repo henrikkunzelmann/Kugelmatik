@@ -20,6 +20,15 @@ namespace KugelmatikLibrary.Protocol
             this.WaitTime = waitTime;
         }
 
+        public void Read(BinaryReader reader)
+        {
+            if (reader == null)
+                throw new ArgumentNullException("reader");
+
+            this.Height = reader.ReadUInt16();
+            this.WaitTime = reader.ReadByte();
+        }
+
         public void Write(BinaryWriter writer)
         {
             if (writer == null)

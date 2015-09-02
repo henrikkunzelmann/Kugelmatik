@@ -126,7 +126,7 @@ namespace KugelmatikLibrary
         /// </summary>
         public void SendHome()
         {
-            Cluster.SendPacket(new PacketHomeStepper(X, Y), true);
+            Cluster.SendPacket(new PacketHomeStepper(new StepperPosition(this)), true);
             WaitTime = 0;
             Height = 0;
             IsInvalid = false;
@@ -138,7 +138,7 @@ namespace KugelmatikLibrary
         /// </summary>
         public void SendFix() 
         {
-            Cluster.SendPacket(new PacketFix(X, Y), true);
+            Cluster.SendPacket(new PacketFix(new StepperPosition(this)), true);
             WaitTime = 0;
             Height = 0;
             IsInvalid = false;

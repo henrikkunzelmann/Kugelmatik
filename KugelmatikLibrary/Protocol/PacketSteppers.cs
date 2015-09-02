@@ -10,11 +10,11 @@ namespace KugelmatikLibrary.Protocol
             get { return PacketType.Steppers; }
         }
 
-        public readonly Item[] Items;
-        public readonly ushort Height;
-        public readonly byte WaitTime;
+        public StepperPosition[] Items;
+        public ushort Height;
+        public byte WaitTime;
 
-        public PacketSteppers(Item[] items, ushort height, byte waitTime)
+        public PacketSteppers(StepperPosition[] items, ushort height, byte waitTime)
         {
             if (items == null)
                 throw new ArgumentNullException("items");
@@ -28,6 +28,20 @@ namespace KugelmatikLibrary.Protocol
             this.WaitTime = waitTime;
         }
 
+        public void Read(BinaryReader reader)
+        {
+            int itemCount = reader.ReadByte();
+            if (itemCount == 0)
+                throw new InvalidDataException("Item count is 0.");
+
+            this.Height = reader.ReadUInt16();
+            this.WaitTime = reader.ReadByte();
+
+            Items = new StepperPosition[itemCount];
+            for (int i = 0; i < itemCount; i++)
+                Items[i] = new StepperPosition(reader);
+        }
+
         public void Write(BinaryWriter writer)
         {
             if (writer == null)
@@ -37,27 +51,7 @@ namespace KugelmatikLibrary.Protocol
             writer.Write(Height);
             writer.Write(WaitTime);
             for (int i = 0; i < Items.Length; i++)
-            {
-                Item item = Items[i];
-                writer.Write((byte)((item.X << 4) | item.Y));
-            }
-        }
-
-        public struct Item
-        {
-            public readonly byte X;
-            public readonly byte Y;
-
-            public Item(byte x, byte y)
-            {
-                if (x > 16)
-                    throw new ArgumentOutOfRangeException("x");
-                if (y > 16)
-                    throw new ArgumentOutOfRangeException("y");
-
-                this.X = x;
-                this.Y = y;
-            }
+                writer.Write(Items[i].Value);
         }
     }
 }

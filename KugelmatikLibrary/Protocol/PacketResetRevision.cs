@@ -13,6 +13,11 @@ namespace KugelmatikLibrary.Protocol
         public PacketResetRevision()
         {
         }
+        
+        public void Read(BinaryReader reader)
+        {
+
+        }
 
         public void Write(BinaryWriter writer)
         {

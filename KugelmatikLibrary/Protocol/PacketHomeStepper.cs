@@ -10,18 +10,25 @@ namespace KugelmatikLibrary.Protocol
             get { return PacketType.HomeStepper; }
         }
 
-        public readonly byte X;
-        public readonly byte Y;
+        public const int MagicValue = 0xABCD;
 
-        public PacketHomeStepper(byte x, byte y)
+        public StepperPosition Position;
+
+        public PacketHomeStepper(StepperPosition position)
         {
-            if (x > 16)
-                throw new ArgumentOutOfRangeException("x");
-            if (y > 16)
-                throw new ArgumentOutOfRangeException("y");
+            this.Position = position;
+        }
 
-            this.X = x;
-            this.Y = y;
+        public void Read(BinaryReader reader)
+        {
+            if (reader == null)
+                throw new ArgumentNullException("reader");
+
+            int magicValue = reader.ReadInt32();
+            if (magicValue != MagicValue)
+                throw new InvalidDataException("Unkown magic value: " + magicValue);
+
+            this.Position = new StepperPosition(reader.ReadByte());
         }
 
         public void Write(BinaryWriter writer)
@@ -30,7 +37,7 @@ namespace KugelmatikLibrary.Protocol
                 throw new ArgumentNullException("writer");
 
             writer.Write(0xABCD);
-            writer.Write((byte)((X << 4) | Y));
+            writer.Write(Position.Value);
         }
     }
 }

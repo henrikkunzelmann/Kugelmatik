@@ -65,7 +65,9 @@ namespace KugelmatikLibrary
         {
             if (other == null)
                 return false;
-            return StepMode == other.StepMode && TickTime == other.TickTime && UseBreak == other.UseBreak;
+            return StepMode == other.StepMode 
+                && TickTime == other.TickTime 
+                && UseBreak == other.UseBreak;
         }
 
         public override int GetHashCode()

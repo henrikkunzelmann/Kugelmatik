@@ -29,6 +29,21 @@ namespace KugelmatikLibrary.Protocol
             this.WaitTimes = waitTimes;
         }
 
+        public void Read(BinaryReader reader)
+        {
+            if (reader == null)
+                throw new ArgumentNullException("reader");
+
+            Heights = new ushort[Cluster.Width * Cluster.Height];
+            WaitTimes = new byte[Cluster.Width * Cluster.Height];
+
+            for (int i = 0; i < Heights.Length; i++)
+            {
+                Heights[i] = reader.ReadUInt16();
+                WaitTimes[i] = reader.ReadByte();
+            }
+        }
+
         public void Write(BinaryWriter writer)
         {
             if (writer == null)

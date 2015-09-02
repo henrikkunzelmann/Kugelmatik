@@ -10,10 +10,12 @@ namespace KugelmatikLibrary.Protocol
             get { return PacketType.GetData; }
         }
 
+        public void Read(BinaryReader reader)
+        {
+        }
+
         public void Write(BinaryWriter writer)
         {
-            if (writer == null)
-                throw new ArgumentNullException("writer");
         }
     }
 }

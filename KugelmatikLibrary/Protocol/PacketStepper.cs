@@ -10,22 +10,25 @@ namespace KugelmatikLibrary.Protocol
             get { return PacketType.Stepper; }
         }
 
-        public readonly byte X;
-        public readonly byte Y;
-        public readonly ushort Height;
-        public readonly byte WaitTime;
+        public StepperPosition Position;
+        public ushort Height;
+        public byte WaitTime;
 
-        public PacketStepper(byte x, byte y, ushort height, byte waitTime)
+        public PacketStepper(StepperPosition position, ushort height, byte waitTime)
         {
-            if (x > 16)
-                throw new ArgumentOutOfRangeException("x");
-            if (y > 16)
-                throw new ArgumentOutOfRangeException("y");
-
-            this.X = x;
-            this.Y = y;
+            this.Position = position;
             this.Height = height;
             this.WaitTime = waitTime;
+        }
+
+        public void Read(BinaryReader reader)
+        {
+            if (reader == null)
+                throw new ArgumentNullException("reader");
+
+            this.Position = new StepperPosition(reader);
+            this.Height = reader.ReadUInt16();
+            this.WaitTime = reader.ReadByte();
         }
 
         public void Write(BinaryWriter writer)
@@ -33,7 +36,7 @@ namespace KugelmatikLibrary.Protocol
             if(writer == null)
                 throw new ArgumentNullException("writer");
 
-            writer.Write((byte)((X << 4) | Y));
+            writer.Write(Position.Value);
             writer.Write(Height);
             writer.Write(WaitTime);
         }

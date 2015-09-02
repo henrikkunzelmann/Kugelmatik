@@ -136,7 +136,7 @@ namespace KugelmatikLibrary
         /// <summary>
         /// Gibt die aktuelle Revision der Daten an die zum Cluster geschickt wurden.
         /// </summary>
-        private int currentRevision = 0;
+        private int currentRevision = 1;
 
         /// <summary>
         /// Gibt die IPAdress des Cluster zurück.
@@ -433,7 +433,13 @@ namespace KugelmatikLibrary
                 if (allSteppersInRect)
                 {
                     if (allInvalidSteppersSameHeight && allSteppersSameWaitTime)
-                        return SendPacket(new PacketSteppersRectangle(minStepperX, minStepperY, maxStepperX, maxStepperY, invalidSteppersHeight.First(), invalidSteppersWaitTimes.First()), guaranteed);
+                    {
+                        return SendPacket(new PacketSteppersRectangle(
+                            new StepperPosition(minStepperX, minStepperY),
+                            new StepperPosition(maxStepperX, maxStepperY), 
+                            invalidSteppersHeight.First(), 
+                            invalidSteppersWaitTimes.First()), guaranteed);
+                    }
                     else
                     {
                         ushort[] rectHeights = new ushort[rectArea];
@@ -448,7 +454,10 @@ namespace KugelmatikLibrary
                                 waitTimes[i++] = stepper.WaitTime;
                             }
 
-                        return SendPacket(new PacketSteppersRectangleArray(minStepperX, minStepperY, maxStepperX, maxStepperY, rectHeights, waitTimes), guaranteed);
+                        return SendPacket(new PacketSteppersRectangleArray(
+                            new StepperPosition(minStepperX, minStepperY),
+                            new StepperPosition(maxStepperX, maxStepperY),
+                            rectHeights, waitTimes), guaranteed);
                     }
                 }
             }
@@ -457,15 +466,15 @@ namespace KugelmatikLibrary
             {
                 bool anyDataSent = false;
                 foreach (Stepper stepper in invalidSteppers)
-                    anyDataSent |= SendPacket(new PacketStepper((byte)stepper.X, (byte)stepper.Y, stepper.Height, stepper.WaitTime), guaranteed);
+                    anyDataSent |= SendPacket(new PacketStepper(new StepperPosition(stepper), stepper.Height, stepper.WaitTime), guaranteed);
                 return anyDataSent;
             }
             else if (invalidSteppers.Count() <= 10)
             {
                 if (allInvalidSteppersSameHeight && allInvalidSteppersSameWaitTime)
-                    return SendPacket(new PacketSteppers(invalidSteppers.Select(s => new PacketSteppers.Item(s.X, s.Y)).ToArray(), invalidSteppersHeight.First(), invalidSteppersWaitTimes.First()), guaranteed);
+                    return SendPacket(new PacketSteppers(invalidSteppers.Select(s => new StepperPosition(s)).ToArray(), invalidSteppersHeight.First(), invalidSteppersWaitTimes.First()), guaranteed);
                 else
-                    return SendPacket(new PacketSteppersArray(invalidSteppers.Select(s => new PacketSteppersArray.Item(s.X, s.Y, s.Height, s.WaitTime)).ToArray()), guaranteed);
+                    return SendPacket(new PacketSteppersArray(invalidSteppers.Select(s => new PacketSteppersArray.Item(new StepperPosition(s), s.Height, s.WaitTime)).ToArray()), guaranteed);
             }
             else
             {
