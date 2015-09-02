@@ -338,13 +338,21 @@ void setAllSteps(int revision, unsigned short gotoSteps, byte waitTime)
 // liest einen int aus einem char-Array angefangen ab offset Bytes
 int readInt(const char* data, int offset)
 {
-    return *((int*)(data + offset));
+	int val = 0;
+    val |= data[offset];
+    val |= data[offset + 1] << 8;
+	val |= data[offset + 2] << 16;
+	val |= data[offset + 3] << 24;
+    return val;
 }
 
 // liest einen unsigned short aus einem char-Array angefangen ab offset Bytes
 unsigned short readUnsignedShort(const char* data, int offset)
 {
-    return *((unsigned int*)(data + offset));
+    unsigned short val = 0;
+	val |= data[offset];
+	val |= data[offset + 1] << 8;
+	return val;
 }
 
 // schreibt einen unsigned short in einen char-Array angefangen ab offset Bytes
