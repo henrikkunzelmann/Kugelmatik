@@ -12,7 +12,12 @@
 #define DEBUG
 #define ENABLE_LOG true // aktiviert den Log der im EEPROM Speicher erzeugt wird
 
-#define BUILD_VERSION 9
+#define BLINK_LED_ASYNC true
+#define WRITE_INTERSTRUCTION_POINTER false
+#define ENABLE_TIMER1 (BLINK_LED_ASYNC  || WRITE_INTERSTRUCTION_POINTER)
+#define DISABLE_INTERRUPTS (!ENABLE_TIMER1)
+
+#define BUILD_VERSION 10
 
 #define LAN_ID 0x11 // ID des Boards im LAN, wird benutzt um die Mac-Adresse zu generieren
 static byte ethernetMac[] = { 0x74, 0x69, 0x69, 0x2D, 0x30, LAN_ID }; // Mac-Adresse des Boards
@@ -208,12 +213,16 @@ void softReset()
 
 int logPosition = 0;
 
+void updateEEPROM(int position, byte val) {
+	if (EEPROM.read(position) != val)
+		EEPROM.write(position, val);
+}
+
 // schreibt einen Byte in den Log
 void printLog(byte val)
 {
 #if ENABLE_LOG
-    if (EEPROM.read(LOG_BEGIN + logPosition) != val)
-        EEPROM.write(LOG_BEGIN + logPosition, val);
+    updateEEPROM(LOG_BEGIN + logPosition, val);
     logPosition++;
     if (logPosition >= LOG_SIZE)
         logPosition = 0;
@@ -892,6 +901,15 @@ void setup()
 {
     wdt_disable(); // Watch Dog deaktivieren, da er nicht benutzt wird und durch softReset() noch aktiviert sein kann
     printLogString("init");
+	
+	#if ENABLE_TIMER1
+		printLogString("timer1");
+
+		TCCR1B |= (1 << CS11);
+		TCNT1 = 0;
+		TIMSK |= (1 << TOIE1);
+		sei();
+	#endif
 
     // LEDs setzen
     pinMode(LED_GREEN, OUTPUT);
@@ -1004,7 +1022,9 @@ static void usdelay(unsigned int us)
 
 void loop()
 {	
-	noInterrupts();
+	#if DISABLE_INTERRUPTS
+		noInterrupts();
+	#endif
     unsigned long procStart = micros();
 
     updateSteppers(false);
@@ -1030,6 +1050,33 @@ void loop()
 		if (time - procStart >= tickTime)
 			break;
 	}
-    interrupts();
-	
+	#if DISABLE_INTERRUPTS
+		interrupts();
+	#endif
+}
+
+int tickCount = 0;
+
+ISR(TIMER1_OVF_vect) {
+	#if BLINK_LED_ASYNC
+		if (tickCount % 128 == 0)
+			toogleGreenLed();
+	#endif
+	#if WRITE_INTERSTRUCTION_POINTER
+		if (tickCount % 128 == 0) {
+			byte addr1 = 0;
+			byte addr2 = 0;
+			// Adresse von Stack nehmen
+			asm volatile ("pop %0" : "=w"(addr1));
+			asm volatile ("pop %0" : "=w"(addr2));
+					
+			// Adresse wieder auf Stack kopieren
+			asm volatile ("push %0" ::  "w"(addr2));
+			asm volatile ("push %0" ::  "w"(addr1));
+		
+			updateEEPROM(1, addr1);
+			updateEEPROM(2, addr2);
+		}
+	#endif
+	tickCount++;
 }
