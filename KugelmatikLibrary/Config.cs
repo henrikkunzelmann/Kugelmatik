@@ -82,6 +82,10 @@ namespace KugelmatikLibrary
         [DescriptionAttribute("Wenn true, dann wird der Guaranteed-Flag ignoriert, wenn das Cluster offline ist.")]
         public bool IgnoreGuaranteedWhenOffline { get; set; }
 
+        [Category("Network")]
+        [DescriptionAttribute("Wenn true, dann wird der Guaranteed-Flag ignoriert.")]
+        public bool IgnoreGuaranteed { get; set; }
+
         public Config()
         {
             ProtocolPort = 14804;
@@ -97,6 +101,7 @@ namespace KugelmatikLibrary
             WaitTime = 0;
             IgnorePacketsWhenOffline = true;
             IgnoreGuaranteedWhenOffline = true;
+            IgnoreGuaranteed = false;
         }
 
         public void PrintToConsole()

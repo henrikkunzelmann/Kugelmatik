@@ -305,7 +305,7 @@ namespace KugelmatikLibrary
         /// <param name="x2"></param>
         /// <param name="y2"></param>
         /// <returns></returns>
-        public static float Distance(int x1, int y1, int x2, int y2)
+        public static float Distance(float x1, float y1, float x2, float y2)
         {
             return (float)Math.Sqrt(Math.Pow(x1 - x2, 2) + Math.Pow(y1 - y2, 2));
         }

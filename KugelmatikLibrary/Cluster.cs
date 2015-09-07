@@ -603,6 +603,9 @@ namespace KugelmatikLibrary
                     return false;
             }
 
+            if (Kugelmatik.Config.IgnoreGuaranteed)
+                guaranteed = false;
+
             lock (locker)
             {
                 bool alreadySent = packetsToAcknowledge.ContainsKey(revision);
@@ -717,7 +720,7 @@ namespace KugelmatikLibrary
                             throw new InvalidDataException("Packet is not long enough.");
 
                         int timeSpan = Environment.TickCount - lastPing;
-                        if (timeSpan > 1000 * 10)
+                        if (timeSpan > 1000 * 10  || ping < 0)
                             if (OnConnected != null)
                                 OnConnected(this, EventArgs.Empty);
 

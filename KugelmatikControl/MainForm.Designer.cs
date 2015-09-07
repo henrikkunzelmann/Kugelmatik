@@ -34,6 +34,7 @@
             this.logToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.heightViewToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.optionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.viewOnlyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.restartToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.closeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -46,20 +47,23 @@
             this.homeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.stopToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.configToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.resetRevisionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.choreographyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.startToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.sineWaveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.distanceToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.rippleToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.stopToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this.pingPongToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.updateTimer = new System.Windows.Forms.Timer(this.components);
-            this.clustersPanel = new NoScrollingPanel();
             this.statusStrip = new System.Windows.Forms.StatusStrip();
             this.networkStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.choreographyStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
-            this.resetRevisionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.clustersPanel = new KugelmatikControl.NoScrollingPanel();
+            this.upDownUpDownToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.statusStrip.SuspendLayout();
             this.SuspendLayout();
@@ -83,6 +87,7 @@
             this.logToolStripMenuItem,
             this.heightViewToolStripMenuItem,
             this.optionsToolStripMenuItem,
+            this.viewOnlyToolStripMenuItem,
             this.toolStripSeparator1,
             this.restartToolStripMenuItem,
             this.closeToolStripMenuItem});
@@ -110,6 +115,13 @@
             this.optionsToolStripMenuItem.Size = new System.Drawing.Size(137, 22);
             this.optionsToolStripMenuItem.Text = "Options";
             this.optionsToolStripMenuItem.Click += new System.EventHandler(this.optionsToolStripMenuItem_Click);
+            // 
+            // viewOnlyToolStripMenuItem
+            // 
+            this.viewOnlyToolStripMenuItem.Name = "viewOnlyToolStripMenuItem";
+            this.viewOnlyToolStripMenuItem.Size = new System.Drawing.Size(137, 22);
+            this.viewOnlyToolStripMenuItem.Text = "View only";
+            this.viewOnlyToolStripMenuItem.Click += new System.EventHandler(this.viewOnlyToolStripMenuItem_Click);
             // 
             // toolStripSeparator1
             // 
@@ -149,56 +161,63 @@
             // dataToolStripMenuItem
             // 
             this.dataToolStripMenuItem.Name = "dataToolStripMenuItem";
-            this.dataToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.dataToolStripMenuItem.Size = new System.Drawing.Size(146, 22);
             this.dataToolStripMenuItem.Text = "Data";
             this.dataToolStripMenuItem.Click += new System.EventHandler(this.dataToolStripMenuItem_Click);
             // 
             // moveAllTo0ToolStripMenuItem
             // 
             this.moveAllTo0ToolStripMenuItem.Name = "moveAllTo0ToolStripMenuItem";
-            this.moveAllTo0ToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.moveAllTo0ToolStripMenuItem.Size = new System.Drawing.Size(146, 22);
             this.moveAllTo0ToolStripMenuItem.Text = "Move all to 0";
             this.moveAllTo0ToolStripMenuItem.Click += new System.EventHandler(this.moveAllTo0ToolStripMenuItem_Click);
             // 
             // infoToolStripMenuItem
             // 
             this.infoToolStripMenuItem.Name = "infoToolStripMenuItem";
-            this.infoToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.infoToolStripMenuItem.Size = new System.Drawing.Size(146, 22);
             this.infoToolStripMenuItem.Text = "Info";
             this.infoToolStripMenuItem.Click += new System.EventHandler(this.infoToolStripMenuItem_Click);
             // 
             // getDataToolStripMenuItem
             // 
             this.getDataToolStripMenuItem.Name = "getDataToolStripMenuItem";
-            this.getDataToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.getDataToolStripMenuItem.Size = new System.Drawing.Size(146, 22);
             this.getDataToolStripMenuItem.Text = "Get data";
             this.getDataToolStripMenuItem.Click += new System.EventHandler(this.getDataToolStripMenuItem_Click);
             // 
             // toolStripSeparator2
             // 
             this.toolStripSeparator2.Name = "toolStripSeparator2";
-            this.toolStripSeparator2.Size = new System.Drawing.Size(149, 6);
+            this.toolStripSeparator2.Size = new System.Drawing.Size(143, 6);
             // 
             // homeToolStripMenuItem
             // 
             this.homeToolStripMenuItem.Name = "homeToolStripMenuItem";
-            this.homeToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.homeToolStripMenuItem.Size = new System.Drawing.Size(146, 22);
             this.homeToolStripMenuItem.Text = "Home";
             this.homeToolStripMenuItem.Click += new System.EventHandler(this.homeToolStripMenuItem_Click);
             // 
             // stopToolStripMenuItem1
             // 
             this.stopToolStripMenuItem1.Name = "stopToolStripMenuItem1";
-            this.stopToolStripMenuItem1.Size = new System.Drawing.Size(152, 22);
+            this.stopToolStripMenuItem1.Size = new System.Drawing.Size(146, 22);
             this.stopToolStripMenuItem1.Text = "Stop";
             this.stopToolStripMenuItem1.Click += new System.EventHandler(this.stopToolStripMenuItem1_Click);
             // 
             // configToolStripMenuItem
             // 
             this.configToolStripMenuItem.Name = "configToolStripMenuItem";
-            this.configToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.configToolStripMenuItem.Size = new System.Drawing.Size(146, 22);
             this.configToolStripMenuItem.Text = "Config";
             this.configToolStripMenuItem.Click += new System.EventHandler(this.configToolStripMenuItem_Click);
+            // 
+            // resetRevisionToolStripMenuItem
+            // 
+            this.resetRevisionToolStripMenuItem.Name = "resetRevisionToolStripMenuItem";
+            this.resetRevisionToolStripMenuItem.Size = new System.Drawing.Size(146, 22);
+            this.resetRevisionToolStripMenuItem.Text = "Reset revision";
+            this.resetRevisionToolStripMenuItem.Click += new System.EventHandler(this.resetRevisionToolStripMenuItem_Click);
             // 
             // choreographyToolStripMenuItem
             // 
@@ -214,34 +233,51 @@
             // startToolStripMenuItem
             // 
             this.startToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.sineWaveToolStripMenuItem});
+            this.sineWaveToolStripMenuItem,
+            this.distanceToolStripMenuItem,
+            this.rippleToolStripMenuItem,
+            this.upDownUpDownToolStripMenuItem});
             this.startToolStripMenuItem.Name = "startToolStripMenuItem";
-            this.startToolStripMenuItem.Size = new System.Drawing.Size(129, 22);
+            this.startToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.startToolStripMenuItem.Text = "Start";
             // 
             // sineWaveToolStripMenuItem
             // 
             this.sineWaveToolStripMenuItem.Name = "sineWaveToolStripMenuItem";
-            this.sineWaveToolStripMenuItem.Size = new System.Drawing.Size(125, 22);
+            this.sineWaveToolStripMenuItem.Size = new System.Drawing.Size(166, 22);
             this.sineWaveToolStripMenuItem.Text = "SineWave";
             this.sineWaveToolStripMenuItem.Click += new System.EventHandler(this.sineWaveToolStripMenuItem_Click);
+            // 
+            // distanceToolStripMenuItem
+            // 
+            this.distanceToolStripMenuItem.Name = "distanceToolStripMenuItem";
+            this.distanceToolStripMenuItem.Size = new System.Drawing.Size(166, 22);
+            this.distanceToolStripMenuItem.Text = "Distance";
+            this.distanceToolStripMenuItem.Click += new System.EventHandler(this.distanceToolStripMenuItem_Click);
+            // 
+            // rippleToolStripMenuItem
+            // 
+            this.rippleToolStripMenuItem.Name = "rippleToolStripMenuItem";
+            this.rippleToolStripMenuItem.Size = new System.Drawing.Size(166, 22);
+            this.rippleToolStripMenuItem.Text = "Ripple";
+            this.rippleToolStripMenuItem.Click += new System.EventHandler(this.rippleToolStripMenuItem_Click);
             // 
             // stopToolStripMenuItem
             // 
             this.stopToolStripMenuItem.Name = "stopToolStripMenuItem";
-            this.stopToolStripMenuItem.Size = new System.Drawing.Size(129, 22);
+            this.stopToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.stopToolStripMenuItem.Text = "Stop";
             this.stopToolStripMenuItem.Click += new System.EventHandler(this.stopToolStripMenuItem_Click);
             // 
             // toolStripSeparator3
             // 
             this.toolStripSeparator3.Name = "toolStripSeparator3";
-            this.toolStripSeparator3.Size = new System.Drawing.Size(126, 6);
+            this.toolStripSeparator3.Size = new System.Drawing.Size(149, 6);
             // 
             // pingPongToolStripMenuItem
             // 
             this.pingPongToolStripMenuItem.Name = "pingPongToolStripMenuItem";
-            this.pingPongToolStripMenuItem.Size = new System.Drawing.Size(129, 22);
+            this.pingPongToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.pingPongToolStripMenuItem.Text = "Ping pong";
             this.pingPongToolStripMenuItem.Click += new System.EventHandler(this.pingPongToolStripMenuItem_Click);
             // 
@@ -266,15 +302,6 @@
             this.updateTimer.Interval = 500;
             this.updateTimer.Tick += new System.EventHandler(this.updateTimer_Tick);
             // 
-            // clustersPanel
-            // 
-            this.clustersPanel.AutoScroll = true;
-            this.clustersPanel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.clustersPanel.Location = new System.Drawing.Point(0, 24);
-            this.clustersPanel.Name = "clustersPanel";
-            this.clustersPanel.Size = new System.Drawing.Size(621, 463);
-            this.clustersPanel.TabIndex = 1;
-            // 
             // statusStrip
             // 
             this.statusStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -298,12 +325,21 @@
             this.choreographyStatusLabel.Size = new System.Drawing.Size(83, 17);
             this.choreographyStatusLabel.Text = "Choreography";
             // 
-            // resetRevisionToolStripMenuItem
+            // clustersPanel
             // 
-            this.resetRevisionToolStripMenuItem.Name = "resetRevisionToolStripMenuItem";
-            this.resetRevisionToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
-            this.resetRevisionToolStripMenuItem.Text = "Reset revision";
-            this.resetRevisionToolStripMenuItem.Click += new System.EventHandler(this.resetRevisionToolStripMenuItem_Click);
+            this.clustersPanel.AutoScroll = true;
+            this.clustersPanel.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.clustersPanel.Location = new System.Drawing.Point(0, 24);
+            this.clustersPanel.Name = "clustersPanel";
+            this.clustersPanel.Size = new System.Drawing.Size(621, 463);
+            this.clustersPanel.TabIndex = 1;
+            // 
+            // upDownUpDownToolStripMenuItem
+            // 
+            this.upDownUpDownToolStripMenuItem.Name = "upDownUpDownToolStripMenuItem";
+            this.upDownUpDownToolStripMenuItem.Size = new System.Drawing.Size(166, 22);
+            this.upDownUpDownToolStripMenuItem.Text = "UpDownUpDown";
+            this.upDownUpDownToolStripMenuItem.Click += new System.EventHandler(this.upDownUpDownToolStripMenuItem_Click);
             // 
             // MainForm
             // 
@@ -336,7 +372,6 @@
         private System.Windows.Forms.Timer updateTimer;
         private System.Windows.Forms.ToolStripMenuItem sendToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem homeToolStripMenuItem;
-        private System.Windows.Forms.Panel clustersPanel;
         private System.Windows.Forms.ToolStripMenuItem getDataToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem moveAllTo0ToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem choreographyToolStripMenuItem;
@@ -358,6 +393,11 @@
         private System.Windows.Forms.ToolStripStatusLabel networkStatusLabel;
         private System.Windows.Forms.ToolStripStatusLabel choreographyStatusLabel;
         private System.Windows.Forms.ToolStripMenuItem resetRevisionToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem distanceToolStripMenuItem;
+        private NoScrollingPanel clustersPanel;
+        private System.Windows.Forms.ToolStripMenuItem rippleToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem viewOnlyToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem upDownUpDownToolStripMenuItem;
     }
 }
 

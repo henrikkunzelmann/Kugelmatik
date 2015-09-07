@@ -154,6 +154,22 @@ namespace KugelmatikProxy
                     Log.WriteFields(LogLevel.Verbose, packet);
 
                     HandlePacket(data, sender, packet);
+
+                    if (guranteed)
+                    {
+                        using (MemoryStream ackData = new MemoryStream())
+                        using (BinaryWriter ackWriter = new BinaryWriter(ackData))
+                        {
+                            ackWriter.Write('K');
+                            ackWriter.Write('K');
+                            ackWriter.Write('S');
+                            ackWriter.Write((byte)0);
+                            ackWriter.Write((byte)2);
+                            ackWriter.Write(rev);
+
+                            server.BeginSend(ackData.GetBuffer(), (int)ackData.Position, SendPacketCallback, null);
+                        }
+                    }
                 }
                 else
                     Log.Debug("[Cluster] [{0}] [rev: {1}{2}]", (PacketType)packetType, rev, guranteed ? " guaranteed" : "");

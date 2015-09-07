@@ -50,6 +50,7 @@
     <Compile Include="Config.cs" />
     <Compile Include="FixedAddressProvider.cs" />
     <Compile Include="FunctionChoreography.cs" />
+    <Compile Include="DistanceChoreography.cs" />
     <Compile Include="IAddressProvider.cs" />
     <Compile Include="IChoreography.cs" />
     <Compile Include="Kugelmatik.cs" />
@@ -82,6 +83,7 @@
     <Compile Include="Protocol\PacketTypeHelper.cs" />
     <Compile Include="Protocol\StepperPosition.cs" />
     <Compile Include="Range.cs" />
+    <Compile Include="Ripple.cs" />
     <Compile Include="SineWave.cs" />
     <Compile Include="StepMode.cs" />
     <Compile Include="Stepper.cs" />

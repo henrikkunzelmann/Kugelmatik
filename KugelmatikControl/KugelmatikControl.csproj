@@ -111,6 +111,12 @@
     <Compile Include="PingPong\World.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="StepByStepHomeForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="StepByStepHomeForm.Designer.cs">
+      <DependentUpon>StepByStepHomeForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="StepperControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -154,6 +160,9 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
+    <EmbeddedResource Include="StepByStepHomeForm.resx">
+      <DependentUpon>StepByStepHomeForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="StepperControl.resx">
       <DependentUpon>StepperControl.cs</DependentUpon>
     </EmbeddedResource>

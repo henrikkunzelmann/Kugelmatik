@@ -65,7 +65,7 @@ namespace KugelmatikControl
                     clusterControls[y * Kugelmatik.Config.KugelmatikWidth + x] = cluster;
                 }
 
-            UpdateChoreographyStatus();
+            UpdateChoreographyStatus();;
         }
 
         protected override void OnClosed(EventArgs e)
@@ -85,7 +85,9 @@ namespace KugelmatikControl
         {
             // Ping und Daten schicken
             Kugelmatik.SendPing();
-            Kugelmatik.SendData();
+
+            if (!viewOnlyToolStripMenuItem.Checked)
+                Kugelmatik.SendData();
 
             if (tickCount % 5 == 0)
                 Kugelmatik.ResendPendingPackets();
@@ -93,6 +95,9 @@ namespace KugelmatikControl
             // alle 10 Ticks Board Informationen neu anfordern
             if (tickCount % 10 == 0)
                 Kugelmatik.SendInfo();
+
+            if (viewOnlyToolStripMenuItem.Checked && tickCount % 2 == 0)
+                Kugelmatik.SendGetData();
 
             // wenn eine Choreograpie läuft, dann werden alle Stepper per Tick geupdatet, da AutomaticUpdate auf false ist
             if (choreography != null)
@@ -176,6 +181,22 @@ namespace KugelmatikControl
             return form;
         }
 
+        private void StartChoreography(IChoreography c)
+        {
+            if (choreography != null)
+            {
+                if (choreography.IsRunning)
+                    choreography.Stop();
+                choreography.Dispose();
+            }
+
+            choreography = new ChoreographyManager(Kugelmatik, 60, c);
+            choreography.Start();
+
+            UpdateChoreographyStatus();
+            SetAutomaticUpdate(false);
+        }
+
         private void Cluster_Click(object sender, EventArgs e)
         {
             ShowCluster(((ClusterControl)sender).Cluster);
@@ -223,18 +244,7 @@ namespace KugelmatikControl
 
         private void sineWaveToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (choreography != null)
-            {
-                if (choreography.IsRunning)
-                    choreography.Stop();
-                choreography.Dispose();
-            }
-
-            choreography = new ChoreographyManager(Kugelmatik, 60, new SineWave(SineWave.Direction.Y, 0.001f, 0.20f));
-            choreography.Start();
-
-            UpdateChoreographyStatus();
-            SetAutomaticUpdate(false);
+            StartChoreography(new SineWave(SineWave.Direction.Y, 0.001f, 0.20f));
         }
 
         private void restartToolStripMenuItem_Click(object sender, EventArgs e)
@@ -281,6 +291,32 @@ namespace KugelmatikControl
         {
             foreach (Cluster cluster in Kugelmatik.EnumerateClusters())
                 cluster.SendPacket(new KugelmatikLibrary.Protocol.PacketResetRevision(), false);
+        }
+
+        private void distanceToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            StartChoreography(new DistanceChoreography());
+        }
+
+        private void rippleToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            StartChoreography(new Ripple());
+        }
+
+        private void viewOnlyToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            viewOnlyToolStripMenuItem.Checked = !viewOnlyToolStripMenuItem.Checked;
+        }
+
+        private void upDownUpDownToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            StartChoreography(new FunctionChoreography((config, time, x, y) =>
+            {
+                float d = (float)((y + time.TotalSeconds * 0.5f) % 10);
+                if (d >= 5)
+                    d = 10 - d;
+                return (ushort)(d / 5 * config.MaxHeight);
+            }));
         }
     }
 }
