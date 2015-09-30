@@ -133,7 +133,7 @@
             this.blinkButton.Location = new System.Drawing.Point(165, 41);
             this.blinkButton.Name = "blinkButton";
             this.blinkButton.Size = new System.Drawing.Size(75, 23);
-            this.blinkButton.TabIndex = 8;
+            this.blinkButton.TabIndex = 6;
             this.blinkButton.Text = "Blink";
             this.blinkButton.UseVisualStyleBackColor = true;
             this.blinkButton.Click += new System.EventHandler(this.blinkButton_Click);
@@ -144,7 +144,7 @@
             this.configButton.Location = new System.Drawing.Point(165, 14);
             this.configButton.Name = "configButton";
             this.configButton.Size = new System.Drawing.Size(75, 23);
-            this.configButton.TabIndex = 7;
+            this.configButton.TabIndex = 5;
             this.configButton.Text = "Config";
             this.configButton.UseVisualStyleBackColor = true;
             this.configButton.Click += new System.EventHandler(this.configButton_Click);
@@ -155,7 +155,7 @@
             this.stopButton.Location = new System.Drawing.Point(84, 66);
             this.stopButton.Name = "stopButton";
             this.stopButton.Size = new System.Drawing.Size(75, 23);
-            this.stopButton.TabIndex = 6;
+            this.stopButton.TabIndex = 4;
             this.stopButton.Text = "Stop";
             this.stopButton.UseVisualStyleBackColor = true;
             this.stopButton.Click += new System.EventHandler(this.stopButton_Click);
@@ -166,7 +166,7 @@
             this.infoButton.Location = new System.Drawing.Point(84, 41);
             this.infoButton.Name = "infoButton";
             this.infoButton.Size = new System.Drawing.Size(75, 23);
-            this.infoButton.TabIndex = 5;
+            this.infoButton.TabIndex = 3;
             this.infoButton.Text = "Info";
             this.infoButton.UseVisualStyleBackColor = true;
             this.infoButton.Click += new System.EventHandler(this.infoButton_Click);
@@ -177,7 +177,7 @@
             this.moveToTopButton.Location = new System.Drawing.Point(3, 14);
             this.moveToTopButton.Name = "moveToTopButton";
             this.moveToTopButton.Size = new System.Drawing.Size(75, 23);
-            this.moveToTopButton.TabIndex = 4;
+            this.moveToTopButton.TabIndex = 0;
             this.moveToTopButton.Text = "Move top";
             this.moveToTopButton.UseVisualStyleBackColor = true;
             this.moveToTopButton.Click += new System.EventHandler(this.moveToTopButton_Click);
@@ -188,7 +188,7 @@
             this.getDataButton.Location = new System.Drawing.Point(84, 14);
             this.getDataButton.Name = "getDataButton";
             this.getDataButton.Size = new System.Drawing.Size(75, 23);
-            this.getDataButton.TabIndex = 3;
+            this.getDataButton.TabIndex = 2;
             this.getDataButton.Text = "Get data";
             this.getDataButton.UseVisualStyleBackColor = true;
             this.getDataButton.Click += new System.EventHandler(this.getDataButton_Click);
@@ -233,7 +233,7 @@
             this.setClusterButton.Location = new System.Drawing.Point(6, 46);
             this.setClusterButton.Name = "setClusterButton";
             this.setClusterButton.Size = new System.Drawing.Size(156, 23);
-            this.setClusterButton.TabIndex = 2;
+            this.setClusterButton.TabIndex = 1;
             this.setClusterButton.Text = "Set cluster";
             this.setClusterButton.UseVisualStyleBackColor = true;
             this.setClusterButton.Click += new System.EventHandler(this.setClusterButton_Click);
@@ -243,7 +243,7 @@
             this.fixStepperButton.Location = new System.Drawing.Point(87, 22);
             this.fixStepperButton.Name = "fixStepperButton";
             this.fixStepperButton.Size = new System.Drawing.Size(75, 23);
-            this.fixStepperButton.TabIndex = 1;
+            this.fixStepperButton.TabIndex = 2;
             this.fixStepperButton.Text = "Fix";
             this.fixStepperButton.UseVisualStyleBackColor = true;
             this.fixStepperButton.Click += new System.EventHandler(this.fixStepperButton_Click);
