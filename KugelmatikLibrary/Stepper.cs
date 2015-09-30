@@ -89,6 +89,16 @@ namespace KugelmatikLibrary
         }
 
         /// <summary>
+        /// Setzt den Stepper auf Anfangswerte zurück.
+        /// </summary>
+        private void Reset()
+        {
+            WaitTime = 0;
+            Height = 0;
+            IsInvalid = false;
+        }
+
+        /// <summary>
         /// Bewegt die Kugel auf die Tiefe height.
         /// </summary>
         /// <param name="height">Die Tiefe zu der die Kugel fahren soll.</param>
@@ -116,7 +126,6 @@ namespace KugelmatikLibrary
                 this.WaitTime = waitTime;
 
                 IsInvalid = true;
-                Cluster.Invalidate();
             }
         }
 
@@ -127,9 +136,7 @@ namespace KugelmatikLibrary
         public void SendHome()
         {
             Cluster.SendPacket(new PacketHomeStepper(new StepperPosition(this)), true);
-            WaitTime = 0;
-            Height = 0;
-            IsInvalid = false;
+            Reset();
         }
 
         /// <summary>
@@ -139,9 +146,7 @@ namespace KugelmatikLibrary
         public void SendFix() 
         {
             Cluster.SendPacket(new PacketFix(new StepperPosition(this)), true);
-            WaitTime = 0;
-            Height = 0;
-            IsInvalid = false;
+            Reset();
         }
     }
 }

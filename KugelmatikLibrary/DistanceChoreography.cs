@@ -15,7 +15,7 @@ namespace KugelmatikLibrary
 
             float dt = (float)time.TotalMilliseconds * 0.05f;
 
-            double dist = Kugelmatik.Distance(x / width, y / height, (dt % 1000) / 1000f, 0.5f);
+            double dist = MathHelper.Distance(x / width, y / height, (dt % 1000) / 1000f, 0.5f);
             if (dist < 0)
                 dist = 0;
             if (dist > 1)

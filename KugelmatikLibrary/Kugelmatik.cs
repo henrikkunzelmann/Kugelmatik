@@ -293,21 +293,8 @@ namespace KugelmatikLibrary
             int radiusInt = (int)Math.Ceiling(radius);
             for (int i = -radiusInt; i <= radiusInt; i++)
                 for (int j = -radiusInt; j <= radiusInt; j++)
-                    if (Distance(0, 0, i, j) <= radius)
+                    if (MathHelper.Distance(0, 0, i, j) <= radius)
                         GetStepperByPosition(x + i, y + j).MoveTo(stepperHeight);
-        }
-
-        /// <summary>
-        /// Gibt die Entfernung zwischen zwei Punkten (x1, y1) und (x2, y2) zurück.
-        /// </summary>
-        /// <param name="x1"></param>
-        /// <param name="y1"></param>
-        /// <param name="x2"></param>
-        /// <param name="y2"></param>
-        /// <returns></returns>
-        public static float Distance(float x1, float y1, float x2, float y2)
-        {
-            return (float)Math.Sqrt(Math.Pow(x1 - x2, 2) + Math.Pow(y1 - y2, 2));
         }
     }
 }

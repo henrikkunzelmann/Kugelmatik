@@ -77,26 +77,20 @@ namespace KugelmatikLibrary
             get { return GetStepperByIndex(index); }
         }
 
-        private bool isInvalid;
 
         /// <summary>
         /// Gibt zurück ob sich mindestens ein Stepper am Cluster ändern soll.
         /// </summary>
         public bool IsInvalid
         {
-            get { return isInvalid; }
-            set
+            get
             {
-                if (isInvalid != value)
-                {
-                    isInvalid = value;
-                    if (OnIsInvalidChange != null)
-                        OnIsInvalidChange(this, EventArgs.Empty);
-                }
+                foreach (Stepper stepper in steppers)
+                    if (stepper.IsInvalid)
+                        return true;
+                return false;
             }
         }
-
-        public event EventHandler OnIsInvalidChange;
 
         private int lastPing = Environment.TickCount;
         private int ping = -1;
@@ -325,11 +319,6 @@ namespace KugelmatikLibrary
             return steppers[y * Width + x];
         }
 
-        internal void Invalidate()
-        {
-            IsInvalid = true;
-        }
-
         /// <summary>
         /// Bewegt alle Stepper zur selben Höhe.
         /// </summary>
@@ -372,8 +361,6 @@ namespace KugelmatikLibrary
                 {
                     for (int i = 0; i < steppers.Length; i++)
                         steppers[i].IsInvalid = false;
-
-                    IsInvalid = false;
                 }
                 return anyDataSent;
             }
@@ -690,7 +677,7 @@ namespace KugelmatikLibrary
             }
         }
 
-        private const int HeaderSize = 9;
+        private const int HeaderSize = 9; // Bytes
 
         private void HandlePacket(byte[] packet)
         {
@@ -810,7 +797,7 @@ namespace KugelmatikLibrary
         }
 
         /// <summary>
-        /// Entfernt ein Paket von der Liste der noch zu bestätigen Pakete.
+        /// Entfernt ein Paket aus der Liste der noch zu bestätigen Pakete.
         /// </summary>
         /// <param name="packetID"></param>
         private void RemovePacketToAcknowlegde(int packetID)
