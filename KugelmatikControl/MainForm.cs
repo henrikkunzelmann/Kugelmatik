@@ -83,11 +83,19 @@ namespace KugelmatikControl
 
         private void updateTimer_Tick(object sender, EventArgs e)
         {
-            // Ping und Daten schicken
+            // Ping senden
             Kugelmatik.SendPing();
 
+            // Daten senden
             if (!viewOnlyToolStripMenuItem.Checked)
-                Kugelmatik.SendData();
+            {
+                // alle 4 Ticks werden die Daten vollständig gesendet
+                // damit werden out-of-sync Fehler behoben wenn ein Paket vom Cluster nicht verarbeitet wurde
+                if (tickCount % 4 == 0)
+                    Kugelmatik.SendData(false, true);
+                else
+                    Kugelmatik.SendData();
+            }
 
             if (tickCount % 5 == 0)
                 Kugelmatik.ResendPendingPackets();
@@ -130,9 +138,11 @@ namespace KugelmatikControl
 
         private void UpdateNetworkStatus()
         {
+            // Ping berechnen
             double avgPing = Kugelmatik.EnumerateClusters().Select(c => c.Ping).Average();
             int maxPing = Kugelmatik.EnumerateClusters().Select(c => c.Ping).Max();
             int pending = Kugelmatik.EnumerateClusters().Select(c => c.PendingAcknowledgePacketsCount).Sum();
+
             networkStatusLabel.Text = string.Format(Properties.Resources.NetworkStatus,
                 avgPing < 0 ? "n/a" : string.Format("{0:0.0}ms", avgPing),
                 maxPing < 0 ? "n/a" : string.Format("{0}ms", maxPing), pending);
@@ -183,6 +193,7 @@ namespace KugelmatikControl
 
         private void StartChoreography(IChoreography c)
         {
+            // wenn schon eine Choreography läuft, dann stoppen
             if (choreography != null)
             {
                 if (choreography.IsRunning)

@@ -177,13 +177,24 @@ namespace KugelmatikLibrary
         /// <summary>
         /// Sendet alle Daten die zur Aktualisierung der Kugelmatik notwendig sind.
         /// </summary>
-        /// <param name="guaranteed">Ob von den Daten eine Bestätigung erwartet wird.</param>
+        /// <param name="guaranteed">Wert der angibt ob das Paket von den Clustern bestätigt werden muss.</param>
         /// <returns>Gibt true zurück, wenn Pakete an ein Cluster geschickt wurden.</returns>
         public bool SendData(bool guaranteed)
         {
+            return SendData(guaranteed, false);
+        }
+
+        /// <summary>
+        /// Sendet alle Daten die zur Aktualisierung der Kugelmatik notwendig sind.
+        /// </summary>
+        /// <param name="guaranteed">Wert der angibt ob das Paket von den Clustern bestätigt werden muss.</param>
+        /// <param name="ignoreInvalid">Wert der angibt ob alle Stepper (auch valide) von den Clustern gesendet werden sollen.</param>
+        /// <returns>Gibt true zurück, wenn Pakete an ein Cluster geschickt wurden.</returns>
+        public bool SendData(bool guaranteed, bool allSteppers)
+        {
             bool anyDataSent = false;
             foreach (Cluster cluster in clusters)
-                anyDataSent |= cluster.SendData(guaranteed);
+                anyDataSent |= cluster.SendData(guaranteed, allSteppers);
             return anyDataSent;
         }
 

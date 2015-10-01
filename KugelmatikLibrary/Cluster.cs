@@ -348,6 +348,18 @@ namespace KugelmatikLibrary
         /// <returns>Gibt true zurück, wenn Daten an das Cluster gesendet wurden</returns>
         public bool SendData(bool guaranteed)
         {
+            return SendData(guaranteed, true);
+        }
+
+
+        /// <summary>
+        /// Sendet alle Daten an das Cluster um die Höhen zu aktualisieren.
+        /// </summary>
+        /// <param name="guaranteed">Wert der angibt ob das Paket vom Cluster bestätigt werden muss.</param>
+        /// <param name="ignoreInvalid">Wert der angibt ob alle Stepper (auch valide) zum Cluster gesendet werden sollen.</param>
+        /// <returns>Gibt true zurück, wenn Daten an das Cluster gesendet wurden</returns>
+        public bool SendData(bool guaranteed, bool sendAllSteppers)
+        {
             if (IsDisposed)
                 throw new ObjectDisposedException(GetType().Name);
 
@@ -356,7 +368,7 @@ namespace KugelmatikLibrary
                 if (!IsInvalid)
                     return false;
 
-                bool anyDataSent = SendDataInternal(guaranteed);
+                bool anyDataSent = SendDataInternal(guaranteed, sendAllSteppers);
                 if (anyDataSent)
                 {
                     for (int i = 0; i < steppers.Length; i++)
@@ -383,9 +395,9 @@ namespace KugelmatikLibrary
             }
         }
 
-        private bool SendDataInternal(bool guaranteed)
+        private bool SendDataInternal(bool guaranteed, bool sendAllSteppers)
         {
-            var invalidSteppers = steppers.Where(s => s.IsInvalid);
+            var invalidSteppers = steppers.Where(s => sendAllSteppers || s.IsInvalid);
             if (invalidSteppers.Count() == 0)
                 return false;
 
