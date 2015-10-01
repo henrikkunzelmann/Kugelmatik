@@ -29,6 +29,9 @@ namespace KugelmatikControl
 
         public void ShowCluster(Cluster cluster)
         {
+            if (cluster == null)
+                throw new ArgumentNullException("cluster");
+
             if (this.Cluster == cluster)
                 return;
 
@@ -36,12 +39,14 @@ namespace KugelmatikControl
 
             Text = string.Format("Cluster {0}, {1}", cluster.X + 1, cluster.Y + 1);
 
-            if (ClusterControl != null)
-                Controls.Remove(ClusterControl);
-
-            ClusterControl = new ClusterControlDetailed(cluster);
-            ClusterControl.Dock = DockStyle.Fill;
-            Controls.Add(ClusterControl);
+            if (ClusterControl == null)
+            {
+                ClusterControl = new ClusterControlDetailed(cluster);
+                ClusterControl.Dock = DockStyle.Fill;
+                Controls.Add(ClusterControl);
+            }
+            else
+                ClusterControl.ShowCluster(Cluster);
         }
     }
 }

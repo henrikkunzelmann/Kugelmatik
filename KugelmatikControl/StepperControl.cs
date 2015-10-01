@@ -15,6 +15,9 @@ namespace KugelmatikControl
     {
         public Stepper Stepper { get; private set; }
 
+        /// <summary>
+        /// Gibt an ob das StepperControl automatisch die Werte vom Stepper aktualisiert werden soll.
+        /// </summary>
         public bool AutomaticUpdate { get; set; } = true;
 
         public StepperControl(Stepper stepper)
@@ -32,9 +35,14 @@ namespace KugelmatikControl
             heightTrackBar.Minimum = 0;
             heightTrackBar.Maximum = stepper.Kugelmatik.Config.MaxHeight;
 
-            heightNumber.Value = stepper.Height;
-            stepper.OnHeightChange += Stepper_OnHeightChange;
+            ShowStepper(stepper);
             SetupOnClick(this);
+        }
+
+        protected override void OnHandleDestroyed(EventArgs e)
+        {
+            ResetStepper();
+            base.OnHandleDestroyed(e);
         }
 
         private void SetupOnClick(Control parent)
@@ -51,10 +59,39 @@ namespace KugelmatikControl
             InvokeOnClick(this, EventArgs.Empty);
         }
 
+        private void ResetStepper()
+        {
+            if (Stepper != null)
+            {
+                Stepper.OnHeightChange -= Stepper_OnHeightChange;
+                Stepper = null;
+            }
+        }
+
+        public void ShowStepper(Stepper stepper)
+        {
+            if (stepper == null)
+                throw new ArgumentNullException("stepper");
+
+            if (this.Stepper == stepper)
+                return;
+
+            ResetStepper();
+            this.Stepper = stepper;
+            UpdateHeight();
+
+            stepper.OnHeightChange += Stepper_OnHeightChange;
+        }
+
         public void UpdateHeight()
         {
-            heightNumber.Value = Stepper.Height;
-            heightTrackBar.Value = Stepper.Height;
+            if (Stepper != null)
+            {
+                stepperUpdate = true;
+                heightNumber.Value = Stepper.Height;
+                heightTrackBar.Value = Stepper.Height;
+                stepperUpdate = false;
+            }
         }
 
         // verhindert das wir den Stepper updaten wenn die Änderung vom Stepper selbst stammt
@@ -69,11 +106,7 @@ namespace KugelmatikControl
             if (heightNumber.InvokeRequired)
                 heightNumber.BeginInvoke(new Action<object, EventArgs>(Stepper_OnHeightChange), sender, e);
             else
-            {
-                stepperUpdate = true;
                 UpdateHeight();
-                stepperUpdate = false;
-            }
         }
 
         private void heightTrackBar_ValueChanged(object sender, EventArgs e)

@@ -14,7 +14,10 @@ namespace KugelmatikControl
 {
     public partial class ClusterControlDetailed : UserControl
     {
-        public Cluster Cluster { get; private set; }
+        /// <summary>
+        /// Gibt das derzeitige gezeitige Cluster zurück.
+        /// </summary>
+        public Cluster CurrentCluster { get; private set; }
 
         private StepperControl[] steppers;
         private StepperControl selectedStepper = null;
@@ -24,11 +27,8 @@ namespace KugelmatikControl
             if (cluster == null)
                 throw new ArgumentNullException("cluster");
 
-            this.Cluster = cluster;
-            
             InitializeComponent();
-            stepperBox.Visible = false;
-
+            
             const int padding = 2; // Abstand zwischen zwei StepperControls
             int height = 0;
 
@@ -44,7 +44,7 @@ namespace KugelmatikControl
 
                 for (int x = 0; x < Cluster.Width; x++)
                 {
-                    StepperControl stepper = new StepperControl(Cluster.GetStepperByPosition(x, Cluster.Height - 1 - y));
+                    StepperControl stepper = new StepperControl(cluster.GetStepperByPosition(x, Cluster.Height - 1 - y));
                     steppersPanel.Controls.Add(stepper);
 
                     steppers[y * Cluster.Width + x] = stepper;
@@ -66,12 +66,52 @@ namespace KugelmatikControl
 
 
                 labelRow.Location = new Point(0, y * height + height / 2 - labelRow.Height / 2);
-
-                cluster.OnPingChange += UpdateClusterBox;
-                cluster.OnInfoChange += UpdateClusterBox;
             }
 
+            ShowCluster(cluster);
+        }
+
+        protected override void OnHandleDestroyed(EventArgs e)
+        {
+            ResetCurrentCluster();
+            base.OnHandleDestroyed(e);
+        }
+
+
+        private void ResetCurrentCluster()
+        {
+            if (CurrentCluster != null)
+            {
+                CurrentCluster.OnPingChange -= UpdateClusterBox;
+                CurrentCluster.OnInfoChange -= UpdateClusterBox;
+                CurrentCluster = null;
+            }
+        }
+
+        public void ShowCluster(Cluster cluster)
+        {
+            if (cluster == null)
+                throw new ArgumentNullException("cluster");
+
+            if (CurrentCluster == cluster)
+                return;
+
+            // UI zurücksetzen
+            ActiveControl = null;
+            ShowStepper(null);
+            ResetCurrentCluster();
+
+            CurrentCluster = cluster;
+
+            // neue UI zeigen
+            for (int x = 0; x < Cluster.Width; x++)
+                for (int y = 0; y < Cluster.Height; y++)
+                    steppers[y * Cluster.Width + x].ShowStepper(CurrentCluster.GetStepperByPosition(x, Cluster.Height - 1 - y));
             UpdateClusterBox(cluster, EventArgs.Empty);
+
+            // Events setzen
+            cluster.OnPingChange += UpdateClusterBox;
+            cluster.OnInfoChange += UpdateClusterBox;
         }
 
         public IEnumerable<StepperControl> EnumerateStepperControls()
@@ -89,9 +129,9 @@ namespace KugelmatikControl
         private void UpdateClusterBox(object sender, EventArgs e)
         {
             if (clusterBox.InvokeRequired)
-                clusterBox.BeginInvoke(new Action<int, ClusterInfo>(UpdateClusterBoxInternal), Cluster.Ping, Cluster.Info);
+                clusterBox.BeginInvoke(new Action<int, ClusterInfo>(UpdateClusterBoxInternal), CurrentCluster.Ping, CurrentCluster.Info);
             else
-                UpdateClusterBoxInternal(Cluster.Ping, Cluster.Info);
+                UpdateClusterBoxInternal(CurrentCluster.Ping, CurrentCluster.Info);
         }
 
         private void UpdateClusterBoxInternal(int ping, ClusterInfo info)
@@ -109,24 +149,33 @@ namespace KugelmatikControl
             }
 
             clusterBox.Text = string.Format(Properties.Resources.ClusterInfo,
-                Cluster.X + 1, Cluster.Y + 1,
+                CurrentCluster.X + 1, CurrentCluster.Y + 1,
                 ping == -1 ? "offline" : (ping + "ms"),
-                Cluster.Address);
+                CurrentCluster.Address);
         }
 
-        public void ShowStepper(StepperControl stepper)
+        private void ShowStepper(StepperControl stepper)
         {
             if (selectedStepper == stepper)
                 return;
-            stepperBox.Visible = true;
 
+            // Hintergrund-Farbe von Stepper rückgängig machen
             if (selectedStepper != null)
                 selectedStepper.BackColor = SystemColors.Control;
-            stepper.BackColor = SystemColors.Highlight;
 
             selectedStepper = stepper;
 
+            // wenn kein Stepper ausgewählt StepperBox unsichtbar machen
+            if (stepper == null)
+            {
+                stepperBox.Visible = false;
+                return;
+            }
+
+            stepperBox.Visible = true;
             stepperBox.Text = string.Format(Properties.Resources.StepperInfo, selectedStepper.Stepper.X, selectedStepper.Stepper.Y);
+
+            stepper.BackColor = SystemColors.Highlight;
         }
 
         private void homeStepperButton_Click(object sender, EventArgs e)
@@ -155,33 +204,33 @@ namespace KugelmatikControl
 
         private void homeButton_Click(object sender, EventArgs e)
         {
-            Cluster.SendHome();
+            CurrentCluster.SendHome();
         }
 
         private void getDataButton_Click(object sender, EventArgs e)
         {
-            Cluster.SendGetData();
+            CurrentCluster.SendGetData();
         }
 
         private void moveToTopButton_Click(object sender, EventArgs e)
         {
-            Cluster.MoveAllStepper(0);
-            Cluster.SendData();
+            CurrentCluster.MoveAllStepper(0);
+            CurrentCluster.SendData(false, true);
         }
 
         private void infoButton_Click(object sender, EventArgs e)
         {
-            Cluster.SendInfo();
+            CurrentCluster.SendInfo();
         }
 
         private void stopButton_Click(object sender, EventArgs e)
         {
-            Cluster.SendStop();
+            CurrentCluster.SendStop();
         }
 
         private void configButton_Click(object sender, EventArgs e)
         {
-            Cluster.SendConfig(new ClusterConfig(Cluster.Kugelmatik.Config));
+            CurrentCluster.SendConfig(new ClusterConfig(CurrentCluster.Kugelmatik.Config));
         }
 
         private void blinkButton_Click(object sender, EventArgs e)
@@ -191,12 +240,12 @@ namespace KugelmatikControl
 
         private void greenToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Cluster.SendPacket(new PacketBlinkGreen(), false);
+            CurrentCluster.SendPacket(new PacketBlinkGreen(), false);
         }
 
         private void redToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Cluster.SendPacket(new PacketBlinkRed(), false);
+            CurrentCluster.SendPacket(new PacketBlinkRed(), false);
         }
     }
 }
