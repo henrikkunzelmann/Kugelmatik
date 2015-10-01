@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace KugelmatikLibrary
 {
+    /// <summary>
+    /// Stellt verschiedene mathematische Hilfsmethoden bereit.
+    /// </summary>
     public static class MathHelper
     {
         /// <summary>

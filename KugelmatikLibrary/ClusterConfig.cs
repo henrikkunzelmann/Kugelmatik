@@ -6,10 +6,24 @@ using System.Threading.Tasks;
 
 namespace KugelmatikLibrary
 {
+    /// <summary>
+    /// Stellt die Einstellung eines Clusters dar.
+    /// </summary>
     public class ClusterConfig : IEquatable<ClusterConfig>
     {
+        /// <summary>
+        /// Gibt den Schrittmodus zurück, welcher das Cluster benutzt.
+        /// </summary>
         public StepMode StepMode { get; private set; }
+
+        /// <summary>
+        /// Gibt die Wartezeit (Ticktime) zwischen zwei Schritten zurück.
+        /// </summary>
         public int TickTime { get; private set; }
+
+        /// <summary>
+        /// Gibt zurück, ob das Cluster die Bremse benutzt.
+        /// </summary>
         public bool UseBreak { get; private set; }
 
         public ClusterConfig()

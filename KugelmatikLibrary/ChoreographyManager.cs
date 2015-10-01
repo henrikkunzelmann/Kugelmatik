@@ -86,6 +86,9 @@ namespace KugelmatikLibrary
             IsDisposed = true;
         }
 
+        /// <summary>
+        /// Startet den ChoreographyManager.
+        /// </summary>
         public void Start()
         {
             if (IsDisposed)
@@ -98,6 +101,9 @@ namespace KugelmatikLibrary
             task.Start();
         }
 
+        /// <summary>
+        /// Stoppt den ChoreographyManager.
+        /// </summary>
         public void Stop()
         {
             if (IsDisposed)
@@ -115,6 +121,8 @@ namespace KugelmatikLibrary
                 for (int y = 0; y < Kugelmatik.Config.KugelmatikHeight * Cluster.Height; y++)
                     Kugelmatik.GetStepperByPosition(x, y).MoveTo(Choreography.GetHeight(Kugelmatik.Config, TimeSpan.Zero, x, y));
             Kugelmatik.SendData(true);
+
+            // warten bis alle Pakete bestätigt wurden
             while (Kugelmatik.AnyPacketsAcknowledgePending)
             {
                 Thread.Sleep(500);
@@ -124,24 +132,28 @@ namespace KugelmatikLibrary
             Thread.Sleep(5000); // warten bis alle Kugeln auf Anfang sind
 
             // Zeit messen
-            Stopwatch time = new Stopwatch();
+            Stopwatch time = new Stopwatch(); // gesammte Zeit
             time.Start();
-            Stopwatch frame = new Stopwatch();
+            Stopwatch frame = new Stopwatch(); // Zeit zwischen zwei Frames
             frame.Start();
 
             while (!cancellationToken.IsCancellationRequested)
             {
                 TimeSpan timeStamp = time.Elapsed;
+
+                // Daten setzen und zu den Clustern senden
                 for (int x = 0; x < Kugelmatik.Config.KugelmatikWidth * Cluster.Width; x++)
                     for (int y = 0; y < Kugelmatik.Config.KugelmatikHeight * Cluster.Height; y++)
                         Kugelmatik.GetStepperByPosition(x, y).MoveTo(Choreography.GetHeight(Kugelmatik.Config, timeStamp, x, y));
                 Kugelmatik.SendData();
 
+                // alle 2 Sekunden Ping senden
                 if ((int)timeStamp.TotalSeconds % 2 == 0)
                     Kugelmatik.SendPing();
 
-                int sleepTime = (int)(1000f / TargetFPS) - (int)frame.ElapsedMilliseconds; // berechnen wie lange der Thread schlafen soll um die TargetFPS zu erreichen
-                if (sleepTime > 0)
+                // berechnen wie lange der Thread schlafen soll um die TargetFPS zu erreichen
+                int sleepTime = (int)(1000f / TargetFPS) - (int)frame.ElapsedMilliseconds;
+                if (sleepTime > 0) 
                     Thread.Sleep(sleepTime);
 
                 FPS = (int)Math.Ceiling(1000f / frame.ElapsedMilliseconds);

@@ -18,6 +18,7 @@ namespace KugelmatikControl
         {
             InitializeComponent();
 
+            // Log Klasse vorbereiten 
             Log.OnFlushBuffer += Log_OnFlushBuffer;
             Log.FlushBuffer();
             Log.AutomaticFlush = true;

@@ -25,6 +25,7 @@ namespace KugelmatikControl
 
             InitializeComponent();
 
+            // UI initialisieren
             minHeight.Minimum = 0;
             minHeight.Maximum = Kugelmatik.Config.MaxHeight;
 
@@ -43,9 +44,11 @@ namespace KugelmatikControl
         {
             try
             {
+                // Zeit messen die ein Frame brauch zum Zeichnen
                 Stopwatch stopwatch = new Stopwatch();
                 stopwatch.Start();
 
+                // Minimum und Maximum Werte finden
                 int min = (int)minHeight.Value;
                 int max = (int)maxHeight.Value;
 
@@ -61,10 +64,15 @@ namespace KugelmatikControl
                 float minHeightValue = (float)min;
                 float maxHeightValue = (float)max - minHeightValue;
 
+                // Graphics vorbereiten
                 e.Graphics.Clear(SystemColors.Control);
                 e.Graphics.TranslateTransform(32, 32);
                 e.Graphics.ScaleTransform((float)scale.Value, (float)scale.Value);
+
+                // Outline zeichnen
                 e.Graphics.DrawRectangle(Pens.LightGreen, new Rectangle(0, 0, Kugelmatik.StepperCountX, Kugelmatik.StepperCountY));
+
+
                 for (int x = 0; x < Kugelmatik.StepperCountX; x++)
                     for (int y = 0; y < Kugelmatik.StepperCountY; y++)
                     {
@@ -85,6 +93,7 @@ namespace KugelmatikControl
 
                 stopwatch.Stop();
 
+                // Frame-Zeit anzeigen
                 Font font = new Font("Consolas", 12.0f);
                 e.Graphics.ResetTransform();
                 e.Graphics.DrawString(stopwatch.ElapsedMilliseconds + "ms", font, Brushes.Black, new PointF(8, 8));

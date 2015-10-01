@@ -29,11 +29,12 @@ namespace KugelmatikControl
             InitializeComponent();
             stepperBox.Visible = false;
 
-            const int padding = 2;
+            const int padding = 2; // Abstand zwischen zwei StepperControls
             int height = 0;
 
             steppers = new StepperControl[Cluster.Width * Cluster.Height];
 
+            // im folgenden wird über X und Y Koordinaten eine Tabelle erzeugt
             for (int y = 0; y < Cluster.Height; y++)
             {
                 Label labelRow = new Label();
@@ -104,7 +105,7 @@ namespace KugelmatikControl
             }
             catch(NullReferenceException)
             {
-                // weird PropertyGrid Exception
+                // komische PropertyGrid Exception
             }
 
             clusterBox.Text = string.Format(Properties.Resources.ClusterInfo,
