@@ -81,6 +81,8 @@ namespace KugelmatikLibrary
             {
                 if (cancellationToken != null)
                     cancellationToken.Dispose();
+                if (task != null)
+                    task.Dispose();
             }
 
             IsDisposed = true;
