@@ -25,8 +25,6 @@ namespace KugelmatikControl
             if (stepper == null)
                 throw new ArgumentNullException("stepper");
 
-            this.Stepper = stepper;
-
             InitializeComponent();
 
             // UI updaten
