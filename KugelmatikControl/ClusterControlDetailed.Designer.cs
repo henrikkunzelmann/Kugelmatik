@@ -32,7 +32,6 @@
             System.Windows.Forms.SplitContainer splitContainer1;
             this.splitContainer2 = new System.Windows.Forms.SplitContainer();
             this.clusterInfoGrid = new System.Windows.Forms.PropertyGrid();
-            this.steppersPanel = new System.Windows.Forms.Panel();
             this.blinkButton = new System.Windows.Forms.Button();
             this.configButton = new System.Windows.Forms.Button();
             this.stopButton = new System.Windows.Forms.Button();
@@ -49,6 +48,11 @@
             this.blinkContextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.greenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.redToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.steppersPanel = new System.Windows.Forms.Panel();
+            this.splitContainer3 = new System.Windows.Forms.SplitContainer();
+            this.label1 = new System.Windows.Forms.Label();
+            this.clusterHeight = new System.Windows.Forms.NumericUpDown();
+            this.clusterHeightTrackBar = new System.Windows.Forms.TrackBar();
             splitContainer1 = new System.Windows.Forms.SplitContainer();
             ((System.ComponentModel.ISupportInitialize)(splitContainer1)).BeginInit();
             splitContainer1.Panel1.SuspendLayout();
@@ -61,11 +65,18 @@
             this.stepperBox.SuspendLayout();
             this.clusterBox.SuspendLayout();
             this.blinkContextMenu.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer3)).BeginInit();
+            this.splitContainer3.Panel1.SuspendLayout();
+            this.splitContainer3.Panel2.SuspendLayout();
+            this.splitContainer3.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.clusterHeight)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.clusterHeightTrackBar)).BeginInit();
             this.SuspendLayout();
             // 
             // splitContainer1
             // 
             splitContainer1.Dock = System.Windows.Forms.DockStyle.Fill;
+            splitContainer1.FixedPanel = System.Windows.Forms.FixedPanel.Panel2;
             splitContainer1.IsSplitterFixed = true;
             splitContainer1.Location = new System.Drawing.Point(3, 19);
             splitContainer1.Name = "splitContainer1";
@@ -102,7 +113,7 @@
             // 
             // splitContainer2.Panel2
             // 
-            this.splitContainer2.Panel2.Controls.Add(this.steppersPanel);
+            this.splitContainer2.Panel2.Controls.Add(this.splitContainer3);
             this.splitContainer2.Size = new System.Drawing.Size(633, 319);
             this.splitContainer2.SplitterDistance = 173;
             this.splitContainer2.TabIndex = 1;
@@ -116,16 +127,6 @@
             this.clusterInfoGrid.Name = "clusterInfoGrid";
             this.clusterInfoGrid.Size = new System.Drawing.Size(173, 319);
             this.clusterInfoGrid.TabIndex = 0;
-            // 
-            // steppersPanel
-            // 
-            this.steppersPanel.AutoScroll = true;
-            this.steppersPanel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.steppersPanel.Location = new System.Drawing.Point(0, 0);
-            this.steppersPanel.Margin = new System.Windows.Forms.Padding(10);
-            this.steppersPanel.Name = "steppersPanel";
-            this.steppersPanel.Size = new System.Drawing.Size(456, 319);
-            this.steppersPanel.TabIndex = 0;
             // 
             // blinkButton
             // 
@@ -292,6 +293,65 @@
             this.redToolStripMenuItem.Text = "Red";
             this.redToolStripMenuItem.Click += new System.EventHandler(this.redToolStripMenuItem_Click);
             // 
+            // steppersPanel
+            // 
+            this.steppersPanel.AutoScroll = true;
+            this.steppersPanel.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.steppersPanel.Location = new System.Drawing.Point(0, 0);
+            this.steppersPanel.Margin = new System.Windows.Forms.Padding(10);
+            this.steppersPanel.Name = "steppersPanel";
+            this.steppersPanel.Size = new System.Drawing.Size(456, 253);
+            this.steppersPanel.TabIndex = 0;
+            // 
+            // splitContainer3
+            // 
+            this.splitContainer3.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.splitContainer3.FixedPanel = System.Windows.Forms.FixedPanel.Panel2;
+            this.splitContainer3.IsSplitterFixed = true;
+            this.splitContainer3.Location = new System.Drawing.Point(0, 0);
+            this.splitContainer3.Name = "splitContainer3";
+            this.splitContainer3.Orientation = System.Windows.Forms.Orientation.Horizontal;
+            // 
+            // splitContainer3.Panel1
+            // 
+            this.splitContainer3.Panel1.Controls.Add(this.steppersPanel);
+            // 
+            // splitContainer3.Panel2
+            // 
+            this.splitContainer3.Panel2.Controls.Add(this.clusterHeightTrackBar);
+            this.splitContainer3.Panel2.Controls.Add(this.clusterHeight);
+            this.splitContainer3.Panel2.Controls.Add(this.label1);
+            this.splitContainer3.Size = new System.Drawing.Size(456, 319);
+            this.splitContainer3.SplitterDistance = 253;
+            this.splitContainer3.TabIndex = 1;
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(10, 23);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(56, 15);
+            this.label1.TabIndex = 0;
+            this.label1.Text = "Cluster";
+            // 
+            // clusterHeight
+            // 
+            this.clusterHeight.Location = new System.Drawing.Point(82, 21);
+            this.clusterHeight.Name = "clusterHeight";
+            this.clusterHeight.Size = new System.Drawing.Size(120, 23);
+            this.clusterHeight.TabIndex = 1;
+            this.clusterHeight.ValueChanged += new System.EventHandler(this.clusterHeight_ValueChanged);
+            // 
+            // clusterHeightTrackBar
+            // 
+            this.clusterHeightTrackBar.Location = new System.Drawing.Point(211, 21);
+            this.clusterHeightTrackBar.Name = "clusterHeightTrackBar";
+            this.clusterHeightTrackBar.Size = new System.Drawing.Size(242, 45);
+            this.clusterHeightTrackBar.TabIndex = 2;
+            this.clusterHeightTrackBar.TickFrequency = 100;
+            this.clusterHeightTrackBar.TickStyle = System.Windows.Forms.TickStyle.None;
+            this.clusterHeightTrackBar.ValueChanged += new System.EventHandler(this.clusterHeightTrackBar_ValueChanged);
+            // 
             // ClusterControlDetailed
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -310,6 +370,13 @@
             this.stepperBox.ResumeLayout(false);
             this.clusterBox.ResumeLayout(false);
             this.blinkContextMenu.ResumeLayout(false);
+            this.splitContainer3.Panel1.ResumeLayout(false);
+            this.splitContainer3.Panel2.ResumeLayout(false);
+            this.splitContainer3.Panel2.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer3)).EndInit();
+            this.splitContainer3.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.clusterHeight)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.clusterHeightTrackBar)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -317,7 +384,6 @@
         #endregion
 
         private System.Windows.Forms.GroupBox clusterBox;
-        private System.Windows.Forms.Panel steppersPanel;
         private System.Windows.Forms.GroupBox stepperBox;
         private System.Windows.Forms.Button homeButton;
         private System.Windows.Forms.Button fixStepperButton;
@@ -335,5 +401,10 @@
         private System.Windows.Forms.ToolStripMenuItem redToolStripMenuItem;
         private System.Windows.Forms.PropertyGrid clusterInfoGrid;
         private System.Windows.Forms.SplitContainer splitContainer2;
+        private System.Windows.Forms.SplitContainer splitContainer3;
+        private System.Windows.Forms.Panel steppersPanel;
+        private System.Windows.Forms.TrackBar clusterHeightTrackBar;
+        private System.Windows.Forms.NumericUpDown clusterHeight;
+        private System.Windows.Forms.Label label1;
     }
 }

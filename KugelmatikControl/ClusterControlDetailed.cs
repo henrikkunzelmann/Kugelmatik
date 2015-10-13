@@ -112,6 +112,16 @@ namespace KugelmatikControl
             // Events setzen
             cluster.OnPingChange += UpdateClusterBox;
             cluster.OnInfoChange += UpdateClusterBox;
+
+            int avgHeight = (int)CurrentCluster.EnumerateSteppers().Average(s => s.Height);
+            clusterHeight.Value = avgHeight;
+            clusterHeightTrackBar.Value = avgHeight;
+
+            clusterHeight.Minimum = 0;
+            clusterHeight.Maximum = cluster.Kugelmatik.Config.MaxHeight;
+
+            clusterHeightTrackBar.Minimum = 0;
+            clusterHeightTrackBar.Maximum = cluster.Kugelmatik.Config.MaxHeight;
         }
 
         public IEnumerable<StepperControl> EnumerateStepperControls()
@@ -246,6 +256,18 @@ namespace KugelmatikControl
         private void redToolStripMenuItem_Click(object sender, EventArgs e)
         {
             CurrentCluster.SendPacket(new PacketBlinkRed(), false);
+        }
+
+        private void clusterHeight_ValueChanged(object sender, EventArgs e)
+        {
+            clusterHeightTrackBar.Value = (int)clusterHeight.Value;
+            CurrentCluster.MoveAllStepper((ushort)clusterHeight.Value);
+        }
+
+        private void clusterHeightTrackBar_ValueChanged(object sender, EventArgs e)
+        {
+            clusterHeight.Value = clusterHeightTrackBar.Value;
+            CurrentCluster.MoveAllStepper((ushort)clusterHeightTrackBar.Value);
         }
     }
 }
