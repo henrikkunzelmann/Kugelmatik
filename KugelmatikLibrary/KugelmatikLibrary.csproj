@@ -43,6 +43,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BusyCommand.cs" />
     <Compile Include="ChoreographyManager.cs" />
     <Compile Include="Cluster.cs" />
     <Compile Include="ClusterConfig.cs" />

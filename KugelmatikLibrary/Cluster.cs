@@ -769,12 +769,18 @@ namespace KugelmatikLibrary
 
                         byte buildVersion = reader.ReadByte();
 
-                        bool isRunningBusyCommand = false;
-                        if (buildVersion >= 8)
+                        BusyCommand currentBusyCommand = BusyCommand.None;
+                        if (buildVersion >= 11)
                         {
                             if (packet.Length < HeaderSize + 8)
                                 throw new InvalidDataException("Packet is not long enough.");
-                            isRunningBusyCommand = reader.ReadByte() > 0;
+                            currentBusyCommand = (BusyCommand)reader.ReadByte();
+                        }
+                        else if(buildVersion >= 8)
+                        {
+                            if (packet.Length < HeaderSize + 8)
+                                throw new InvalidDataException("Packet is not long enough.");
+                            currentBusyCommand = reader.ReadByte() > 0 ? BusyCommand.Unkown : BusyCommand.None;
                         }
 
                         int highestRevision = 0;
@@ -799,7 +805,7 @@ namespace KugelmatikLibrary
                             useBreak = reader.ReadByte() > 0;
                         }
 
-                        Info = new ClusterInfo(buildVersion, isRunningBusyCommand, highestRevision, new ClusterConfig((StepMode)stepMode, delayTime, useBreak));
+                        Info = new ClusterInfo(buildVersion, currentBusyCommand, highestRevision, new ClusterConfig((StepMode)stepMode, delayTime, useBreak));
                         RemovePacketToAcknowlegde(revision);
                         break;
                     default:
