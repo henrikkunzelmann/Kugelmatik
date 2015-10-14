@@ -22,6 +22,8 @@ namespace KugelmatikControl
         private StepperControl[] steppers;
         private StepperControl selectedStepper = null;
 
+        private bool updatingClusterHeight = false;
+
         public ClusterControlDetailed(Cluster cluster)
         {
             if (cluster == null)
@@ -113,15 +115,24 @@ namespace KugelmatikControl
             cluster.OnPingChange += UpdateClusterBox;
             cluster.OnInfoChange += UpdateClusterBox;
 
+            UpdateClusterHeight();
+        }
+
+        private void UpdateClusterHeight()
+        {
+            updatingClusterHeight = true;
+
             int avgHeight = (int)CurrentCluster.EnumerateSteppers().Average(s => s.Height);
             clusterHeight.Value = avgHeight;
             clusterHeightTrackBar.Value = avgHeight;
 
             clusterHeight.Minimum = 0;
-            clusterHeight.Maximum = cluster.Kugelmatik.Config.MaxHeight;
+            clusterHeight.Maximum = CurrentCluster.Kugelmatik.Config.MaxHeight;
 
             clusterHeightTrackBar.Minimum = 0;
-            clusterHeightTrackBar.Maximum = cluster.Kugelmatik.Config.MaxHeight;
+            clusterHeightTrackBar.Maximum = CurrentCluster.Kugelmatik.Config.MaxHeight;
+
+            updatingClusterHeight = false;
         }
 
         public IEnumerable<StepperControl> EnumerateStepperControls()
@@ -166,6 +177,14 @@ namespace KugelmatikControl
 
         private void ShowStepper(StepperControl stepper)
         {
+            // wenn kein Stepper ausgewählt StepperBox unsichtbar machen
+            if (stepper == null)
+            {
+                selectedStepper = null;
+                stepperBox.Visible = false;
+                return;
+            }
+
             if (selectedStepper == stepper)
                 return;
 
@@ -175,15 +194,9 @@ namespace KugelmatikControl
 
             selectedStepper = stepper;
 
-            // wenn kein Stepper ausgewählt StepperBox unsichtbar machen
-            if (stepper == null)
-            {
-                stepperBox.Visible = false;
-                return;
-            }
 
             stepperBox.Visible = true;
-            stepperBox.Text = string.Format(Properties.Resources.StepperInfo, selectedStepper.Stepper.X, selectedStepper.Stepper.Y);
+            stepperBox.Text = string.Format(Properties.Resources.StepperInfo, selectedStepper.Stepper.X + 1, selectedStepper.Stepper.Y + 1);
 
             stepper.BackColor = SystemColors.Highlight;
         }
@@ -203,29 +216,38 @@ namespace KugelmatikControl
         private void setClusterButton_Click(object sender, EventArgs e)
         {
             if (selectedStepper != null)
+            {
                 selectedStepper.Stepper.Cluster.MoveAllStepper(selectedStepper.Stepper.Height);
+                UpdateClusterHeight();
+            }
         }
 
         private void setKugelmatikButton_Click(object sender, EventArgs e)
         {
             if (selectedStepper != null)
+            {
                 selectedStepper.Stepper.Kugelmatik.MoveAllClusters(selectedStepper.Stepper.Height);
+                UpdateClusterHeight();
+            }
         }
 
         private void homeButton_Click(object sender, EventArgs e)
         {
             CurrentCluster.SendHome();
+            UpdateClusterHeight();
         }
 
         private void getDataButton_Click(object sender, EventArgs e)
         {
             CurrentCluster.SendGetData();
+            UpdateClusterHeight();
         }
 
         private void moveToTopButton_Click(object sender, EventArgs e)
         {
             CurrentCluster.MoveAllStepper(0);
             CurrentCluster.SendData(false, true);
+            UpdateClusterHeight();
         }
 
         private void infoButton_Click(object sender, EventArgs e)
@@ -260,12 +282,18 @@ namespace KugelmatikControl
 
         private void clusterHeight_ValueChanged(object sender, EventArgs e)
         {
+            if (updatingClusterHeight)
+                return;
+
             clusterHeightTrackBar.Value = (int)clusterHeight.Value;
             CurrentCluster.MoveAllStepper((ushort)clusterHeight.Value);
         }
 
         private void clusterHeightTrackBar_ValueChanged(object sender, EventArgs e)
         {
+            if (updatingClusterHeight)
+                return;
+
             clusterHeight.Value = clusterHeightTrackBar.Value;
             CurrentCluster.MoveAllStepper((ushort)clusterHeightTrackBar.Value);
         }
