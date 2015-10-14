@@ -10,22 +10,25 @@
 
 // Defines
 #define DEBUG
-#define ENABLE_LOG true // aktiviert den Log der im EEPROM Speicher erzeugt wird
+#define ENABLE_LOG false // aktiviert den Log der im EEPROM Speicher erzeugt wird
 
-#define BLINK_LED_ASYNC true
+#define BLINK_LED_ASYNC false
 #define WRITE_INTERSTRUCTION_POINTER false
 #define ENABLE_TIMER1 (BLINK_LED_ASYNC  || WRITE_INTERSTRUCTION_POINTER)
-#define DISABLE_INTERRUPTS (!ENABLE_TIMER1)
+#define ENABLE_WATCH_DOG false
+#define ENABLE_WATCH_DOG_SAVE true // gibt an ob nach einem Watch Dog Reset die Stepper Daten aus dem EEPROM gelesen werden sollen
 
-#define BUILD_VERSION 10
+#define DISABLE_INTERRUPTS (!ENABLE_TIMER1 || (ENABLE_WATCH_DOG && ENABLE_WATCH_DOG_SAVE))
+
+#define BUILD_VERSION 11
 
 #define LAN_ID 0x11 // ID des Boards im LAN, wird benutzt um die Mac-Adresse zu generieren
 static byte ethernetMac[] = { 0x74, 0x69, 0x69, 0x2D, 0x30, LAN_ID }; // Mac-Adresse des Boards
 
 
 #define TICK_TIME 2000
-#define HOME_TIME 5000
-#define FIX_TIME 5000
+#define HOME_TIME 4000
+#define FIX_TIME 4000
 
 #define ALLOW_STOP_BUSY true // gibt an ob der Client "busy"-Befehle beenden darf (z.B. Home)
 #define RECEIVE_PACKETS_BUSY true // gibt an ob der Client bei "busy"-Befehle Pakete empfängt
@@ -52,14 +55,16 @@ static byte ethernetMac[] = { 0x74, 0x69, 0x69, 0x2D, 0x30, LAN_ID }; // Mac-Adr
 
 // Includes
 #include <avr/pgmspace.h>
-#include <avr/wdt.h>
+#include <avr/wdt.h> 
+#include <avr/sleep.h>
+#include <avr/interrupt.h>
 #include <limits.h>
 #include <EtherCard.h>
 #include <EEPROM.h>
 #include <I2C.h>
 #include <MCP23017.h>
 #include <LiquidCrystal.h>
-#include "PacketTypes.h"
+#include "constants.h"
 
 struct StepperData
 {
@@ -322,8 +327,7 @@ void setAllSteps(int revision, unsigned short gotoSteps, byte waitTime)
         return blinkRedLedShort();
 
     for (int i = 0; i < MCP_COUNT; i++)
-        for (int j = 0; j < STEPPER_COUNT; j++)
-        {
+        for (int j = 0; j < STEPPER_COUNT; j++) {
             StepperData* stepper = &mcps[i].Steppers[j];
             if (checkRevision(stepper->LastRevision, revision))
             {
@@ -333,6 +337,39 @@ void setAllSteps(int revision, unsigned short gotoSteps, byte waitTime)
 				stepper->WaitTime = waitTime;
             }
         }
+}
+
+#define STEPPER_DATA_START 128 // Bytes, Adresse im EEPROM an dem Stepper Data anfangen soll
+
+// speichert die CurrentSteps der Stepper im EEPROM
+void saveStepData() {
+	updateEEPROM(STEPPER_DATA_START, 1); // speichern, dass Daten vorhanden sind
+	
+	int dataPointer = STEPPER_DATA_START + 1;
+	for (int i = 0; i < MCP_COUNT; i++) {
+		for (int j = 0; j < STEPPER_COUNT; j++) {
+			StepperData* stepper = &mcps[i].Steppers[j];
+			updateEEPROM(dataPointer++, stepper->CurrentSteps & 0xFF);
+			updateEEPROM(dataPointer++, (stepper->CurrentSteps >> 8) & 0xFF);
+		}
+	}
+}
+
+// versucht die CurrentSteps der Stepper aus dem EEPROM zu lesen
+boolean tryLoadStepData() {
+	if (EEPROM.read(STEPPER_DATA_START) != 1)
+		return false; // keine Daten vorhanden
+		
+	int dataPointer = STEPPER_DATA_START + 1;
+	for (int i = 0; i < MCP_COUNT; i++) {
+		for (int j = 0; j < STEPPER_COUNT; j++) {
+			StepperData* stepper = &mcps[i].Steppers[j];
+			stepper->CurrentSteps |= EEPROM.read(dataPointer++);
+			stepper->CurrentSteps |= EEPROM.read(dataPointer++) << 8;
+		}
+	}	
+	EEPROM.write(STEPPER_DATA_START, 0);
+	return true;
 }
 
 // liest einen int aus einem char-Array angefangen ab offset Bytes
@@ -386,7 +423,7 @@ byte stepMode = STEP_MODE;
 int tickTime = TICK_TIME;
 boolean useBreak = USE_BREAK;
 
-boolean busyCommandRunning = false;
+byte currentBusyCommand = BUSY_NONE;
 boolean stopBusyCommand = false;
 
 void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, const char* data, uint16_t len)
@@ -403,7 +440,7 @@ void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, c
     char packetType = data[4];
 	
 	// wenn ein busy-Befehl läuft dann werden nur Ping, Info und Stop verarbeitet
-	if (busyCommandRunning && packetType != PacketPing && packetType != PacketInfo && packetType != PacketStop)
+	if (currentBusyCommand != BUSY_NONE && packetType != PacketPing && packetType != PacketInfo && packetType != PacketStop)
 		return;
 		
 
@@ -605,7 +642,7 @@ void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, c
                         }
                     }
 
-				busyCommandRunning = true;
+				currentBusyCommand = BUSY_HOME;
                 // alle Stepper nach oben Fahren lassen
                 turnRedLedOn();
                 for (int i = 0; i < MAX_STEPS; i++)
@@ -623,7 +660,7 @@ void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, c
 						ether.packetLoop(ether.packetReceive());
 					#endif
                 }
-				busyCommandRunning = false;
+				currentBusyCommand = BUSY_NONE;
 				stopBusyCommand = false;
                 turnGreenLedOff();
                 turnRedLedOff();
@@ -679,7 +716,7 @@ void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, c
 					stepper->TickCount = 0;
 
 					turnRedLedOn();
-					busyCommandRunning = true;
+					currentBusyCommand = BUSY_FIX;
                     for (int i = 0; i < FIX_STEPS; i++)
                     {
 						if (stopBusyCommand)
@@ -695,27 +732,7 @@ void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, c
 						#endif
                     }
 					
-					// zweiter Teil kann extra gestoppt werden
-					stopBusyCommand = false;
-
-                    delay(1000);
-                    stepper->GotoSteps = 0; // wieder komplett hochfahren
-
-                    for (int i = 0; i < FIX_STEPS; i++)
-                    {
-						if (stopBusyCommand)
-							break;
-						if (i % 100 == 0)
-							toogleGreenLed();
-                        updateSteppers(true);
-                        usdelay(FIX_TIME); // langsam bewegen
-						
-						// Pakete empfangen
-						#if RECEIVE_PACKETS_BUSY
-							ether.packetLoop(ether.packetReceive());
-						#endif
-                    }
-					busyCommandRunning = false;
+					currentBusyCommand = BUSY_NONE;
 					stopBusyCommand = false;
 					turnGreenLedOff();
 					turnRedLedOff();
@@ -758,7 +775,7 @@ void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, c
 					stepper->WaitTime = 0; // WaitTime zurück setzen
 					stepper->TickCount = 0;
 
-					busyCommandRunning = true;
+					currentBusyCommand = BUSY_HOME_STEPPER;
 					turnRedLedOn();
                     for (int i = 0; i < MAX_STEPS; i++)
                     {
@@ -774,7 +791,7 @@ void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, c
 							ether.packetLoop(ether.packetReceive());
 						#endif
                     }
-					busyCommandRunning = false;
+					currentBusyCommand = BUSY_NONE;
 					stopBusyCommand = false;
 					turnGreenLedOff();
 					turnRedLedOff();
@@ -828,7 +845,7 @@ void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, c
 				int offsetData = HEADER_SIZE;
 				data[offsetData++] = BUILD_VERSION;
 				
-				data[offsetData++] = busyCommandRunning ? 1 : 0;
+				data[offsetData++] = currentBusyCommand;
 				
 				int highestRevision = INT_MIN;
 				for (int i = 0; i < MCP_COUNT; i++)
@@ -890,7 +907,7 @@ void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, c
 			break;
 		case PacketStop:
 			#ifdef ALLOW_STOP_BUSY
-				if (busyCommandRunning)
+				if (currentBusyCommand != BUSY_NONE)
 					stopBusyCommand = true;
 			#else
 				blinkBothLedsShort();
@@ -907,7 +924,7 @@ void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, c
 
 void setup()
 {
-    wdt_disable(); // Watch Dog deaktivieren, da er nicht benutzt wird und durch softReset() noch aktiviert sein kann
+	wdt_disable(); // Watch Dog deaktivieren, da er noch aktiviert sein kann
     printLogString("init");
 	
 	#if ENABLE_TIMER1
@@ -925,6 +942,8 @@ void setup()
 
     turnGreenLedOn();
     initAllMCPs();
+	
+	tryLoadStepData();
 
     delay(LAN_ID * 10); // Init verzögern damit das Netzwerk nicht überlastet wird
 
@@ -951,6 +970,14 @@ void setup()
     ether.udpServerListenOnPort(&onPacketReceive, PROTOCOL_PORT);
 
 	turnGreenLedOff();
+	
+	#if ENABLE_WATCH_DOG
+		wdt_enable(WDTO_2S);
+		
+		#if ENABLE_WATCH_DOG_SAVE
+			WDTCSR |= 1 << WDIE;
+		#endif
+	#endif
 }
 
 void updateSteppers(boolean alwaysUseHalfStep)
@@ -1049,7 +1076,9 @@ void loop()
 		#if BLINK_PACKET
 			turnGreenLedOff();
 		#endif
-	
+		
+		wdt_reset();
+		
 		// schauen ob wir die Stepper updaten müssen
 		unsigned long time = micros();
 		if (time < procStart) // overflow von micros() handeln
@@ -1087,4 +1116,16 @@ ISR(TIMER1_OVF_vect) {
 		}
 	#endif
 	tickCount++;
+}
+
+ISR(WDT_vect) {
+	turnRedLedOn();
+	wdt_disable();
+	
+	printLogString("watchdog");
+	#if ENABLE_WATCH_DOG_SAVE
+		saveStepData();
+	#endif
+	
+	softReset();
 }
