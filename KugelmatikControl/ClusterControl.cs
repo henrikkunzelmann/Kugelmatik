@@ -73,11 +73,13 @@ namespace KugelmatikControl
             {
                 clusterBox.Text = string.Format(Properties.Resources.ClusterInfo,
                     Cluster.X + 1, Cluster.Y + 1,
-                    Cluster.Ping == -1 ? "n/a" : (Cluster.Ping + "ms"),
+                    Cluster.IsOnline ? "n/a" : (Cluster.Ping + "ms"),
                     Cluster.Address);
 
                 infoText.Text = string.Format(Properties.Resources.ClusterInfoLong,
                     Cluster.Info == null ? "n/a" : Cluster.Info.BuildVersion.ToString());
+
+                SetClusterBoxColor(clusterBox, Cluster);
             }
         }
 
@@ -97,6 +99,35 @@ namespace KugelmatikControl
                 }
                 gridText.Text = builder.ToString();
             }
+        }
+
+        /// <summary>
+        /// Setzt die Farbe der GroupBox passend zum Status des Clusters.
+        /// </summary>
+        /// <param name="groupBox"></param>
+        /// <param name="cluster"></param>
+        public static void SetClusterBoxColor(GroupBox groupBox, Cluster cluster)
+        {
+            SetClusterBoxColor(groupBox, cluster.Ping);
+        }
+
+        /// <summary>
+        /// Setzt die Farbe der GroupBox passend zum Ping.
+        /// </summary>
+        /// <param name="groupBox"></param>
+        /// <param name="cluster"></param>
+        public static void SetClusterBoxColor(GroupBox groupBox, int ping)
+        {
+            if (ping >= 150)
+                groupBox.ForeColor = Color.DarkOrange;
+            else if (ping >= 0)
+                groupBox.ForeColor = Color.DarkGreen;
+            else
+                groupBox.ForeColor = Color.DarkRed;
+
+            // Farbe wieder zurücksetzen
+            foreach (Control c in groupBox.Controls)
+                c.ForeColor = SystemColors.ControlText;
         }
     }
 }

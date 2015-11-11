@@ -118,6 +118,14 @@ namespace KugelmatikLibrary
         }
 
         /// <summary>
+        /// Gibt true zurück, wenn das Cluster online ist.
+        /// </summary>
+        public bool IsOnline
+        {
+            get { return Ping >= 0; }
+        }
+
+        /// <summary>
         /// Wird aufgerufen wenn das Cluster verbunden ist.
         /// </summary>
         public event EventHandler OnConnected;
@@ -500,9 +508,11 @@ namespace KugelmatikLibrary
             if (IsDisposed)
                 throw new ObjectDisposedException(GetType().Name);
 
+            // Zeit zwischen zwei Pins ist zu lange her, wir können davon ausgehen, dass das Cluster offline ist
             if (Environment.TickCount - lastPing > 5000)
                 Ping = -1;
 
+            // StopWatch zum Messen der Zeit für die Pings starten
             if (!stopwatch.IsRunning)
                 stopwatch.Start();
 

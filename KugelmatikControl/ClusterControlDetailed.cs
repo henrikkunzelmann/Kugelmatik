@@ -166,13 +166,15 @@ namespace KugelmatikControl
             }
             catch(NullReferenceException)
             {
-                // komische PropertyGrid Exception
+                // komische PropertyGrid Exception ignorieren
             }
 
             clusterBox.Text = string.Format(Properties.Resources.ClusterInfo,
                 CurrentCluster.X + 1, CurrentCluster.Y + 1,
                 ping == -1 ? "offline" : (ping + "ms"),
                 CurrentCluster.Address);
+
+            ClusterControl.SetClusterBoxColor(clusterBox, ping);
         }
 
         private void ShowStepper(StepperControl stepper)
