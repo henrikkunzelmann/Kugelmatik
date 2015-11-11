@@ -36,7 +36,7 @@ namespace KugelmatikLibrary.Protocol
             if(writer == null)
                 throw new ArgumentNullException("writer");
 
-            writer.Write(0xDCBA);
+            writer.Write(MagicValue);
             writer.Write(Position.Value);
         }
     }

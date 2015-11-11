@@ -20,7 +20,7 @@
 
 #define DISABLE_INTERRUPTS (!ENABLE_TIMER1 || (ENABLE_WATCH_DOG && ENABLE_WATCH_DOG_SAVE))
 
-#define BUILD_VERSION 11
+#define BUILD_VERSION 12
 
 #define LAN_ID 0x11 // ID des Boards im LAN, wird benutzt um die Mac-Adresse zu generieren
 static byte ethernetMac[] = { 0x74, 0x69, 0x69, 0x2D, 0x30, LAN_ID }; // Mac-Adresse des Boards
@@ -96,6 +96,17 @@ byte stepperPosition[CLUSTER_WIDTH * CLUSTER_HEIGHT] = { 2, 3, 2, 3, 1, 1, 0, 1,
 // Buffer für die Ethernet Pakete
 byte Ethernet::buffer[ETHERNET_BUFFER_SIZE];
 
+#define HEADER_SIZE 9 // Größe des Paket-Headers in Bytes
+
+int configRevision = 0; // die letzte Revision für als die Config gesetzt wurde
+byte stepMode = STEP_MODE;
+int tickTime = TICK_TIME;
+boolean useBreak = USE_BREAK;
+
+byte currentBusyCommand = BUSY_NONE;
+boolean stopBusyCommand = false;
+byte lastError = ERROR_NONE;
+
 /// Funktionen für die LEDs
 boolean ledStateGreen = false; // Status der LED für LED_Green (grüne LED)
 boolean ledStateRed = false; // Status der LED für LED_Red (rote LED)
@@ -121,7 +132,7 @@ void toogleGreenLed()
     digitalWrite(LED_GREEN, ledStateGreen);
 }
 
-// läst die grüne Led kurzzeitig blinken
+// lässt die grüne Led kurzzeitig blinken
 void blinkGreenLedShort()
 {
     for (int i = 0; i < 5; i++)
@@ -301,11 +312,20 @@ boolean checkRevision(int lastRevision, int revision)
 void setStepper(int revision, byte x, byte y, unsigned short height, byte waitTime)
 {
     if (x < 0 || x >= CLUSTER_WIDTH)
-        return blinkRedLedShort();
+    {
+	    lastError = ERROR_X_INVALID;
+	    return blinkRedLedShort();
+    }
     if (y < 0 || y >= CLUSTER_HEIGHT)
-        return blinkRedLedShort();
-    if (height > MAX_STEPS)
-        return blinkRedLedShort();
+   {
+	   lastError = ERROR_Y_INVALID;
+	   return blinkRedLedShort();
+   }
+    if (height >= MAX_STEPS)
+    {
+	    lastError = ERROR_INVALID_HEIGHT;
+	    return blinkRedLedShort();
+    }
 
     int index = y * CLUSTER_WIDTH + x;
 
@@ -324,7 +344,10 @@ void setStepper(int revision, byte x, byte y, unsigned short height, byte waitTi
 void setAllSteps(int revision, unsigned short gotoSteps, byte waitTime)
 {
     if (gotoSteps >= MAX_STEPS)
+	{
+		lastError = ERROR_INVALID_HEIGHT;
         return blinkRedLedShort();
+	}
 
     for (int i = 0; i < MCP_COUNT; i++)
         for (int j = 0; j < STEPPER_COUNT; j++) {
@@ -375,12 +398,13 @@ boolean tryLoadStepData() {
 // liest einen int aus einem char-Array angefangen ab offset Bytes
 int readInt(const char* data, int offset)
 {
-	int val = 0;
+	return *(int*)(data + offset);
+	/*int val = 0;
     val |= data[offset];
     val |= data[offset + 1] << 8;
 	val |= data[offset + 2] << 16;
 	val |= data[offset + 3] << 24;
-    return val;
+    return val;*/
 }
 
 // liest einen unsigned short aus einem char-Array angefangen ab offset Bytes
@@ -416,16 +440,6 @@ void sendAckPacket(int revision)
     ether.makeUdpReply(packet, sizeof(packet), PROTOCOL_PORT);
 }
 
-#define HEADER_SIZE 9 // Größe des Paket-Headers in Bytes
-
-int configRevision = 0; // die letzte Revision für als die Config gesetzt wurde
-byte stepMode = STEP_MODE;
-int tickTime = TICK_TIME;
-boolean useBreak = USE_BREAK;
-
-byte currentBusyCommand = BUSY_NONE;
-boolean stopBusyCommand = false;
-
 void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, const char* data, uint16_t len)
 {
     // alle Kugelmatik V3 Pakete
@@ -459,7 +473,10 @@ void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, c
             break;
         case PacketStepper:
             if (len < HEADER_SIZE + 4)
+			{
+				lastError = ERROR_PACKET_TOO_SHORT;
                 return blinkGreenLedShort();
+			}
             else
             {
                 byte x = (data[offset] >> 4) & 0xF;
@@ -475,7 +492,10 @@ void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, c
             break;
         case PacketSteppers:
             if (len < HEADER_SIZE + 5)
-                return blinkGreenLedShort();
+            {
+	            lastError = ERROR_PACKET_TOO_SHORT;
+	            return blinkGreenLedShort();
+            }
             else
             {
                 byte length = data[offset];
@@ -487,7 +507,10 @@ void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, c
 				byte waitTime = data[offset++];
 
                 if (len < offset + length)
-                    return blinkGreenLedShort();
+                {
+	                lastError = ERROR_PACKET_TOO_SHORT;
+	                return blinkGreenLedShort();
+                }
 
                 for (int i = 0; i < length; i++)
                 {
@@ -501,14 +524,20 @@ void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, c
             break;
         case PacketSteppersArray:
             if (len < HEADER_SIZE + 1)
-                return blinkGreenLedShort();
+            {
+	            lastError = ERROR_PACKET_TOO_SHORT;
+	            return blinkGreenLedShort();
+            }
             else
             {
                 byte length = data[offset];
                 offset += 1;
 
                 if (len < offset + length * 4)
-                    return blinkGreenLedShort();
+				{
+					lastError = ERROR_PACKET_TOO_SHORT;
+					return blinkGreenLedShort();
+				}
 
                 for (int i = 0; i < length; i++)
                 {
@@ -527,7 +556,10 @@ void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, c
             break;
         case PacketSteppersRectangle:
             if (len < HEADER_SIZE + 2 + 3)
-                return blinkGreenLedShort();
+            {
+	            lastError = ERROR_PACKET_TOO_SHORT;
+	            return blinkGreenLedShort();
+            }
             else
             {
                 byte minX = data[offset] >> 4;
@@ -544,9 +576,15 @@ void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, c
 				byte waitTime = data[offset++];
 
                 if (minX < 0 || minY < 0 || maxX >= CLUSTER_WIDTH || maxY >= CLUSTER_HEIGHT)
-                    return blinkBothLedsShort();
+				{
+					lastError = ERROR_X_INVALID;
+					return blinkGreenLedShort();
+				}
                 if (minX > maxX || minY > maxY)
-                    return blinkBothLedsShort();
+				{
+					lastError = ERROR_Y_INVALID;
+					return blinkGreenLedShort();
+				}
 
                 for (byte x = minX; x <= maxX; x++)
                     for (byte y = minY; y <= maxY; y++)
@@ -555,7 +593,10 @@ void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, c
             break;
         case PacketSteppersRectangleArray:
             if (len < HEADER_SIZE + 2)
-                return blinkGreenLedShort();
+            {
+	            lastError = ERROR_PACKET_TOO_SHORT;
+	            return blinkGreenLedShort();
+            }
             else
             {
                 byte minX = data[offset] >> 4;
@@ -567,13 +608,22 @@ void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, c
                 offset += 1;
 
                 if (minX < 0 || minY < 0 || maxX >= CLUSTER_WIDTH || maxY >= CLUSTER_HEIGHT)
-                    return blinkBothLedsShort();
+				{
+					lastError = ERROR_X_INVALID;
+					return blinkGreenLedShort();
+				}
                 if (minX > maxX || minY > maxY)
-                    return blinkBothLedsShort();
+                {
+	                lastError = ERROR_Y_INVALID;
+	                return blinkGreenLedShort();
+                }
 
                 int area = (maxX - minX + 1) * (maxY - minY + 1); // +1, da max die letzte Kugel nicht beinhaltet
                 if (len < offset + 3 * area)
-                    return blinkGreenLedShort();
+                {
+	                lastError = ERROR_PACKET_TOO_SHORT;
+	                return blinkGreenLedShort();
+                }
 
 				// beide for-Schleifen müssen mit dem Client übereinstimmen sonst stimmen die Positionen nicht		
                 for (byte x = minX; x <= maxX; x++)
@@ -590,7 +640,10 @@ void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, c
             break;
         case PacketAllSteppers: 
             if (len < HEADER_SIZE + 3)
-                return blinkGreenLedShort();
+            {
+	            lastError = ERROR_PACKET_TOO_SHORT;
+	            return blinkGreenLedShort();
+            }
             else
             {
                 unsigned int height = readUnsignedShort(data, offset);
@@ -601,7 +654,10 @@ void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, c
             break;
         case PacketAllSteppersArray:
             if (len < HEADER_SIZE + 3 * CLUSTER_WIDTH * CLUSTER_HEIGHT)
-                return blinkGreenLedShort();
+            {
+	            lastError = ERROR_PACKET_TOO_SHORT;
+	            return blinkGreenLedShort();
+            }
             else
             {
                 // beide for-Schleifen müssen mit dem Client übereinstimmen sonst stimmen die Positionen nicht		
@@ -619,12 +675,18 @@ void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, c
             break;
         case PacketHome:
             if (len < HEADER_SIZE + 4)
-                return blinkGreenLedShort();
+            {
+	            lastError = ERROR_PACKET_TOO_SHORT;
+	            return blinkGreenLedShort();
+            }
             else
             {
                 // 0xABCD wird benutzt damit man nicht ausversehen das Home-Paket schickt (wenn man z.B. den Paket-Type verwechselt)
                 if (readInt(data, offset) != 0xABCD)
-                    return blinkBothLedsShort();
+                {
+	                lastError = ERROR_INVALID_MAGIC;
+	                return blinkBothLedsShort();
+                }
 
                 // gotoSteps auf -MAX_STEPS setzen damit alle Kugeln voll nach oben fahren (negative Steps sind eigentlich verboten)
                 for (int i = 0; i < MCP_COUNT; i++)
@@ -687,12 +749,18 @@ void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, c
             break;
         case PacketFix:
             if (len < HEADER_SIZE + 5)
-                return blinkGreenLedShort();
+            {
+	            lastError = ERROR_PACKET_TOO_SHORT;
+	            return blinkGreenLedShort();
+            }
             else
             {
                 // 0xDCBA wird benutzt damit man nicht ausversehen das Fix-Paket schickt (wenn man z.B. den Paket-Type verwechselt)
                 if (readInt(data, offset) != 0xDCBA)
-                    return blinkBothLedsShort();
+                {
+	                lastError = ERROR_INVALID_MAGIC;
+	                return blinkBothLedsShort();
+                }
                 offset += 4;
 
                 byte x = (data[offset] >> 4) & 0xF;
@@ -700,9 +768,15 @@ void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, c
                 offset += 1;
 
                 if (x < 0 || x >= CLUSTER_WIDTH)
-                    return blinkBothLedsShort();
+				{
+					lastError = ERROR_X_INVALID;
+					return blinkGreenLedShort();
+				}
                 if (y < 0 || y >= CLUSTER_HEIGHT)
-                    return blinkBothLedsShort();
+                {
+	                lastError = ERROR_Y_INVALID;
+	                return blinkGreenLedShort();
+                }
 
                 int index = y * CLUSTER_WIDTH + x;
                 MCPData* data = &mcps[mcpPosition[index]];
@@ -746,12 +820,18 @@ void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, c
             break;
         case PacketHomeStepper:
             if (len < HEADER_SIZE + 5)
-                return blinkGreenLedShort();
+            {
+	            lastError = ERROR_PACKET_TOO_SHORT;
+	            return blinkGreenLedShort();
+            }
             else
             {
                 // 0xDCBA wird benutzt damit man nicht ausversehen das HomeStepper-Paket schickt (wenn man z.B. den Paket-Type verwechselt)
                 if (readInt(data, offset) != 0xABCD)
-                    return blinkBothLedsShort();
+				{
+					lastError = ERROR_INVALID_MAGIC;
+					return blinkBothLedsShort();
+				}
                 offset += 4;
 
                 byte x = (data[offset] >> 4) & 0xF;
@@ -759,9 +839,15 @@ void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, c
                 offset += 1;
 
                 if (x < 0 || x >= CLUSTER_WIDTH)
-                    return blinkBothLedsShort();
+                {
+	                lastError = ERROR_X_INVALID;
+	                return blinkGreenLedShort();
+                }
                 if (y < 0 || y >= CLUSTER_HEIGHT)
-                    return blinkBothLedsShort();
+                {
+	                lastError = ERROR_Y_INVALID;
+	                return blinkGreenLedShort();
+                }
 
                 int index = y * CLUSTER_WIDTH + x;
                 MCPData* data = &mcps[mcpPosition[index]];
@@ -828,13 +914,16 @@ void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, c
 					}
 			
 				if (offsetData > sizeof(data))
+				{
+					lastError = ERROR_BUFFER_OVERFLOW;
 					error(1, "buffer overflow");
+				}
 				ether.makeUdpReply(data, sizeof(data), PROTOCOL_PORT); 
 			}
 			break;
 		case PacketInfo:
 			{
-				char data[HEADER_SIZE + 12];
+				char data[HEADER_SIZE + 13];
 				data[0] = 'K';
 				data[1] = 'K';
 				data[2] = 'S';
@@ -867,15 +956,23 @@ void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, c
 				offsetData += 4;
 				
 				data[offsetData++] = useBreak ? 1 : 0;
+				
+				data[offsetData++] = lastError;
 			
 				ether.makeUdpReply(data, sizeof(data), PROTOCOL_PORT);
 				if (offsetData > sizeof(data))
+				{
+					lastError = ERROR_BUFFER_OVERFLOW;
 					error(1, "buffer overflow");
+				}
 			}
 			break;
 		case PacketConfig:
 			if (len < HEADER_SIZE + 5)
+			{
+				lastError = ERROR_PACKET_TOO_SHORT;
 				return blinkGreenLedShort();
+			}
 			else
 			{
 				if (!checkRevision(configRevision, revision))
@@ -885,12 +982,18 @@ void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, c
 				
 				byte cStepMode = data[offset++];
 				if (cStepMode < 1 || cStepMode > 3)
+				{
+					lastError = ERROR_INVALID_CONFIG_VALUE;
 					return blinkBothLedsShort();
+				}
 					
 				int cTickTime = readInt(data, offset);
 				offset += 4;
 				if (cTickTime < 50 || cTickTime > 15000)
+				{
+					lastError = ERROR_INVALID_CONFIG_VALUE;
 					return blinkBothLedsShort();
+				}
 					
 				boolean cUseBreak = data[offset++] > 0;
 					
@@ -910,10 +1013,12 @@ void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, c
 				if (currentBusyCommand != BUSY_NONE)
 					stopBusyCommand = true;
 			#else
+				lastError = ERROR_NOT_RUNNING_BUSY;
 				blinkBothLedsShort();
 			#endif
 			break;
         default:
+			lastError = ERROR_UNKOWN_PACKET;
             return blinkRedLedShort();
     }
 	#if BLINK_PACKET

@@ -805,7 +805,15 @@ namespace KugelmatikLibrary
                             useBreak = reader.ReadByte() > 0;
                         }
 
-                        Info = new ClusterInfo(buildVersion, currentBusyCommand, highestRevision, new ClusterConfig((StepMode)stepMode, delayTime, useBreak));
+                        ErrorCode lastError = ErrorCode.None;
+                        if (buildVersion >= 12)
+                        {
+                            if (packet.Length < HeaderSize + 8)
+                                throw new InvalidDataException("Packet is not long enough.");
+                            lastError = (ErrorCode)reader.ReadByte();
+                        }
+
+                        Info = new ClusterInfo(buildVersion, currentBusyCommand, highestRevision, new ClusterConfig((StepMode)stepMode, delayTime, useBreak), lastError);
                         RemovePacketToAcknowlegde(revision);
                         break;
                     default:

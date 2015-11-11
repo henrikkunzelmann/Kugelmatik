@@ -122,15 +122,15 @@ namespace KugelmatikControl
         {
             updatingClusterHeight = true;
 
-            int avgHeight = (int)CurrentCluster.EnumerateSteppers().Average(s => s.Height);
-            clusterHeight.Value = avgHeight;
-            clusterHeightTrackBar.Value = avgHeight;
-
             clusterHeight.Minimum = 0;
             clusterHeight.Maximum = CurrentCluster.Kugelmatik.Config.MaxHeight;
 
             clusterHeightTrackBar.Minimum = 0;
             clusterHeightTrackBar.Maximum = CurrentCluster.Kugelmatik.Config.MaxHeight;
+
+            int avgHeight = (int)CurrentCluster.EnumerateSteppers().Average(s => s.Height);
+            clusterHeight.Value = avgHeight;
+            clusterHeightTrackBar.Value = avgHeight;
 
             updatingClusterHeight = false;
         }

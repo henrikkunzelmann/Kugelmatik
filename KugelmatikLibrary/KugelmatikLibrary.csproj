@@ -49,6 +49,7 @@
     <Compile Include="ClusterConfig.cs" />
     <Compile Include="ClusterInfo.cs" />
     <Compile Include="Config.cs" />
+    <Compile Include="ErrorCode.cs" />
     <Compile Include="FixedAddressProvider.cs" />
     <Compile Include="FunctionChoreography.cs" />
     <Compile Include="DistanceChoreography.cs" />
