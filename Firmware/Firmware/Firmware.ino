@@ -31,6 +31,7 @@ static byte ethernetMac[] = { 0x74, 0x69, 0x69, 0x2D, 0x30, LAN_ID }; // Mac-Adr
 #define FIX_TIME 4000
 
 #define ALLOW_STOP_BUSY true // gibt an ob der Client "busy"-Befehle beenden darf (z.B. Home)
+#define ALLOW_STOP_MOVE true // gibt an ob der Client die Bewegung stoppen darf
 #define RECEIVE_PACKETS_BUSY true // gibt an ob der Client bei "busy"-Befehle Pakete empfängt
 
 #define MCP_COUNT 8 // Anzahl der MCP Chips
@@ -63,7 +64,6 @@ static byte ethernetMac[] = { 0x74, 0x69, 0x69, 0x2D, 0x30, LAN_ID }; // Mac-Adr
 #include <EEPROM.h>
 #include <I2C.h>
 #include <MCP23017.h>
-#include <LiquidCrystal.h>
 #include "constants.h"
 
 struct StepperData
@@ -110,6 +110,7 @@ byte lastError = ERROR_NONE;
 /// Funktionen für die LEDs
 boolean ledStateGreen = false; // Status der LED für LED_Green (grüne LED)
 boolean ledStateRed = false; // Status der LED für LED_Red (rote LED)
+
 
 // setzt die grüne LED an
 void turnGreenLedOn()
@@ -228,6 +229,7 @@ void softReset()
 #define LOG_SIZE 512 // Größe des Logs in Bytes, wird diese Grenze überschritten dann gehen alle weiteren Zeichen wieder an den Anfang (LOG_BEGIN)
 
 int logPosition = 0;
+char _intToStringBuffer[12];
 
 void updateEEPROM(int position, byte val) {
 	if (EEPROM.read(position) != val)
@@ -259,6 +261,14 @@ void printLogCharArray(const char* array, word len)
     for (int i = 0; i < len; i++)
         printLog(array[i]);
     printLog(' ');
+}
+
+void printLogInt(int value) {
+	int count = sprintf(_intToStringBuffer, "%d", value);
+	if (count < 0)
+		return blinkRedLedShort();
+	
+	printLogCharArray(_intToStringBuffer, count);
 }
 
 // bringt den Chip in den Fehler-Modus und blockiert ihn 
@@ -317,10 +327,10 @@ void setStepper(int revision, byte x, byte y, unsigned short height, byte waitTi
 	    return blinkRedLedShort();
     }
     if (y < 0 || y >= CLUSTER_HEIGHT)
-   {
-	   lastError = ERROR_Y_INVALID;
-	   return blinkRedLedShort();
-   }
+	{
+		 lastError = ERROR_Y_INVALID;
+		return blinkRedLedShort();
+	}
     if (height >= MAX_STEPS)
     {
 	    lastError = ERROR_INVALID_HEIGHT;
@@ -398,39 +408,30 @@ boolean tryLoadStepData() {
 // liest einen int aus einem char-Array angefangen ab offset Bytes
 int readInt(const char* data, int offset)
 {
-	return *(int*)(data + offset);
-	/*int val = 0;
-    val |= data[offset];
-    val |= data[offset + 1] << 8;
-	val |= data[offset + 2] << 16;
-	val |= data[offset + 3] << 24;
-    return val;*/
+	 return *((int*)(data + offset));
 }
 
 // liest einen unsigned short aus einem char-Array angefangen ab offset Bytes
 unsigned short readUnsignedShort(const char* data, int offset)
 {
-    unsigned short val = 0;
-	val |= data[offset];
-	val |= data[offset + 1] << 8;
-	return val;
+    return *((unsigned short*)(data + offset));
 }
 
 // schreibt einen unsigned short in einen char-Array angefangen ab offset Bytes
 void writeUShort(char* data, int offset, unsigned short val)
 {
-	data[offset] = val & 0xFF;
-	data[offset + 1] = (val >> 8) & 0xFF;
+	data[offset] = (char)(val & 0x00FF);
+	data[offset + 1] = (char)((val & 0xFF00) >> 8);
 }
 
 
 // schreibt einen int in einen char-Array angefangen ab offset Bytes
 void writeInt(char* data, int offset, int val)
 {
-	data[offset] = val & 0xFF;
-	data[offset + 1] = (val >> 8) & 0xFF;
-	data[offset + 2] = (val >> 16) & 0xFF;
-	data[offset + 3] = (val >> 24) & 0xFF;
+	data[offset] = (char)(val & 0x000000FF);
+	data[offset + 1] = (char)((val & 0x0000FF00) >> 8);
+	data[offset + 2] = (char)((val & 0x00FF0000) >> 16);
+	data[offset + 3] = (char)((val & 0xFF000000) >> 24);
 }
 
 void sendAckPacket(int revision)
@@ -438,6 +439,39 @@ void sendAckPacket(int revision)
     char packet[] = { 'K', 'K', 'S', 0, PacketAck, 0, 0, 0, 0 };
     writeInt(packet, 5, revision);
     ether.makeUdpReply(packet, sizeof(packet), PROTOCOL_PORT);
+}
+
+void sendData(int revision)
+{
+	char data[HEADER_SIZE + CLUSTER_WIDTH * CLUSTER_HEIGHT * 3];
+	data[0] = 'K';
+	data[1] = 'K';
+	data[2] = 'S';
+	data[3] = 0;
+	data[4] = PacketGetData; // Paket-Type GetData
+	writeInt(data, 5, revision);
+	
+	int offsetData = HEADER_SIZE;
+	for (int x = 0; x < CLUSTER_WIDTH; x++)
+	for (int y = 0; y < CLUSTER_HEIGHT; y++)
+	{
+		int index = y * CLUSTER_WIDTH + x;
+		MCPData* mcp = &mcps[mcpPosition[index]];
+		StepperData* stepper = &mcp->Steppers[stepperPosition[index]];
+		writeUShort(data, offsetData, (unsigned short)stepper->CurrentSteps);
+		
+		offsetData += 2;
+		
+		data[offsetData++] = stepper->WaitTime;
+	}
+	
+	if (offsetData > sizeof(data))
+	{
+		lastError = ERROR_BUFFER_OVERFLOW;
+		blinkRedLedShort();
+		return;
+	}
+	ether.makeUdpReply(data, sizeof(data), PROTOCOL_PORT);
 }
 
 void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, const char* data, uint16_t len)
@@ -453,13 +487,12 @@ void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, c
     // erstes Byte nach dem Magicstring gibt den Paket-Typ an
     char packetType = data[4];
 	
+	// fortlaufende ID für die Pakete werden nach dem Magicstring und dem Paket-Typ geschickt
+	int revision = readInt(data, 5);
+	
 	// wenn ein busy-Befehl läuft dann werden nur Ping, Info und Stop verarbeitet
-	if (currentBusyCommand != BUSY_NONE && packetType != PacketPing && packetType != PacketInfo && packetType != PacketStop)
+	if (currentBusyCommand != BUSY_NONE && packetType != PacketPing && packetType != PacketInfo && packetType != PacketStop) 
 		return;
-		
-
-    // fortlaufende ID für die Pakete werden nach dem Magicstring und dem Paket-Typ geschickt
-    int revision = readInt(data, 5);
 
     // isGuaranteed gibt an ob der Sender eine Antwort erwartet
     if (isGuaranteed)
@@ -577,12 +610,12 @@ void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, c
 
                 if (minX < 0 || minY < 0 || maxX >= CLUSTER_WIDTH || maxY >= CLUSTER_HEIGHT)
 				{
-					lastError = ERROR_X_INVALID;
+					lastError = ERROR_INVALID_VALUE;
 					return blinkGreenLedShort();
 				}
                 if (minX > maxX || minY > maxY)
 				{
-					lastError = ERROR_Y_INVALID;
+					lastError = ERROR_INVALID_VALUE;
 					return blinkGreenLedShort();
 				}
 
@@ -607,16 +640,16 @@ void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, c
                 byte maxY = data[offset] & 0xF;
                 offset += 1;
 
-                if (minX < 0 || minY < 0 || maxX >= CLUSTER_WIDTH || maxY >= CLUSTER_HEIGHT)
+                if (minX < 0 || minX >= CLUSTER_WIDTH || minY < 0 || minY >= CLUSTER_HEIGHT)
 				{
-					lastError = ERROR_X_INVALID;
+					lastError = ERROR_INVALID_VALUE;
 					return blinkGreenLedShort();
 				}
-                if (minX > maxX || minY > maxY)
-                {
-	                lastError = ERROR_Y_INVALID;
-	                return blinkGreenLedShort();
-                }
+				if (minX > maxX || minY > maxY)
+				{
+					lastError = ERROR_INVALID_VALUE;
+					return blinkGreenLedShort();
+				}
 
                 int area = (maxX - minX + 1) * (maxY - minY + 1); // +1, da max die letzte Kugel nicht beinhaltet
                 if (len < offset + 3 * area)
@@ -682,9 +715,10 @@ void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, c
             else
             {
                 // 0xABCD wird benutzt damit man nicht ausversehen das Home-Paket schickt (wenn man z.B. den Paket-Type verwechselt)
-                if (readInt(data, offset) != 0xABCD)
+				int magic = readInt(data, offset);
+                if (magic != 0xABCD)
                 {
-	                lastError = ERROR_INVALID_MAGIC;
+					lastError = ERROR_INVALID_MAGIC;
 	                return blinkBothLedsShort();
                 }
 
@@ -756,7 +790,8 @@ void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, c
             else
             {
                 // 0xDCBA wird benutzt damit man nicht ausversehen das Fix-Paket schickt (wenn man z.B. den Paket-Type verwechselt)
-                if (readInt(data, offset) != 0xDCBA)
+				int magic = readInt(data, offset);
+                if (magic != 0xDCBA)
                 {
 	                lastError = ERROR_INVALID_MAGIC;
 	                return blinkBothLedsShort();
@@ -827,7 +862,8 @@ void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, c
             else
             {
                 // 0xDCBA wird benutzt damit man nicht ausversehen das HomeStepper-Paket schickt (wenn man z.B. den Paket-Type verwechselt)
-                if (readInt(data, offset) != 0xABCD)
+				int magic = readInt(data, offset);
+                if (magic != 0xABCD)
 				{
 					lastError = ERROR_INVALID_MAGIC;
 					return blinkBothLedsShort();
@@ -891,34 +927,7 @@ void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, c
             break;
 		case PacketGetData:
 			{
-				char data[HEADER_SIZE + CLUSTER_WIDTH * CLUSTER_HEIGHT * 3];
-				data[0] = 'K';
-				data[1] = 'K';
-				data[2] = 'S';
-				data[3] = 0; 
-				data[4] = PacketGetData; // Paket-Type GetData
-				writeInt(data, 5, revision);
-			
-				int offsetData = HEADER_SIZE;
-				for (int x = 0; x < CLUSTER_WIDTH; x++)
-					for (int y = 0; y < CLUSTER_HEIGHT; y++)
-					{
-						int index = y * CLUSTER_WIDTH + x;
-						MCPData* mcp = &mcps[mcpPosition[index]];
-						StepperData* stepper = &mcp->Steppers[stepperPosition[index]];
-						writeUShort(data, offsetData, (unsigned short)stepper->CurrentSteps);
-					
-						offsetData += 2;
-						
-						data[offsetData++] = stepper->WaitTime;
-					}
-			
-				if (offsetData > sizeof(data))
-				{
-					lastError = ERROR_BUFFER_OVERFLOW;
-					error(1, "buffer overflow");
-				}
-				ether.makeUdpReply(data, sizeof(data), PROTOCOL_PORT); 
+				sendData(revision);
 			}
 			break;
 		case PacketInfo:
@@ -952,6 +961,7 @@ void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, c
 				offsetData += 4;
 				
 				data[offsetData++] = stepMode;
+				
 				writeInt(data, offsetData, tickTime);
 				offsetData += 4;
 				
@@ -959,12 +969,14 @@ void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, c
 				
 				data[offsetData++] = lastError;
 			
-				ether.makeUdpReply(data, sizeof(data), PROTOCOL_PORT);
+		
 				if (offsetData > sizeof(data))
 				{
 					lastError = ERROR_BUFFER_OVERFLOW;
-					error(1, "buffer overflow");
+					blinkRedLedShort();
+					return;
 				}
+				ether.makeUdpReply(data, sizeof(data), PROTOCOL_PORT);
 			}
 			break;
 		case PacketConfig:
@@ -1009,12 +1021,21 @@ void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, c
 			blinkRedLedShort();
 			break;
 		case PacketStop:
-			#ifdef ALLOW_STOP_BUSY
+			#if ALLOW_STOP_BUSY
 				if (currentBusyCommand != BUSY_NONE)
 					stopBusyCommand = true;
-			#else
-				lastError = ERROR_NOT_RUNNING_BUSY;
-				blinkBothLedsShort();
+			#endif
+			#if ALLOW_STOP_MOVE
+				for (int i = 0; i < MCP_COUNT; i++)
+					for (int j = 0; j < STEPPER_COUNT; j++)  {
+						StepperData* stepper = &mcps[i].Steppers[j];
+							
+						// stoppen
+						stepper->GotoSteps = stepper->CurrentSteps;
+					}
+				
+				// Client informieren, dass es möglicherweise neue Daten gibt
+				sendData(revision);
 			#endif
 			break;
         default:
@@ -1192,6 +1213,7 @@ void loop()
 		if (time - procStart >= tickTime)
 			break;
 	}
+	
 	#if DISABLE_INTERRUPTS
 		interrupts();
 	#endif

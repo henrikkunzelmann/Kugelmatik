@@ -18,5 +18,6 @@ namespace KugelmatikLibrary
         NotRunningBusy = 7,
         InvalidConfigValue = 8,
         InvalidHeight = 9,
+        InvalidValue = 10,
     }
 }

@@ -827,7 +827,7 @@ namespace KugelmatikLibrary
                         RemovePacketToAcknowlegde(revision);
                         break;
                     default:
-                        throw new InvalidDataException("Invalid packet type to get sent by cluster.");
+                        throw new InvalidDataException("Invalid packet type sent by cluster.");
                 }
             }
         }
