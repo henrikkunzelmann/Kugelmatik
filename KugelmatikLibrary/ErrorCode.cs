@@ -17,5 +17,6 @@ namespace KugelmatikLibrary
         UnkownPacket = 6,
         NotRunningBusy = 7,
         InvalidConfigValue = 8,
+        InvalidHeight = 9,
     }
 }
