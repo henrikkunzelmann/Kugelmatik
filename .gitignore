@@ -196,4 +196,4 @@ FakesAssemblies/
 *.opt
 /Firmware/Visual Micro
 /*.atsuo
-Firmware.cppproj
+__vm
