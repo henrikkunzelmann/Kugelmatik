@@ -74,7 +74,7 @@ namespace KugelmatikControl
                 clusterBox.Text = string.Format(Properties.Resources.ClusterInfo,
                     Cluster.X + 1, Cluster.Y + 1,
                     Cluster.IsOnline ? (Cluster.Ping + "ms") : "n/a",
-                    Cluster.Address);
+                    Cluster.Address == null ? "none" : Cluster.Address.ToString());
 
                 infoText.Text = string.Format(Properties.Resources.ClusterInfoLong,
                     Cluster.Info == null ? "n/a" : Cluster.Info.BuildVersion.ToString());

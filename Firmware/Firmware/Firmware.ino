@@ -9,44 +9,48 @@
 //  L293DNE
 
 // Defines
+#define BUILD_VERSION 13
 #define DEBUG
 #define ENABLE_LOG false // aktiviert den Log der im EEPROM Speicher erzeugt wird
 
-#define BLINK_LED_ASYNC false
-#define WRITE_INTERSTRUCTION_POINTER false
+
+#define BLINK_LED_ASYNC false // gibt an ob die LED async blinken soll, also unabhängig davon was die Firmware gerade macht
+#define WRITE_INTERSTRUCTION_POINTER false // gibt an ob der aktuelle Instruction Pointer gespeichert werden soll (experimentell)
 #define ENABLE_TIMER1 (BLINK_LED_ASYNC  || WRITE_INTERSTRUCTION_POINTER)
-#define ENABLE_WATCH_DOG false
-#define ENABLE_WATCH_DOG_SAVE true // gibt an ob nach einem Watch Dog Reset die Stepper Daten aus dem EEPROM gelesen werden sollen
 
-#define DISABLE_INTERRUPTS (!ENABLE_TIMER1 || (ENABLE_WATCH_DOG && ENABLE_WATCH_DOG_SAVE))
+#define ENABLE_WATCH_DOG true		// gibt an ob der WatchDog aktiviert sein soll, der Chip wird resetet wenn er sich aufhängt
+#define ENABLE_WATCH_DOG_SAVE false // WIP, WIRD NICHT UNTERSTÜTZT; gibt an ob nach einem Watch Dog Reset die Stepper Daten aus dem EEPROM gelesen werden sollen
 
-#define BUILD_VERSION 12
+#define ENABLE_INTERRUPTS true // gibt an ob die Interrupts immer an sein sollen
+
+
+#define _DISABLE_INTERRUPTS (!ENABLE_INTERRUPTS && (!ENABLE_TIMER1 || (ENABLE_WATCH_DOG && ENABLE_WATCH_DOG_SAVE)))
 
 #define LAN_ID 0x11 // ID des Boards im LAN, wird benutzt um die Mac-Adresse zu generieren
 static byte ethernetMac[] = { 0x74, 0x69, 0x69, 0x2D, 0x30, LAN_ID }; // Mac-Adresse des Boards
 
 
 #define TICK_TIME 2000
-#define HOME_TIME 4000
-#define FIX_TIME 4000
+#define HOME_TIME 3500
+#define FIX_TIME 3500
 
-#define ALLOW_STOP_BUSY true // gibt an ob der Client "busy"-Befehle beenden darf (z.B. Home)
-#define ALLOW_STOP_MOVE true // gibt an ob der Client die Bewegung stoppen darf
-#define RECEIVE_PACKETS_BUSY true // gibt an ob der Client bei "busy"-Befehle Pakete empfängt
+#define ALLOW_STOP_BUSY true		// gibt an ob der Client "busy"-Befehle beenden darf (z.B. Home)
+#define ALLOW_STOP_MOVE true		// gibt an ob der Client die Bewegung stoppen darf
+#define RECEIVE_PACKETS_BUSY true	// gibt an ob der Client bei "busy"-Befehle Pakete empfängt
 
-#define MCP_COUNT 8 // Anzahl der MCP Chips
-#define STEPPER_COUNT 4 // Anzahl der Stepper pro MCP Chip
+#define MCP_COUNT 8			// Anzahl der MCP Chips
+#define STEPPER_COUNT 4		// Anzahl der Stepper pro MCP Chip
 
-#define CLUSTER_WIDTH 5 // Anzahl Stepper in der Breite (X)
-#define CLUSTER_HEIGHT 6 // Anzahl Stepper in der Höhe (Y)
+#define CLUSTER_WIDTH 5		// Anzahl Stepper in der Breite (X)
+#define CLUSTER_HEIGHT 6	// Anzahl Stepper in der Höhe (Y)
 
-#define STEP_MODE 1 // 1 = Half Step, 2 = Full Step, 3 = Both
-#define MAX_STEPS 8000 // Maximale Anzahl an Steps die die Firmware maximal machen darf (nach unten)
-#define FIX_STEPS 20000 // Steps die ein Stepper macht um einen Stepper zu fixen
-#define USE_BREAK false // Wenn true, dann bremsen die Schrittmotoren
+#define STEP_MODE 1			// 1 = Half Step, 2 = Full Step, 3 = Both
+#define MAX_STEPS 8000		// Maximale Anzahl an Steps die die Firmware maximal machen darf (nach unten)
+#define FIX_STEPS 20000		// Steps die ein Stepper macht um einen Stepper zu fixen
+#define USE_BREAK false		// Wenn true, dann bremsen die Schrittmotoren
 
-#define LED_GREEN 2 // Port für grüne LED (Pin 4 SUBD)
-#define LED_RED 3 // Port für rote LED (Pin 5 SUBD)
+#define LED_GREEN 2		// Port für grüne LED (Pin 4 SUBD)
+#define LED_RED 3		// Port für rote LED (Pin 5 SUBD)
 
 #define BLINK_PACKET false // Wenn true, dann blinkt die grüne Led wenn ein Kugelmatik Paket verarbeitet wird
 
@@ -68,25 +72,25 @@ static byte ethernetMac[] = { 0x74, 0x69, 0x69, 0x2D, 0x30, LAN_ID }; // Mac-Adr
 
 struct StepperData
 {
-    int LastRevision; // letzte Revision der Daten
-    int CurrentSteps; // derzeitige Schritte die der Motor gemacht hat
-    int GotoSteps; // Schritte zu der der Motor gehen soll
-    byte CurrentStepIndex; // derzeitiger Stepper Wert Index, siehe stepsStepper
-	int TickCount; // derzeitige Tick Anzahl, wenn kleiner als 0 dann wird ein Schritt gemacht und die Variable auf WaitTime gesetzt
-	byte WaitTime; // Wert für TickCount nach jedem Schritt
+    int32_t LastRevision;	// letzte Revision der Daten
+    int32_t CurrentSteps;	// derzeitige Schritte die der Motor gemacht hat
+    int32_t GotoSteps;		// Schritte zu der der Motor gehen soll
+    byte CurrentStepIndex;	// derzeitiger Stepper Wert Index, siehe stepsStepper
+	int32_t TickCount;		// derzeitige Tick Anzahl, wenn kleiner als 0 dann wird ein Schritt gemacht und die Variable auf WaitTime gesetzt
+	byte WaitTime;			// Wert für TickCount nach jedem Schritt
 };
 
 struct MCPData
 {
     StepperData Steppers[STEPPER_COUNT]; // Schrittmotoren pro MCP
-    int MCPAddress;
+    byte MCPAddress;
     MCP23017 MCP;
 }
 mcps[MCP_COUNT];
 
 // Anweisung die der Schrittmotor machen soll
 #define STEPPER_STEP_COUNT 8 // es gibt 8 Anweisungen für den Schrittmotor, siehe stepsStepper
-int stepsStepper[STEPPER_STEP_COUNT] = { 0x05, 0x04, 0x06, 0x02, 0x0A, 0x08, 0x09, 0x01 };
+byte stepsStepper[STEPPER_STEP_COUNT] = { 0x05, 0x04, 0x06, 0x02, 0x0A, 0x08, 0x09, 0x01 };
 
 // geben die Position des MCPs und des Steppers für jede Kugel an
 // erster Index ist die linke untere Kugel, siehe "Cluster_Kugelpositionen.pdf" in "Handbücher"
@@ -98,9 +102,9 @@ byte Ethernet::buffer[ETHERNET_BUFFER_SIZE];
 
 #define HEADER_SIZE 9 // Größe des Paket-Headers in Bytes
 
-int configRevision = 0; // die letzte Revision für als die Config gesetzt wurde
+int32_t configRevision = 0; // die letzte Revision als die Config gesetzt wurde
 byte stepMode = STEP_MODE;
-int tickTime = TICK_TIME;
+int32_t tickTime = TICK_TIME;
 boolean useBreak = USE_BREAK;
 
 byte currentBusyCommand = BUSY_NONE;
@@ -136,7 +140,7 @@ void toogleGreenLed()
 // lässt die grüne Led kurzzeitig blinken
 void blinkGreenLedShort()
 {
-    for (int i = 0; i < 5; i++)
+    for (byte i = 0; i < 5; i++)
     {
         turnGreenLedOn();
         delay(200);
@@ -169,44 +173,19 @@ void toogleRedLed()
 // läst die rote Led kurzzeitig blinken
 void blinkRedLedShort()
 {
-    for (int i = 0; i < 5; i++)
+    for (byte i = 0; i < 5; i++)
     {
         turnRedLedOn();
         delay(200);
         turnRedLedOff();
         delay(200);
-    }
-}
-
-// lässt die rote Led dauerhaft blinken, wird benutzt um einen Fehler zu zeigen
-// code gibt ein "Morse-Code" an, d.h. Bit 0 ist kurz und Bit 1 ist lang, nur die 4 niedrigsten Bits werden benutzt
-void blinkRedLed(byte code)
-{
-    wdt_disable(); // Watch Dog deaktivieren damit die Endlosschleife dauerhaft läuft
-    int codeIndex = 0;
-    while (true)
-    {
-        turnRedLedOn();
-
-        if (code & (1 << codeIndex) > 0)
-            delay(2000);
-        else
-            delay(500);
-
-        turnRedLedOff();
-
-        delay(500);
-
-        codeIndex++;
-        if (codeIndex >= 4)
-            codeIndex = 0;
     }
 }
 
 // lässt beide LEDs kurzzeitig blinken
 void blinkBothLedsShort()
 {
-    for (int i = 0; i < 5; i++)
+    for (byte i = 0; i < 5; i++)
     {
         turnRedLedOn();
         turnGreenLedOn();
@@ -220,18 +199,18 @@ void blinkBothLedsShort()
 // setzt den Chip zurück
 void softReset()
 {
-    wdt_enable(WDTO_2S); // Watch Dog aktivieren damit der Chip resetet wird
-    while (true) ; // in Endlosschleife gehen damit der Watch Dog den Chip resetet
+    wdt_enable(WDTO_2S);	// Watch Dog aktivieren damit der Chip zurück gesetzt wird
+    while (true) ;			// in Endlosschleife gehen damit der Watch Dog den Chip resetet
 }
 
 // folgende Funktionen schreiben Bytes oder Strings in den EEPROM-Speicher um einfache Troubleshooting-Infos zu bringen
 #define LOG_BEGIN 32 // ab wann der Log im EEPROM-Speicher beginnen soll (in Bytes)
 #define LOG_SIZE 512 // Größe des Logs in Bytes, wird diese Grenze überschritten dann gehen alle weiteren Zeichen wieder an den Anfang (LOG_BEGIN)
 
-int logPosition = 0;
+int32_t logPosition = 0;
 char _intToStringBuffer[12];
 
-void updateEEPROM(int position, byte val) {
+void updateEEPROM(int32_t position, byte val) {
 	if (EEPROM.read(position) != val)
 		EEPROM.write(position, val);
 }
@@ -250,19 +229,20 @@ void printLog(byte val)
 // schreibt einen nullterminierten String in den Log ('\0')
 void printLogString(char* str)
 {
-    for (int i = 0; str[i] != '\0'; i++)
+    for (int32_t i = 0; str[i] != '\0'; i++)
         printLog(str[i]);
     printLog(' ');
 }
 
 // schreibt aus einem char-Array len Bytes in den Log
-void printLogCharArray(const char* array, word len)
+void printLogCharArray(const char* array, int32_t len)
 {
-    for (int i = 0; i < len; i++)
+    for (int32_t i = 0; i < len; i++)
         printLog(array[i]);
     printLog(' ');
 }
 
+// schreibt einen Integer-Wert in den Log
 void printLogInt(int value) {
 	int count = sprintf(_intToStringBuffer, "%d", value);
 	if (count < 0)
@@ -275,17 +255,19 @@ void printLogInt(int value) {
 void error(byte code, char* message)
 {
     printLogString(message);
-    blinkRedLed(code);
-    // Endlosschleife von blinkRedLed
+    while(true) {
+		toogleRedLed();
+		delay(500);
+	}
 }
 
 // initialisiert einen MCP
-void initMCP(int index)
+void initMCP(byte index)
 {
     MCPData* data = &mcps[index];
     data->MCPAddress = index;
 
-    for (int i = 0; i < STEPPER_COUNT; i++)
+    for (byte i = 0; i < STEPPER_COUNT; i++)
     {
         StepperData* stepper = &data->Steppers[i];
         stepper->LastRevision = 0;
@@ -306,12 +288,12 @@ void initMCP(int index)
 // initialisiert alle MCPs
 void initAllMCPs()
 {
-    for (int i = 0; i < MCP_COUNT; i++)
+    for (byte i = 0; i < MCP_COUNT; i++)
         initMCP(i);
 }
 
 // gibt true zurück wenn revision neuer ist als lastRevision
-boolean checkRevision(int lastRevision, int revision)
+boolean checkRevision(int32_t lastRevision, int32_t revision)
 {
     if (lastRevision >= 0 && revision < 0) // Overflow handeln
         return true;
@@ -319,7 +301,7 @@ boolean checkRevision(int lastRevision, int revision)
 }
 
 // setzt einen Stepper auf eine bestimmte Höhe
-void setStepper(int revision, byte x, byte y, unsigned short height, byte waitTime)
+void setStepper(int32_t revision, byte x, byte y, uint16_t height, byte waitTime)
 {
     if (x < 0 || x >= CLUSTER_WIDTH)
     {
@@ -328,7 +310,7 @@ void setStepper(int revision, byte x, byte y, unsigned short height, byte waitTi
     }
     if (y < 0 || y >= CLUSTER_HEIGHT)
 	{
-		 lastError = ERROR_Y_INVALID;
+		lastError = ERROR_Y_INVALID;
 		return blinkRedLedShort();
 	}
     if (height >= MAX_STEPS)
@@ -337,7 +319,7 @@ void setStepper(int revision, byte x, byte y, unsigned short height, byte waitTi
 	    return blinkRedLedShort();
     }
 
-    int index = y * CLUSTER_WIDTH + x;
+    byte index = y * CLUSTER_WIDTH + x;
 
     MCPData* data = &mcps[mcpPosition[index]];
     StepperData* stepper = &data->Steppers[stepperPosition[index]];
@@ -351,7 +333,7 @@ void setStepper(int revision, byte x, byte y, unsigned short height, byte waitTi
 }
 
 // setzt alle Schrittmotoren auf eine bestimmte Höhe
-void setAllSteps(int revision, unsigned short gotoSteps, byte waitTime)
+void setAllSteps(int32_t revision, uint16_t gotoSteps, byte waitTime)
 {
     if (gotoSteps >= MAX_STEPS)
 	{
@@ -359,8 +341,8 @@ void setAllSteps(int revision, unsigned short gotoSteps, byte waitTime)
         return blinkRedLedShort();
 	}
 
-    for (int i = 0; i < MCP_COUNT; i++)
-        for (int j = 0; j < STEPPER_COUNT; j++) {
+    for (byte i = 0; i < MCP_COUNT; i++)
+        for (byte j = 0; j < STEPPER_COUNT; j++) {
             StepperData* stepper = &mcps[i].Steppers[j];
             if (checkRevision(stepper->LastRevision, revision))
             {
@@ -372,15 +354,27 @@ void setAllSteps(int revision, unsigned short gotoSteps, byte waitTime)
         }
 }
 
+// setzt alle Werte aller Stepper so, dass sie aufhören sich zu bewegen
+void stopMove() {
+	for (byte i = 0; i < MCP_COUNT; i++) {
+		for (byte j = 0; j < STEPPER_COUNT; j++)  {
+			StepperData* stepper = &mcps[i].Steppers[j];
+		
+			// stoppen
+			stepper->GotoSteps = stepper->CurrentSteps;
+		}	
+	}
+}
+
 #define STEPPER_DATA_START 128 // Bytes, Adresse im EEPROM an dem Stepper Data anfangen soll
 
 // speichert die CurrentSteps der Stepper im EEPROM
 void saveStepData() {
 	updateEEPROM(STEPPER_DATA_START, 1); // speichern, dass Daten vorhanden sind
 	
-	int dataPointer = STEPPER_DATA_START + 1;
-	for (int i = 0; i < MCP_COUNT; i++) {
-		for (int j = 0; j < STEPPER_COUNT; j++) {
+	int32_t dataPointer = STEPPER_DATA_START + 1;
+	for (byte i = 0; i < MCP_COUNT; i++) {
+		for (byte j = 0; j < STEPPER_COUNT; j++) {
 			StepperData* stepper = &mcps[i].Steppers[j];
 			updateEEPROM(dataPointer++, stepper->CurrentSteps & 0xFF);
 			updateEEPROM(dataPointer++, (stepper->CurrentSteps >> 8) & 0xFF);
@@ -393,9 +387,9 @@ boolean tryLoadStepData() {
 	if (EEPROM.read(STEPPER_DATA_START) != 1)
 		return false; // keine Daten vorhanden
 		
-	int dataPointer = STEPPER_DATA_START + 1;
-	for (int i = 0; i < MCP_COUNT; i++) {
-		for (int j = 0; j < STEPPER_COUNT; j++) {
+	int32_t dataPointer = STEPPER_DATA_START + 1;
+	for (byte i = 0; i < MCP_COUNT; i++) {
+		for (byte j = 0; j < STEPPER_COUNT; j++) {
 			StepperData* stepper = &mcps[i].Steppers[j];
 			stepper->CurrentSteps |= EEPROM.read(dataPointer++);
 			stepper->CurrentSteps |= EEPROM.read(dataPointer++) << 8;
@@ -405,43 +399,43 @@ boolean tryLoadStepData() {
 	return true;
 }
 
-// liest einen int aus einem char-Array angefangen ab offset Bytes
-int readInt(const char* data, int offset)
+// liest einen unsigned short aus einem char-Array angefangen ab offset Bytes
+uint16_t readUInt16(const char* data, int32_t offset)
 {
-	 return *((int*)(data + offset));
+	uint16_t val = 0;
+	memcpy(&val, data + offset, sizeof(uint16_t));
+	return val;
 }
 
-// liest einen unsigned short aus einem char-Array angefangen ab offset Bytes
-unsigned short readUnsignedShort(const char* data, int offset)
+// liest einen int aus einem char-Array angefangen ab offset Bytes
+int32_t readInt32(const char* data, int32_t offset)
 {
-    return *((unsigned short*)(data + offset));
+	 int32_t val = 0;
+	 memcpy(&val, data + offset, sizeof(int32_t));
+	 return val;
 }
 
 // schreibt einen unsigned short in einen char-Array angefangen ab offset Bytes
-void writeUShort(char* data, int offset, unsigned short val)
+void writeUInt16(char* data, int32_t offset, const uint16_t val)
 {
-	data[offset] = (char)(val & 0x00FF);
-	data[offset + 1] = (char)((val & 0xFF00) >> 8);
+	memcpy(data + offset, &val, sizeof(uint16_t));
 }
 
 
 // schreibt einen int in einen char-Array angefangen ab offset Bytes
-void writeInt(char* data, int offset, int val)
+void writeInt32(char* data, int32_t offset, const int32_t val)
 {
-	data[offset] = (char)(val & 0x000000FF);
-	data[offset + 1] = (char)((val & 0x0000FF00) >> 8);
-	data[offset + 2] = (char)((val & 0x00FF0000) >> 16);
-	data[offset + 3] = (char)((val & 0xFF000000) >> 24);
+	memcpy(data + offset, &val, sizeof(int32_t));
 }
 
-void sendAckPacket(int revision)
+void sendAckPacket(int32_t  revision)
 {
-    char packet[] = { 'K', 'K', 'S', 0, PacketAck, 0, 0, 0, 0 };
-    writeInt(packet, 5, revision);
+    char packet[] = { 'K', 'K', 'S', 0, PacketAck, 0xDE, 0xAD, 0xBE, 0xEF };
+    writeInt32(packet, 5, revision);
     ether.makeUdpReply(packet, sizeof(packet), PROTOCOL_PORT);
 }
 
-void sendData(int revision)
+void sendData(int32_t  revision)
 {
 	char data[HEADER_SIZE + CLUSTER_WIDTH * CLUSTER_HEIGHT * 3];
 	data[0] = 'K';
@@ -449,20 +443,21 @@ void sendData(int revision)
 	data[2] = 'S';
 	data[3] = 0;
 	data[4] = PacketGetData; // Paket-Type GetData
-	writeInt(data, 5, revision);
+	writeInt32(data, 5, revision);
 	
-	int offsetData = HEADER_SIZE;
-	for (int x = 0; x < CLUSTER_WIDTH; x++)
-	for (int y = 0; y < CLUSTER_HEIGHT; y++)
-	{
-		int index = y * CLUSTER_WIDTH + x;
-		MCPData* mcp = &mcps[mcpPosition[index]];
-		StepperData* stepper = &mcp->Steppers[stepperPosition[index]];
-		writeUShort(data, offsetData, (unsigned short)stepper->CurrentSteps);
-		
-		offsetData += 2;
-		
-		data[offsetData++] = stepper->WaitTime;
+	int32_t offsetData = HEADER_SIZE;
+	for (byte x = 0; x < CLUSTER_WIDTH; x++) {
+		for (byte y = 0; y < CLUSTER_HEIGHT; y++)
+		{
+			byte index = y * CLUSTER_WIDTH + x;
+			MCPData* mcp = &mcps[mcpPosition[index]];
+			StepperData* stepper = &mcp->Steppers[stepperPosition[index]];
+			writeUInt16(data, offsetData, (unsigned short)stepper->CurrentSteps);
+			
+			offsetData += 2;
+			
+			data[offsetData++] = stepper->WaitTime;
+		}
 	}
 	
 	if (offsetData > sizeof(data))
@@ -488,7 +483,7 @@ void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, c
     char packetType = data[4];
 	
 	// fortlaufende ID für die Pakete werden nach dem Magicstring und dem Paket-Typ geschickt
-	int revision = readInt(data, 5);
+	int32_t  revision = readInt32(data, 5);
 	
 	// wenn ein busy-Befehl läuft dann werden nur Ping, Info und Stop verarbeitet
 	if (currentBusyCommand != BUSY_NONE && packetType != PacketPing && packetType != PacketInfo && packetType != PacketStop) 
@@ -498,7 +493,7 @@ void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, c
     if (isGuaranteed)
         sendAckPacket(revision);
 
-    int offset = HEADER_SIZE;
+    int32_t offset = HEADER_SIZE;
     switch (packetType)
     {
         case PacketPing:
@@ -516,7 +511,7 @@ void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, c
                 byte y = data[offset] & 0xF;
                 offset += 1;
 
-                unsigned short height = readUnsignedShort(data, offset);
+                uint16_t height = readUInt16(data, offset);
 				offset += 2;
 				
 				byte waitTime = data[offset++];
@@ -534,7 +529,7 @@ void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, c
                 byte length = data[offset];
                 offset += 1;
 
-                unsigned short height = readUnsignedShort(data, offset);
+                uint16_t  height = readUInt16(data, offset);
                 offset += 2;
 				
 				byte waitTime = data[offset++];
@@ -545,7 +540,7 @@ void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, c
 	                return blinkGreenLedShort();
                 }
 
-                for (int i = 0; i < length; i++)
+                for (byte i = 0; i < length; i++)
                 {
                     byte x = data[offset] >> 4;
                     byte y = data[offset] & 0xF;
@@ -572,13 +567,13 @@ void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, c
 					return blinkGreenLedShort();
 				}
 
-                for (int i = 0; i < length; i++)
+                for (byte i = 0; i < length; i++)
                 {
                     byte x = data[offset] >> 4;
                     byte y = data[offset] & 0xF;
                     offset += 1;
 
-                    unsigned int height = readUnsignedShort(data, offset);
+                    uint16_t  height = readUInt16(data, offset);
 					offset += 2;
 										
 					byte waitTime = data[offset++];
@@ -603,7 +598,7 @@ void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, c
                 byte maxY = data[offset] & 0xF;
                 offset += 1;
 
-                unsigned int height = readUnsignedShort(data, offset);
+                uint16_t height = readUInt16(data, offset);
                 offset += 2;
 				
 				byte waitTime = data[offset++];
@@ -651,7 +646,7 @@ void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, c
 					return blinkGreenLedShort();
 				}
 
-                int area = (maxX - minX + 1) * (maxY - minY + 1); // +1, da max die letzte Kugel nicht beinhaltet
+                byte area = (maxX - minX + 1) * (maxY - minY + 1); // +1, da max die letzte Kugel nicht beinhaltet
                 if (len < offset + 3 * area)
                 {
 	                lastError = ERROR_PACKET_TOO_SHORT;
@@ -662,7 +657,7 @@ void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, c
                 for (byte x = minX; x <= maxX; x++)
                     for (byte y = minY; y <= maxY; y++)
                     {
-						unsigned int height = readUnsignedShort(data, offset);
+						uint16_t height = readUInt16(data, offset);
 						offset += 2;
 						
 						byte waitTime = data[offset++];
@@ -679,7 +674,7 @@ void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, c
             }
             else
             {
-                unsigned int height = readUnsignedShort(data, offset);
+                uint16_t height = readUInt16(data, offset);
 				offset += 2;
 				byte waitTime = data[offset++];
                 setAllSteps(revision, height, waitTime);
@@ -694,10 +689,10 @@ void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, c
             else
             {
                 // beide for-Schleifen müssen mit dem Client übereinstimmen sonst stimmen die Positionen nicht		
-                for (int x = 0; x < CLUSTER_WIDTH; x++)
-                    for (int y = 0; y < CLUSTER_HEIGHT; y++)
+                for (byte x = 0; x < CLUSTER_WIDTH; x++)
+                    for (byte y = 0; y < CLUSTER_HEIGHT; y++)
                     {
-						unsigned int height = readUnsignedShort(data, offset);
+						uint16_t height = readUInt16(data, offset);
 						offset += 2;
 						
 						byte waitTime = data[offset++];
@@ -715,7 +710,7 @@ void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, c
             else
             {
                 // 0xABCD wird benutzt damit man nicht ausversehen das Home-Paket schickt (wenn man z.B. den Paket-Type verwechselt)
-				int magic = readInt(data, offset);
+				int32_t magic = readInt32(data, offset);
                 if (magic != 0xABCD)
                 {
 					lastError = ERROR_INVALID_MAGIC;
@@ -723,8 +718,8 @@ void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, c
                 }
 
                 // gotoSteps auf -MAX_STEPS setzen damit alle Kugeln voll nach oben fahren (negative Steps sind eigentlich verboten)
-                for (int i = 0; i < MCP_COUNT; i++)
-                    for (int j = 0; j < STEPPER_COUNT; j++)
+                for (byte i = 0; i < MCP_COUNT; i++) {
+                    for (byte j = 0; j < STEPPER_COUNT; j++)
                     {
                         StepperData* stepper = &mcps[i].Steppers[j];
                         if (checkRevision(stepper->LastRevision, revision))
@@ -737,8 +732,10 @@ void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, c
 							stepper->TickCount = 0;
                         }
                     }
+				}
 
 				currentBusyCommand = BUSY_HOME;
+				
                 // alle Stepper nach oben Fahren lassen
                 turnRedLedOn();
                 for (int i = 0; i < MAX_STEPS; i++)
@@ -762,8 +759,8 @@ void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, c
                 turnRedLedOff();
 
 				// alle Stepper zurücksetzen
-                for (int i = 0; i < MCP_COUNT; i++)
-                    for (int j = 0; j < STEPPER_COUNT; j++)
+                for (byte i = 0; i < MCP_COUNT; i++) {
+                    for (byte j = 0; j < STEPPER_COUNT; j++)
                     {
                         StepperData* stepper = &mcps[i].Steppers[j];
                         stepper->GotoSteps = 0;
@@ -772,14 +769,16 @@ void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, c
 						stepper->WaitTime = 0;
 						stepper->TickCount = 0;
                     }
+				}
 			}
             break;
         case PacketResetRevision:
-            for (int i = 0; i < MCP_COUNT; i++)
-                for (int j = 0; j < STEPPER_COUNT; j++) {
+            for (byte i = 0; i < MCP_COUNT; i++) {
+                for (byte j = 0; j < STEPPER_COUNT; j++) {
 	                StepperData* stepper = &mcps[i].Steppers[j];
 	                stepper->LastRevision = 0;
                 }
+			}
             break;
         case PacketFix:
             if (len < HEADER_SIZE + 5)
@@ -790,7 +789,7 @@ void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, c
             else
             {
                 // 0xDCBA wird benutzt damit man nicht ausversehen das Fix-Paket schickt (wenn man z.B. den Paket-Type verwechselt)
-				int magic = readInt(data, offset);
+				int32_t magic = readInt32(data, offset);
                 if (magic != 0xDCBA)
                 {
 	                lastError = ERROR_INVALID_MAGIC;
@@ -813,7 +812,7 @@ void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, c
 	                return blinkGreenLedShort();
                 }
 
-                int index = y * CLUSTER_WIDTH + x;
+                byte index = y * CLUSTER_WIDTH + x;
                 MCPData* data = &mcps[mcpPosition[index]];
                 StepperData* stepper = &data->Steppers[stepperPosition[index]];
                 if (checkRevision(stepper->LastRevision, revision))
@@ -826,7 +825,7 @@ void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, c
 
 					turnRedLedOn();
 					currentBusyCommand = BUSY_FIX;
-                    for (int i = 0; i < FIX_STEPS; i++)
+                    for (int32_t i = 0; i < FIX_STEPS; i++)
                     {
 						if (stopBusyCommand)
 							break;
@@ -862,7 +861,7 @@ void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, c
             else
             {
                 // 0xDCBA wird benutzt damit man nicht ausversehen das HomeStepper-Paket schickt (wenn man z.B. den Paket-Type verwechselt)
-				int magic = readInt(data, offset);
+				int32_t magic = readInt32(data, offset);
                 if (magic != 0xABCD)
 				{
 					lastError = ERROR_INVALID_MAGIC;
@@ -899,7 +898,7 @@ void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, c
 
 					currentBusyCommand = BUSY_HOME_STEPPER;
 					turnRedLedOn();
-                    for (int i = 0; i < MAX_STEPS; i++)
+                    for (int32_t i = 0; i < MAX_STEPS; i++)
                     {
 						if (stopBusyCommand)
 							break;
@@ -938,16 +937,16 @@ void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, c
 				data[2] = 'S';
 				data[3] = 0;
 				data[4] = PacketInfo; // Paket-Type Info
-				writeInt(data, 5, revision);
+				writeInt32(data, 5, revision);
 			
-				int offsetData = HEADER_SIZE;
+				int32_t offsetData = HEADER_SIZE;
 				data[offsetData++] = BUILD_VERSION;
 				
 				data[offsetData++] = currentBusyCommand;
 				
-				int highestRevision = INT_MIN;
-				for (int i = 0; i < MCP_COUNT; i++)
-					for (int j = 0; j < STEPPER_COUNT; j++)  {
+				int32_t highestRevision = INT_MIN;
+				for (byte i = 0; i < MCP_COUNT; i++)
+					for (byte j = 0; j < STEPPER_COUNT; j++)  {
 						StepperData* stepper = &mcps[i].Steppers[j];
 						
 						if (stepper->LastRevision > highestRevision)
@@ -957,12 +956,12 @@ void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, c
 				if (configRevision > highestRevision)
 					highestRevision = configRevision;
 					
-				writeInt(data, offsetData, highestRevision);
+				writeInt32(data, offsetData, highestRevision);
 				offsetData += 4;
 				
 				data[offsetData++] = stepMode;
 				
-				writeInt(data, offsetData, tickTime);
+				writeInt32(data, offsetData, tickTime);
 				offsetData += 4;
 				
 				data[offsetData++] = useBreak ? 1 : 0;
@@ -999,7 +998,7 @@ void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, c
 					return blinkBothLedsShort();
 				}
 					
-				int cTickTime = readInt(data, offset);
+				int32_t cTickTime = readInt32(data, offset);
 				offset += 4;
 				if (cTickTime < 50 || cTickTime > 15000)
 				{
@@ -1026,13 +1025,7 @@ void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, c
 					stopBusyCommand = true;
 			#endif
 			#if ALLOW_STOP_MOVE
-				for (int i = 0; i < MCP_COUNT; i++)
-					for (int j = 0; j < STEPPER_COUNT; j++)  {
-						StepperData* stepper = &mcps[i].Steppers[j];
-							
-						// stoppen
-						stepper->GotoSteps = stepper->CurrentSteps;
-					}
+				stopMove();
 				
 				// Client informieren, dass es möglicherweise neue Daten gibt
 				sendData(revision);
@@ -1056,10 +1049,11 @@ void setup()
 	#if ENABLE_TIMER1
 		printLogString("timer1");
 
+		noInterrupts();
 		TCCR1B |= (1 << CS11);
 		TCNT1 = 0;
 		TIMSK |= (1 << TOIE1);
-		sei();
+		interrupts();
 	#endif
 
     // LEDs setzen
@@ -1098,27 +1092,29 @@ void setup()
 	turnGreenLedOff();
 	
 	#if ENABLE_WATCH_DOG
+		noInterrupts();
 		wdt_enable(WDTO_2S);
 		
 		#if ENABLE_WATCH_DOG_SAVE
 			WDTCSR |= 1 << WDIE;
 		#endif
+		interrupts();
 	#endif
 }
 
 void updateSteppers(boolean alwaysUseHalfStep)
 {
-    for (int i = 0; i < MCP_COUNT; i++)
+    for (byte i = 0; i < MCP_COUNT; i++)
     {
         // Wert für den GPIO
-        unsigned int gpioValue = 0;
+        uint16_t gpioValue = 0;
 
-        for (int j = 0; j < STEPPER_COUNT; j++)
+        for (byte j = 0; j < STEPPER_COUNT; j++)
         {
             StepperData* stepper = &mcps[i].Steppers[j];
 
-			int stepSize = 0;
-			int diff = abs(stepper->CurrentSteps - stepper->GotoSteps);
+			byte stepSize = 0;
+			int32_t diff = abs(stepper->CurrentSteps - stepper->GotoSteps);
 			if (diff != 0) 
 			{
 				if (stepMode == 3) // StepMode Both, schauen ob wir Full oder Half Step gemacht werden soll
@@ -1135,7 +1131,7 @@ void updateSteppers(boolean alwaysUseHalfStep)
 			
             if (stepSize > 0 && (stepper->WaitTime == 0 || stepper->TickCount < 0))
             {
-                int stepperIndex = stepper->CurrentStepIndex;
+                int8_t stepperIndex = stepper->CurrentStepIndex;
 				if (stepperIndex % stepSize > 0) // schauen ob wir noch einen Zwischenschritt machen müssen
 					stepSize = 1;
 				
@@ -1169,7 +1165,7 @@ void updateSteppers(boolean alwaysUseHalfStep)
     }
 }
 
-static void usdelay(unsigned int us)
+static void usdelay(uint16_t us)
 {
     while (us--)
     {
@@ -1219,32 +1215,37 @@ void loop()
 	#endif
 }
 
-int tickCount = 0;
+int16_t tickCount = 0;
 
 ISR(TIMER1_OVF_vect) {
-	#if BLINK_LED_ASYNC
-		if (tickCount % 128 == 0)
-			toogleGreenLed();
-	#endif
-	#if WRITE_INTERSTRUCTION_POINTER
-		if (tickCount % 128 == 0) {
-			byte addr1 = 0;
-			byte addr2 = 0;
-			// Adresse von Stack nehmen
-			asm volatile ("pop %0" : "=w"(addr1));
-			asm volatile ("pop %0" : "=w"(addr2));
+	if (tickCount++ >= 128) {
+		#if BLINK_LED_ASYNC
+			if (tickCount % 128 == 0)
+				toogleGreenLed();
+		#endif
+		#if WRITE_INTERSTRUCTION_POINTER
+			if (tickCount % 128 == 0) {
+				byte addr1 = 0;
+				byte addr2 = 0;
+				// Adresse von Stack nehmen
+				asm volatile ("pop %0" : "=w"(addr1));
+				asm volatile ("pop %0" : "=w"(addr2));
 					
-			// Adresse wieder auf Stack kopieren
-			asm volatile ("push %0" ::  "w"(addr2));
-			asm volatile ("push %0" ::  "w"(addr1));
+				// Adresse wieder auf Stack kopieren
+				asm volatile ("push %0" ::  "w"(addr2));
+				asm volatile ("push %0" ::  "w"(addr1));
 		
-			updateEEPROM(1, addr1);
-			updateEEPROM(2, addr2);
-		}
-	#endif
-	tickCount++;
+				updateEEPROM(1, addr1);
+				updateEEPROM(2, addr2);
+			}
+		#endif
+		
+		tickCount = 0;
+	}
 }
 
+
+// wird aufgerufen wenn der WatchDog aktiviert wurde und der Chip zurück gesetzt wird
 ISR(WDT_vect) {
 	turnRedLedOn();
 	wdt_disable();

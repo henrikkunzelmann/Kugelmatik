@@ -56,8 +56,12 @@ namespace KugelmatikLibrary
         public bool LogPingPacket { get; set; }
 
         [Category("Network")]
-        [DescriptionAttribute("Setzt eine IP-Addresse die für ein Cluster benutzt werden soll. Wenn der Wert leer ist dann wird die normale Addressen-Zuordnung benutzt")]
+        [DescriptionAttribute("Setzt eine IP-Adresse die für ein Cluster benutzt werden soll.")]
         public string FixedIP { get; set; }
+
+        [Category("Network")]
+        [DescriptionAttribute("Setzt eine Datei die für die Zuordnung der IP-Adressen benutzt wird")]
+        public string AddressFile { get; set; }
 
         [Category("Network")]
         [DescriptionAttribute("Port der UDP-Verbindung zu den Clustern")]
@@ -70,7 +74,7 @@ namespace KugelmatikLibrary
         public int AcknowlegdeTime { get; set; }
 
         [Category("Network")]
-        [DescriptionAttribute("Standard Wartezeit die jeder Schrittmotor zwischen jedem Schritt warten soll.")]
+        [DescriptionAttribute("Standard Wartezeit die jeder Schrittmotor zwischen jedem Schritt warten soll")]
         [Range(0, byte.MaxValue)]
         public int WaitTime { get; set; }
 
@@ -95,6 +99,7 @@ namespace KugelmatikLibrary
             VerbosePacketSending = true;
             VerbosePacketReceive = true;
             FixedIP = "";
+            AddressFile = "";
             ClusterStepMode = StepMode.Half;
             ClusterTickTime = 1000;
             AcknowlegdeTime = 20;

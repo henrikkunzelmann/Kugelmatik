@@ -230,8 +230,6 @@ namespace KugelmatikLibrary
                 throw new ArgumentOutOfRangeException("x");
             if (y < 0 || y >= 16)
                 throw new ArgumentOutOfRangeException("y");
-            if (address == null)
-                throw new ArgumentNullException("address");
 
             this.Kugelmatik = kugelmatik;
             this.X = x;
@@ -242,6 +240,9 @@ namespace KugelmatikLibrary
             for (byte i = 0; i < Width; i++)
                 for (byte j = 0; j < Height; j++)
                     steppers[j * Width + i] = new Stepper(this, i, j);
+
+            if (address == null)
+                return;
 
             socket = new UdpClient();
             socket.Connect(address, kugelmatik.Config.ProtocolPort);
@@ -256,8 +257,8 @@ namespace KugelmatikLibrary
             OnConnected += (sender, args) =>
             {
                 SendPacket(new PacketResetRevision(), true);
-                // Daten abfragen
-                SendGetData();
+                    // Daten abfragen
+                    SendGetData();
                 SendInfo();
             };
         }
@@ -600,6 +601,9 @@ namespace KugelmatikLibrary
                 throw new ObjectDisposedException(GetType().Name);
             if (packet == null)
                 throw new ArgumentNullException("packet");
+
+            if (Address == null)
+                return false;
 
             // wenn das Cluster nicht erreichbar ist
             if (Ping < 0)

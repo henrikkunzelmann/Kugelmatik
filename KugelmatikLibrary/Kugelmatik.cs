@@ -69,19 +69,40 @@ namespace KugelmatikLibrary
             }
         }
 
+        public Kugelmatik(Config config)
+        {
+            if (config == null)
+                throw new ArgumentNullException("config");
+
+            IAddressProvider addressProvider;
+            if (!string.IsNullOrWhiteSpace(config.AddressFile))
+                addressProvider = new FileAddressProvider(config.AddressFile);
+            else if (!string.IsNullOrWhiteSpace(config.FixedIP))
+                addressProvider = new FixedAddressProvider(config.FixedIP);
+            else
+                addressProvider = new KugelmatikAddressProvider();
+
+            InitClusters(addressProvider);
+        }
+
         public Kugelmatik(Config config, IAddressProvider addressProvider)
         {
             if (config == null)
                 throw new ArgumentNullException("config");
+
+            this.Config = config;
+            InitClusters(addressProvider);
+        }
+
+        private void InitClusters(IAddressProvider addressProvider)
+        {
             if (addressProvider == null)
                 throw new ArgumentNullException("addressProvider");
 
-            this.Config = config;
-
-            clusters = new Cluster[config.KugelmatikWidth * config.KugelmatikHeight];
-            for (int x = 0; x < config.KugelmatikWidth; x++)
-                for (int y = 0; y < config.KugelmatikHeight; y++)
-                    clusters[y * config.KugelmatikWidth + x] = new Cluster(this, x, y, addressProvider.GetAddress(config, x, y));
+            clusters = new Cluster[Config.KugelmatikWidth * Config.KugelmatikHeight];
+            for (int x = 0; x < Config.KugelmatikWidth; x++)
+                for (int y = 0; y < Config.KugelmatikHeight; y++)
+                    clusters[y * Config.KugelmatikWidth + x] = new Cluster(this, x, y, addressProvider.GetAddress(Config, x, y));
         }
 
         public void Dispose()

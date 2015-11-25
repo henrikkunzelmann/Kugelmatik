@@ -172,7 +172,7 @@ namespace KugelmatikControl
             clusterBox.Text = string.Format(Properties.Resources.ClusterInfo,
                 CurrentCluster.X + 1, CurrentCluster.Y + 1,
                 ping == -1 ? "offline" : (ping + "ms"),
-                CurrentCluster.Address);
+                CurrentCluster.Address == null ? "none" : CurrentCluster.Address.ToString());
 
             ClusterControl.SetClusterBoxColor(clusterBox, ping);
         }

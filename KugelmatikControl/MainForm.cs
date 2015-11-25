@@ -44,13 +44,9 @@ namespace KugelmatikControl
             else
                 config.SaveToFile(ConfigFile);
 
-            IAddressProvider addressProvider;
-            if (string.IsNullOrWhiteSpace(config.FixedIP))
-                addressProvider = new KugelmatikAddressProvider();
-            else
-                addressProvider = new FixedAddressProvider(config.FixedIP);
 
-            Kugelmatik = new Kugelmatik(config, addressProvider);
+
+            Kugelmatik = new Kugelmatik(config);
 
             clusterControls = new ClusterControl[Kugelmatik.Config.KugelmatikWidth * Kugelmatik.Config.KugelmatikHeight];
 

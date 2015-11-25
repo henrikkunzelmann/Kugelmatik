@@ -84,7 +84,7 @@
       <Value>C:/Program Files (x86)/Arduino/hardware/tools/avr//avr/include/avr/</Value>
       <Value>C:/Program Files (x86)/Arduino/hardware/tools/avr/avr/include/</Value>
       <Value>C:/Users/Henrik/Documents/Arduino/libraries</Value>
-      <Value>C:/Program Files (x86)/Atmel/Studio/7.0/Extensions/zmyqia14.sa4/Micro Platforms/default/debuggers</Value>
+      <Value>C:/Program Files (x86)/Atmel/Studio/7.0/Extensions/qrtxz454.2ng/Micro Platforms/default/debuggers</Value>
       <Value>C:/Program Files (x86)/Arduino/hardware/avrnetino/avr/libraries</Value>
       <Value>C:/Program Files (x86)/Arduino/libraries</Value>
       <Value>C:/Program Files (x86)/Arduino/libraries/MCP23017/utility</Value>
@@ -124,7 +124,7 @@
       <Value>C:/Program Files (x86)/Arduino/hardware/tools/avr//avr/include/avr/</Value>
       <Value>C:/Program Files (x86)/Arduino/hardware/tools/avr/avr/include/</Value>
       <Value>C:/Users/Henrik/Documents/Arduino/libraries</Value>
-      <Value>C:/Program Files (x86)/Atmel/Studio/7.0/Extensions/zmyqia14.sa4/Micro Platforms/default/debuggers</Value>
+      <Value>C:/Program Files (x86)/Atmel/Studio/7.0/Extensions/qrtxz454.2ng/Micro Platforms/default/debuggers</Value>
       <Value>C:/Program Files (x86)/Arduino/hardware/avrnetino/avr/libraries</Value>
       <Value>C:/Program Files (x86)/Arduino/libraries</Value>
       <Value>C:/Program Files (x86)/Arduino/libraries/MCP23017/utility</Value>
@@ -153,7 +153,7 @@
   <avrgcccpp.assembler.debugging.DebugLevel>Default (-Wa,-g)</avrgcccpp.assembler.debugging.DebugLevel>
 </AvrGccCpp>
     </ToolchainSettings>
-    <VMSETTING_IncludePaths>C:/Program Files (x86)/Arduino/hardware/avrnetino/avr/cores/avrnetio;C:/Program Files (x86)/Arduino/hardware/avrnetino/avr/variants/avrnetio;../../Firmware;C:/Program Files (x86)/Arduino/hardware/avrnetino/avr/libraries/EEPROM;C:/Program Files (x86)/Arduino/hardware/avrnetino/avr/libraries/EEPROM/utility;C:/Program Files (x86)/Arduino/libraries/EtherCard;C:/Program Files (x86)/Arduino/libraries/EtherCard/utility;C:/Program Files (x86)/Arduino/libraries/LiquidCrystal/src;C:/Program Files (x86)/Arduino/libraries/LiquidCrystal/src/utility;C:/Program Files (x86)/Arduino/libraries;C:/Program Files (x86)/Arduino/hardware/avrnetino/avr/libraries;C:/Program Files (x86)/Atmel/Studio/7.0/Extensions/zmyqia14.sa4/Micro Platforms/default/debuggers;C:/Users/Henrik/Documents/Arduino/libraries;C:/Program Files (x86)/Arduino/hardware/tools/avr/avr/include/;C:/Program Files (x86)/Arduino/hardware/tools/avr//avr/include/avr/;C:/Program Files (x86)/Arduino/hardware/tools/avr/lib/gcc/avr/4.8.1/include;C:/Program Files (x86)/Arduino/libraries/ethercard;C:/Program Files (x86)/Arduino/libraries/ethercard/utility;C:/Program Files (x86)/Arduino/libraries/i2c;C:/Program Files (x86)/Arduino/libraries/i2c/utility;C:/Program Files (x86)/Arduino/hardware/arduino/avr/cores/arduino;C:/Program Files (x86)/Arduino/hardware/arduino/avr/variants/yun;C:/Program Files (x86)/Arduino/hardware/arduino/avr/libraries/EEPROM;C:/Program Files (x86)/Arduino/hardware/arduino/avr/libraries/EEPROM/utility;C:/Program Files (x86)/Arduino/hardware/arduino/avr/libraries;C:/Program Files (x86)/Arduino/libraries/MCP23017;C:/Program Files (x86)/Arduino/libraries/MCP23017/utility;</VMSETTING_IncludePaths>
+    <VMSETTING_IncludePaths>C:/Program Files (x86)/Arduino/hardware/avrnetino/avr/cores/avrnetio;C:/Program Files (x86)/Arduino/hardware/avrnetino/avr/variants/avrnetio;../../Firmware;C:/Program Files (x86)/Arduino/hardware/avrnetino/avr/libraries/EEPROM;C:/Program Files (x86)/Arduino/hardware/avrnetino/avr/libraries/EEPROM/utility;C:/Program Files (x86)/Arduino/libraries/EtherCard;C:/Program Files (x86)/Arduino/libraries/EtherCard/utility;C:/Program Files (x86)/Arduino/libraries/LiquidCrystal/src;C:/Program Files (x86)/Arduino/libraries/LiquidCrystal/src/utility;C:/Program Files (x86)/Arduino/libraries;C:/Program Files (x86)/Arduino/hardware/avrnetino/avr/libraries;C:/Program Files (x86)/Atmel/Studio/7.0/Extensions/zmyqia14.sa4/Micro Platforms/default/debuggers;C:/Users/Henrik/Documents/Arduino/libraries;C:/Program Files (x86)/Arduino/hardware/tools/avr/avr/include/;C:/Program Files (x86)/Arduino/hardware/tools/avr//avr/include/avr/;C:/Program Files (x86)/Arduino/hardware/tools/avr/lib/gcc/avr/4.8.1/include;C:/Program Files (x86)/Arduino/libraries/ethercard;C:/Program Files (x86)/Arduino/libraries/ethercard/utility;C:/Program Files (x86)/Arduino/libraries/i2c;C:/Program Files (x86)/Arduino/libraries/i2c/utility;C:/Program Files (x86)/Arduino/hardware/arduino/avr/cores/arduino;C:/Program Files (x86)/Arduino/hardware/arduino/avr/variants/yun;C:/Program Files (x86)/Arduino/hardware/arduino/avr/libraries/EEPROM;C:/Program Files (x86)/Arduino/hardware/arduino/avr/libraries/EEPROM/utility;C:/Program Files (x86)/Arduino/hardware/arduino/avr/libraries;C:/Program Files (x86)/Arduino/libraries/MCP23017;C:/Program Files (x86)/Arduino/libraries/MCP23017/utility;C:/Program Files (x86)/Atmel/Studio/7.0/Extensions/qrtxz454.2ng/Micro Platforms/default/debuggers;</VMSETTING_IncludePaths>
     <VisualMicroSettings>
       <VisualMicroSettings>
         <ValidatedAS7>1</ValidatedAS7>
@@ -407,7 +407,7 @@ vmresolved.tools.path=C:\Program Files (x86)\Arduino\hardware\tools\avr
       <Value>C:/Program Files (x86)/Arduino/hardware/tools/avr//avr/include/avr/</Value>
       <Value>C:/Program Files (x86)/Arduino/hardware/tools/avr/avr/include/</Value>
       <Value>C:/Users/Henrik/Documents/Arduino/libraries</Value>
-      <Value>C:/Program Files (x86)/Atmel/Studio/7.0/Extensions/zmyqia14.sa4/Micro Platforms/default/debuggers</Value>
+      <Value>C:/Program Files (x86)/Atmel/Studio/7.0/Extensions/qrtxz454.2ng/Micro Platforms/default/debuggers</Value>
       <Value>C:/Program Files (x86)/Arduino/hardware/avrnetino/avr/libraries</Value>
       <Value>C:/Program Files (x86)/Arduino/libraries</Value>
       <Value>C:/Program Files (x86)/Arduino/libraries/MCP23017/utility</Value>
@@ -447,7 +447,7 @@ vmresolved.tools.path=C:\Program Files (x86)\Arduino\hardware\tools\avr
       <Value>C:/Program Files (x86)/Arduino/hardware/tools/avr//avr/include/avr/</Value>
       <Value>C:/Program Files (x86)/Arduino/hardware/tools/avr/avr/include/</Value>
       <Value>C:/Users/Henrik/Documents/Arduino/libraries</Value>
-      <Value>C:/Program Files (x86)/Atmel/Studio/7.0/Extensions/zmyqia14.sa4/Micro Platforms/default/debuggers</Value>
+      <Value>C:/Program Files (x86)/Atmel/Studio/7.0/Extensions/qrtxz454.2ng/Micro Platforms/default/debuggers</Value>
       <Value>C:/Program Files (x86)/Arduino/hardware/avrnetino/avr/libraries</Value>
       <Value>C:/Program Files (x86)/Arduino/libraries</Value>
       <Value>C:/Program Files (x86)/Arduino/libraries/MCP23017/utility</Value>
@@ -476,7 +476,7 @@ vmresolved.tools.path=C:\Program Files (x86)\Arduino\hardware\tools\avr
   <avrgcccpp.assembler.debugging.DebugLevel>Default (-Wa,-g)</avrgcccpp.assembler.debugging.DebugLevel>
 </AvrGccCpp>
     </ToolchainSettings>
-    <VMSETTING_IncludePaths>C:/Program Files (x86)/Arduino/hardware/avrnetino/avr/cores/avrnetio;C:/Program Files (x86)/Arduino/hardware/avrnetino/avr/variants/avrnetio;../../Firmware;C:/Program Files (x86)/Arduino/hardware/avrnetino/avr/libraries/EEPROM;C:/Program Files (x86)/Arduino/hardware/avrnetino/avr/libraries/EEPROM/utility;C:/Program Files (x86)/Arduino/libraries/EtherCard;C:/Program Files (x86)/Arduino/libraries/EtherCard/utility;C:/Program Files (x86)/Arduino/libraries/LiquidCrystal/src;C:/Program Files (x86)/Arduino/libraries/LiquidCrystal/src/utility;C:/Program Files (x86)/Arduino/libraries;C:/Program Files (x86)/Arduino/hardware/avrnetino/avr/libraries;C:/Program Files (x86)/Atmel/Studio/7.0/Extensions/zmyqia14.sa4/Micro Platforms/default/debuggers;C:/Users/Henrik/Documents/Arduino/libraries;C:/Program Files (x86)/Arduino/hardware/tools/avr/avr/include/;C:/Program Files (x86)/Arduino/hardware/tools/avr//avr/include/avr/;C:/Program Files (x86)/Arduino/hardware/tools/avr/lib/gcc/avr/4.8.1/include;C:/Program Files (x86)/Arduino/libraries/ethercard;C:/Program Files (x86)/Arduino/libraries/ethercard/utility;C:/Program Files (x86)/Arduino/libraries/i2c;C:/Program Files (x86)/Arduino/libraries/i2c/utility;C:/Program Files (x86)/Arduino/hardware/arduino/avr/cores/arduino;C:/Program Files (x86)/Arduino/hardware/arduino/avr/variants/yun;C:/Program Files (x86)/Arduino/hardware/arduino/avr/libraries/EEPROM;C:/Program Files (x86)/Arduino/hardware/arduino/avr/libraries/EEPROM/utility;C:/Program Files (x86)/Arduino/hardware/arduino/avr/libraries;C:/Program Files (x86)/Arduino/libraries/MCP23017;C:/Program Files (x86)/Arduino/libraries/MCP23017/utility;</VMSETTING_IncludePaths>
+    <VMSETTING_IncludePaths>C:/Program Files (x86)/Arduino/hardware/avrnetino/avr/cores/avrnetio;C:/Program Files (x86)/Arduino/hardware/avrnetino/avr/variants/avrnetio;../../Firmware;C:/Program Files (x86)/Arduino/hardware/avrnetino/avr/libraries/EEPROM;C:/Program Files (x86)/Arduino/hardware/avrnetino/avr/libraries/EEPROM/utility;C:/Program Files (x86)/Arduino/libraries/EtherCard;C:/Program Files (x86)/Arduino/libraries/EtherCard/utility;C:/Program Files (x86)/Arduino/libraries/LiquidCrystal/src;C:/Program Files (x86)/Arduino/libraries/LiquidCrystal/src/utility;C:/Program Files (x86)/Arduino/libraries;C:/Program Files (x86)/Arduino/hardware/avrnetino/avr/libraries;C:/Program Files (x86)/Atmel/Studio/7.0/Extensions/zmyqia14.sa4/Micro Platforms/default/debuggers;C:/Users/Henrik/Documents/Arduino/libraries;C:/Program Files (x86)/Arduino/hardware/tools/avr/avr/include/;C:/Program Files (x86)/Arduino/hardware/tools/avr//avr/include/avr/;C:/Program Files (x86)/Arduino/hardware/tools/avr/lib/gcc/avr/4.8.1/include;C:/Program Files (x86)/Arduino/libraries/ethercard;C:/Program Files (x86)/Arduino/libraries/ethercard/utility;C:/Program Files (x86)/Arduino/libraries/i2c;C:/Program Files (x86)/Arduino/libraries/i2c/utility;C:/Program Files (x86)/Arduino/hardware/arduino/avr/cores/arduino;C:/Program Files (x86)/Arduino/hardware/arduino/avr/variants/yun;C:/Program Files (x86)/Arduino/hardware/arduino/avr/libraries/EEPROM;C:/Program Files (x86)/Arduino/hardware/arduino/avr/libraries/EEPROM/utility;C:/Program Files (x86)/Arduino/hardware/arduino/avr/libraries;C:/Program Files (x86)/Arduino/libraries/MCP23017;C:/Program Files (x86)/Arduino/libraries/MCP23017/utility;C:/Program Files (x86)/Atmel/Studio/7.0/Extensions/qrtxz454.2ng/Micro Platforms/default/debuggers;</VMSETTING_IncludePaths>
     <VisualMicroSettings>
       <VisualMicroSettings>
         <ValidatedAS7>1</ValidatedAS7>
