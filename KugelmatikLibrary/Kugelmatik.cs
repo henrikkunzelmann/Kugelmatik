@@ -74,6 +74,8 @@ namespace KugelmatikLibrary
             if (config == null)
                 throw new ArgumentNullException("config");
 
+            this.Config = config;
+
             IAddressProvider addressProvider;
             if (!string.IsNullOrWhiteSpace(config.AddressFile))
                 addressProvider = new FileAddressProvider(config.AddressFile);
