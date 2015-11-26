@@ -9,8 +9,7 @@
 //  L293DNE
 
 // Defines
-#define BUILD_VERSION 13
-#define DEBUG
+#define BUILD_VERSION 14
 #define ENABLE_LOG false // aktiviert den Log der im EEPROM Speicher erzeugt wird
 
 
@@ -27,7 +26,7 @@
 #define _DISABLE_INTERRUPTS (!ENABLE_INTERRUPTS && (!ENABLE_TIMER1 || (ENABLE_WATCH_DOG && ENABLE_WATCH_DOG_SAVE)))
 
 #define LAN_ID 0x11 // ID des Boards im LAN, wird benutzt um die Mac-Adresse zu generieren
-static byte ethernetMac[] = { 0x74, 0x69, 0x69, 0x2D, 0x30, LAN_ID }; // Mac-Adresse des Boards
+const static byte ethernetMac[] = { 0x74, 0x69, 0x69, 0x2D, 0x30, LAN_ID }; // Mac-Adresse des Boards
 
 
 #define TICK_TIME 2000
@@ -56,7 +55,7 @@ static byte ethernetMac[] = { 0x74, 0x69, 0x69, 0x2D, 0x30, LAN_ID }; // Mac-Adr
 
 #define PROTOCOL_PORT 14804 // Port für das Protokoll über UDP
 
-#define ETHERNET_BUFFER_SIZE 700 // Größe des Ethernet Buffers in Bytes
+#define ETHERNET_BUFFER_SIZE 550 // Größe des Ethernet Buffers in Bytes
 
 // Includes
 #include <avr/pgmspace.h>
@@ -90,19 +89,22 @@ mcps[MCP_COUNT];
 
 // Anweisung die der Schrittmotor machen soll
 #define STEPPER_STEP_COUNT 8 // es gibt 8 Anweisungen für den Schrittmotor, siehe stepsStepper
-byte stepsStepper[STEPPER_STEP_COUNT] = { 0x05, 0x04, 0x06, 0x02, 0x0A, 0x08, 0x09, 0x01 };
+const byte stepsStepper[STEPPER_STEP_COUNT] = { 0x05, 0x04, 0x06, 0x02, 0x0A, 0x08, 0x09, 0x01 };
 
 // geben die Position des MCPs und des Steppers für jede Kugel an
 // erster Index ist die linke untere Kugel, siehe "Cluster_Kugelpositionen.pdf" in "Handbücher"
-byte mcpPosition[CLUSTER_WIDTH * CLUSTER_HEIGHT] = { 6, 6, 5, 5, 4, 6, 6, 5, 5, 4, 7, 7, 1, 2, 2, 7, 7, 1, 2, 2, 0, 0, 1, 3, 3, 0, 0, 1, 3, 3 };
-byte stepperPosition[CLUSTER_WIDTH * CLUSTER_HEIGHT] = { 2, 3, 2, 3, 1, 1, 0, 1, 0, 0, 1, 0, 3, 2, 3, 2, 3, 2, 1, 0, 2, 3, 1, 2, 3, 1, 0, 0, 1, 0 };
+const byte mcpPosition[CLUSTER_WIDTH * CLUSTER_HEIGHT] = { 6, 6, 5, 5, 4, 6, 6, 5, 5, 4, 7, 7, 1, 2, 2, 7, 7, 1, 2, 2, 0, 0, 1, 3, 3, 0, 0, 1, 3, 3 };
+const byte stepperPosition[CLUSTER_WIDTH * CLUSTER_HEIGHT] = { 2, 3, 2, 3, 1, 1, 0, 1, 0, 0, 1, 0, 3, 2, 3, 2, 3, 2, 1, 0, 2, 3, 1, 2, 3, 1, 0, 0, 1, 0 };
 
 // Buffer für die Ethernet Pakete
 byte Ethernet::buffer[ETHERNET_BUFFER_SIZE];
 
 #define HEADER_SIZE 9 // Größe des Paket-Headers in Bytes
 
-int32_t configRevision = 0; // die letzte Revision als die Config gesetzt wurde
+
+int32_t configRevision = 0; // die letzte Revision des Config-Packets
+int32_t setDataRevision = 0; // die letzte Revision des SetData-Packets
+
 byte stepMode = STEP_MODE;
 int32_t tickTime = TICK_TIME;
 boolean useBreak = USE_BREAK;
@@ -146,6 +148,7 @@ void blinkGreenLedShort()
         delay(200);
         turnGreenLedOff();
         delay(200);
+		wdt_reset();
     }
 }
 
@@ -179,6 +182,7 @@ void blinkRedLedShort()
         delay(200);
         turnRedLedOff();
         delay(200);
+		wdt_reset();
     }
 }
 
@@ -193,6 +197,7 @@ void blinkBothLedsShort()
         turnRedLedOff();
         turnGreenLedOff();
         delay(200);
+		wdt_reset();
     }
 }
 
@@ -208,7 +213,10 @@ void softReset()
 #define LOG_SIZE 512 // Größe des Logs in Bytes, wird diese Grenze überschritten dann gehen alle weiteren Zeichen wieder an den Anfang (LOG_BEGIN)
 
 int32_t logPosition = 0;
-char _intToStringBuffer[12];
+
+#if ENABLE_LOG
+	char _intToStringBuffer[12];
+#endif
 
 void updateEEPROM(int32_t position, byte val) {
 	if (EEPROM.read(position) != val)
@@ -219,7 +227,7 @@ void updateEEPROM(int32_t position, byte val) {
 void printLog(byte val)
 {
 #if ENABLE_LOG
-    updateEEPROM(LOG_BEGIN + logPosition, val);
+    EEPROM.update(LOG_BEGIN + logPosition, val);
     logPosition++;
     if (logPosition >= LOG_SIZE)
         logPosition = 0;
@@ -244,11 +252,13 @@ void printLogCharArray(const char* array, int32_t len)
 
 // schreibt einen Integer-Wert in den Log
 void printLogInt(int value) {
-	int count = sprintf(_intToStringBuffer, "%d", value);
-	if (count < 0)
-		return blinkRedLedShort();
-	
-	printLogCharArray(_intToStringBuffer, count);
+	#if ENABLE_LOG
+		int count = sprintf(_intToStringBuffer, "%d", value);
+		if (count < 0)
+			return blinkRedLedShort();
+		
+		printLogCharArray(_intToStringBuffer, count);
+	#endif
 }
 
 // bringt den Chip in den Fehler-Modus und blockiert ihn 
@@ -258,6 +268,7 @@ void error(byte code, char* message)
     while(true) {
 		toogleRedLed();
 		delay(500);
+		wdt_reset();
 	}
 }
 
@@ -313,7 +324,7 @@ void setStepper(int32_t revision, byte x, byte y, uint16_t height, byte waitTime
 		lastError = ERROR_Y_INVALID;
 		return blinkRedLedShort();
 	}
-    if (height >= MAX_STEPS)
+    if (height > MAX_STEPS)
     {
 	    lastError = ERROR_INVALID_HEIGHT;
 	    return blinkRedLedShort();
@@ -335,13 +346,13 @@ void setStepper(int32_t revision, byte x, byte y, uint16_t height, byte waitTime
 // setzt alle Schrittmotoren auf eine bestimmte Höhe
 void setAllSteps(int32_t revision, uint16_t gotoSteps, byte waitTime)
 {
-    if (gotoSteps >= MAX_STEPS)
+    if (gotoSteps > MAX_STEPS)
 	{
 		lastError = ERROR_INVALID_HEIGHT;
         return blinkRedLedShort();
 	}
 
-    for (byte i = 0; i < MCP_COUNT; i++)
+    for (byte i = 0; i < MCP_COUNT; i++) {
         for (byte j = 0; j < STEPPER_COUNT; j++) {
             StepperData* stepper = &mcps[i].Steppers[j];
             if (checkRevision(stepper->LastRevision, revision))
@@ -352,6 +363,7 @@ void setAllSteps(int32_t revision, uint16_t gotoSteps, byte waitTime)
 				stepper->WaitTime = waitTime;
             }
         }
+	}
 }
 
 // setzt alle Werte aller Stepper so, dass sie aufhören sich zu bewegen
@@ -452,7 +464,7 @@ void sendData(int32_t  revision)
 			byte index = y * CLUSTER_WIDTH + x;
 			MCPData* mcp = &mcps[mcpPosition[index]];
 			StepperData* stepper = &mcp->Steppers[stepperPosition[index]];
-			writeUInt16(data, offsetData, (unsigned short)stepper->CurrentSteps);
+			writeUInt16(data, offsetData, (uint16_t)stepper->CurrentSteps);
 			
 			offsetData += 2;
 			
@@ -614,9 +626,11 @@ void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, c
 					return blinkGreenLedShort();
 				}
 
-                for (byte x = minX; x <= maxX; x++)
-                    for (byte y = minY; y <= maxY; y++)
+                for (byte x = minX; x <= maxX; x++) {
+                    for (byte y = minY; y <= maxY; y++) {
                         setStepper(revision, x, y, height, waitTime);
+					}
+				}
             }
             break;
         case PacketSteppersRectangleArray:
@@ -654,7 +668,7 @@ void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, c
                 }
 
 				// beide for-Schleifen müssen mit dem Client übereinstimmen sonst stimmen die Positionen nicht		
-                for (byte x = minX; x <= maxX; x++)
+                for (byte x = minX; x <= maxX; x++) {
                     for (byte y = minY; y <= maxY; y++)
                     {
 						uint16_t height = readUInt16(data, offset);
@@ -664,6 +678,7 @@ void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, c
 						
                         setStepper(revision, x, y, height, offset);
                     }
+				}
             }
             break;
         case PacketAllSteppers: 
@@ -689,7 +704,7 @@ void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, c
             else
             {
                 // beide for-Schleifen müssen mit dem Client übereinstimmen sonst stimmen die Positionen nicht		
-                for (byte x = 0; x < CLUSTER_WIDTH; x++)
+                for (byte x = 0; x < CLUSTER_WIDTH; x++) {
                     for (byte y = 0; y < CLUSTER_HEIGHT; y++)
                     {
 						uint16_t height = readUInt16(data, offset);
@@ -699,6 +714,7 @@ void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, c
 						
                         setStepper(revision, x, y, height, waitTime);
                     }
+				}
             }
             break;
         case PacketHome:
@@ -738,7 +754,7 @@ void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, c
 				
                 // alle Stepper nach oben Fahren lassen
                 turnRedLedOn();
-                for (int i = 0; i < MAX_STEPS; i++)
+                for (int i = 0; i <= MAX_STEPS; i++)
                 {
 					if (stopBusyCommand)
 						break;
@@ -747,6 +763,8 @@ void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, c
 						toogleGreenLed();
 	                updateSteppers(true);
 	                usdelay(HOME_TIME); // langsam bewegen
+					
+					wdt_reset();
 					
 					// Pakete empfangen
 					#if RECEIVE_PACKETS_BUSY
@@ -834,6 +852,8 @@ void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, c
                         updateSteppers(true);
                         usdelay(FIX_TIME); // langsam bewegen
 						
+						wdt_reset();
+						
 						// Pakete empfangen
 						#if RECEIVE_PACKETS_BUSY
 							ether.packetLoop(ether.packetReceive());
@@ -898,7 +918,7 @@ void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, c
 
 					currentBusyCommand = BUSY_HOME_STEPPER;
 					turnRedLedOn();
-                    for (int32_t i = 0; i < MAX_STEPS; i++)
+                    for (int32_t i = 0; i <= MAX_STEPS; i++)
                     {
 						if (stopBusyCommand)
 							break;
@@ -906,6 +926,8 @@ void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, c
 							toogleGreenLed();
                         updateSteppers(true);
                         usdelay(HOME_TIME); // langsam bewegen
+						
+						wdt_reset();
 						
 						// Pakete empfangen
 						#if RECEIVE_PACKETS_BUSY
@@ -931,7 +953,7 @@ void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, c
 			break;
 		case PacketInfo:
 			{
-				char data[HEADER_SIZE + 13];
+				char data[HEADER_SIZE + 17];
 				data[0] = 'K';
 				data[1] = 'K';
 				data[2] = 'S';
@@ -956,6 +978,9 @@ void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, c
 				if (configRevision > highestRevision)
 					highestRevision = configRevision;
 					
+				if (setDataRevision > highestRevision)
+					highestRevision = setDataRevision;
+					
 				writeInt32(data, offsetData, highestRevision);
 				offsetData += 4;
 				
@@ -967,6 +992,9 @@ void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, c
 				data[offsetData++] = useBreak ? 1 : 0;
 				
 				data[offsetData++] = lastError;
+				
+				writeInt32(data, offsetData, freeRam());
+				offset += 4;
 			
 		
 				if (offsetData > sizeof(data))
@@ -988,7 +1016,7 @@ void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, c
 			{
 				if (!checkRevision(configRevision, revision))
 					break;
-					
+				
 				configRevision = revision;
 				
 				byte cStepMode = data[offset++];
@@ -1030,6 +1058,40 @@ void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, c
 				// Client informieren, dass es möglicherweise neue Daten gibt
 				sendData(revision);
 			#endif
+			break;
+		case PacketSetData:
+			if (len < HEADER_SIZE + CLUSTER_WIDTH * CLUSTER_HEIGHT * 2)
+			{
+				lastError = ERROR_PACKET_TOO_SHORT;
+				return blinkGreenLedShort();
+			}
+			else
+			{
+				if (!checkRevision(setDataRevision, revision))
+					break;
+					
+				setDataRevision = revision;
+					
+				for (byte x = 0; x < CLUSTER_WIDTH; x++) {
+					for (byte y = 0; y < CLUSTER_HEIGHT; y++)
+					{
+						byte index = y * CLUSTER_WIDTH + x;
+						MCPData* mcp = &mcps[mcpPosition[index]];
+						StepperData* stepper = &mcp->Steppers[stepperPosition[index]];
+						
+						uint16_t height = readUInt16(data, offset);
+						offset += 2;
+												
+						if (height > MAX_STEPS) {
+							lastError = ERROR_INVALID_HEIGHT;
+							return blinkBothLedsShort();
+						}
+						
+						stepper->CurrentSteps = height;
+						stopMove();
+					}
+				}		
+			}
 			break;
         default:
 			lastError = ERROR_UNKOWN_PACKET;
@@ -1165,16 +1227,21 @@ void updateSteppers(boolean alwaysUseHalfStep)
     }
 }
 
-static void usdelay(uint16_t us)
-{
-    while (us--)
-    {
+void usdelay(uint16_t us) {
+    while (us--) {
         // 4 times * 4 cycles gives 16 cyles = 1 us with 16 MHz clocking
-        unsigned char i = 4;
+        byte i = 4;
         // this while loop executes with exact 4 cycles:
         while (i--)
             asm volatile("nop");
     }
+}
+
+// gibt den freien SRAM zurück, siehe http://playground.arduino.cc/Code/AvailableMemory
+int freeRam() {
+	extern int __heap_start, *__brkval;
+	int v;
+	return (int) &v - (__brkval == 0 ? (int) &__heap_start : (int) __brkval);
 }
 
 void loop()
@@ -1191,9 +1258,7 @@ void loop()
 		// Packet abfragen
 		word plen = ether.packetReceive();
 		if (plen > 0) // neues Packet empfangen
-		{ 
 			ether.packetLoop(plen);
-		}
 			
 		#if BLINK_PACKET
 			turnGreenLedOff();

@@ -28,6 +28,8 @@
 
 #define PacketStop 19
 
+#define PacketSetData 20
+
 #define BUSY_NONE 0
 #define BUSY_HOME 1
 #define BUSY_FIX 2
@@ -44,6 +46,5 @@
 #define ERROR_INVALID_CONFIG_VALUE 8
 #define ERROR_INVALID_HEIGHT 9
 #define ERROR_INVALID_VALUE 10
-
 
 #endif /* CONSTANTS_H_ */
