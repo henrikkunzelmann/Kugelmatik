@@ -38,13 +38,19 @@ namespace KugelmatikLibrary
         /// </summary>
         public ErrorCode LastError { get; private set; }
 
-        public ClusterInfo(byte buildVersion, BusyCommand currentBusyCommand, int highestRevision, ClusterConfig config, ErrorCode lastError)
+        /// <summary>
+        /// Gibt den freien Speicher auf dem Cluster zurück.
+        /// </summary>
+        public int FreeRam { get; private set; }
+
+        public ClusterInfo(byte buildVersion, BusyCommand currentBusyCommand, int highestRevision, ClusterConfig config, ErrorCode lastError, int freeRam)
         {
             this.BuildVersion = buildVersion;
             this.CurrentBusyCommand = currentBusyCommand;
             this.HighestRevision = highestRevision;
             this.Config = config;
             this.LastError = lastError;
+            this.FreeRam = freeRam;
         }
 
         public static bool operator ==(ClusterInfo a, ClusterInfo b)
@@ -76,7 +82,8 @@ namespace KugelmatikLibrary
                 && CurrentBusyCommand == other.CurrentBusyCommand
                 && HighestRevision == other.HighestRevision
                 && Config == other.Config
-                && LastError == other.LastError;
+                && LastError == other.LastError
+                && FreeRam == other.FreeRam;
         }
 
         public override int GetHashCode()
@@ -89,6 +96,7 @@ namespace KugelmatikLibrary
                 hash = hash * 7 + HighestRevision.GetHashCode();
                 hash = hash * 7 + Config.GetHashCode();
                 hash = hash * 7 + LastError.GetHashCode();
+                hash = hash * 7 + FreeRam.GetHashCode();
                 return hash;
             }
         }

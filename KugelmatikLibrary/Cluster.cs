@@ -586,6 +586,21 @@ namespace KugelmatikLibrary
         }
 
         /// <summary>
+        /// Schickt die Daten über ein SetData-Befehl an das Cluster.
+        /// </summary>
+        public void SendSetData()
+        {
+            if (IsDisposed)
+                throw new ObjectDisposedException(GetType().Name);
+
+            ushort[] heights = new ushort[Width * Height];
+            for (int x = 0; x < Width; x++)
+                for (int y = 0; y < Height; y++)
+                    heights[y * Width + x] = GetStepperByPosition(x, y).Height;
+            SendPacket(new PacketSetData(heights), true);
+        }
+
+        /// <summary>
         /// Schickt ein Packet an das Cluster.
         /// </summary>
         /// <param name="packet"></param>
@@ -827,7 +842,11 @@ namespace KugelmatikLibrary
                             lastError = (ErrorCode)reader.ReadByte();
                         }
 
-                        Info = new ClusterInfo(buildVersion, currentBusyCommand, highestRevision, new ClusterConfig((StepMode)stepMode, delayTime, useBreak), lastError);
+                        int freeRam = -1;
+                        if (buildVersion >= 14)
+                            freeRam = reader.ReadInt32();
+
+                        Info = new ClusterInfo(buildVersion, currentBusyCommand, highestRevision, new ClusterConfig((StepMode)stepMode, delayTime, useBreak), lastError, freeRam);
                         RemovePacketToAcknowlegde(revision);
                         break;
                     default:
