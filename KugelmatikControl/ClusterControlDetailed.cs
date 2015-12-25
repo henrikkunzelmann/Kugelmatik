@@ -179,17 +179,6 @@ namespace KugelmatikControl
 
         private void ShowStepper(StepperControl stepper)
         {
-            // wenn kein Stepper ausgewählt StepperBox unsichtbar machen
-            if (stepper == null)
-            {
-                selectedStepper = null;
-                stepperBox.Visible = false;
-                return;
-            }
-
-            if (selectedStepper == stepper)
-                return;
-
             // Hintergrund-Farbe von Stepper rückgängig machen
             if (selectedStepper != null)
                 selectedStepper.BackColor = SystemColors.Control;
@@ -197,10 +186,15 @@ namespace KugelmatikControl
             selectedStepper = stepper;
 
 
-            stepperBox.Visible = true;
-            stepperBox.Text = string.Format(Properties.Resources.StepperInfo, selectedStepper.Stepper.X + 1, selectedStepper.Stepper.Y + 1);
+            if (selectedStepper != null)
+            {
+                stepperBox.Visible = true;
+                stepperBox.Text = string.Format(Properties.Resources.StepperInfo, selectedStepper.Stepper.X + 1, selectedStepper.Stepper.Y + 1);
 
-            stepper.BackColor = SystemColors.Highlight;
+                selectedStepper.BackColor = SystemColors.Highlight;
+            }
+            else
+                stepperBox.Visible = false;
         }
 
         private void homeStepperButton_Click(object sender, EventArgs e)
