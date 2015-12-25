@@ -383,7 +383,7 @@ namespace KugelmatikLibrary
                 if (anyDataSent)
                 {
                     for (int i = 0; i < steppers.Length; i++)
-                        steppers[i].IsInvalid = false;
+                        steppers[i].OnDataSent();
                 }
                 return anyDataSent;
             }
@@ -538,7 +538,7 @@ namespace KugelmatikLibrary
                 {
                     Stepper stepper = steppers[i];
                     stepper.Height = 0;
-                    stepper.IsInvalid = false;
+                    stepper.OnDataSent();
                 }
             }
         }

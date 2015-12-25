@@ -35,6 +35,7 @@ namespace KugelmatikLibrary
         /// </summary>
         public byte Y { get; private set; }
 
+        private ushort lastHeight;
         private ushort height;
 
         /// <summary>
@@ -45,7 +46,7 @@ namespace KugelmatikLibrary
             get { return height; }
             internal set
             {
-                if (value < 0 || value > Cluster.Kugelmatik.Config.MaxHeight)
+                if (value > Cluster.Kugelmatik.Config.MaxHeight)
                     throw new ArgumentOutOfRangeException();
 
                 if (height != value)
@@ -56,6 +57,8 @@ namespace KugelmatikLibrary
                 }
             }
         }
+
+        private byte lastWaitTime;
 
         /// <summary>
         /// Gibt die letzte Wartezeit zwischen jedem Tick zurück die der Schrittmotor warten sollte.
@@ -70,7 +73,13 @@ namespace KugelmatikLibrary
         /// <summary>
         /// Gibt den Zustand ob sich der Stepper geändert hat und Daten neugesendet werden müssen zurück.
         /// </summary>
-        public bool IsInvalid { get; internal set; }
+        public bool IsInvalid
+        {
+            get
+            {
+                return lastHeight != Height || lastWaitTime != WaitTime;
+            }
+        }
 
         private object locker = new object();
 
@@ -89,13 +98,23 @@ namespace KugelmatikLibrary
         }
 
         /// <summary>
+        /// Wird aufgerufen, wenn die Daten von der Cluster Klasse gesendet wurden.
+        /// </summary>
+        internal void OnDataSent()
+        {
+            lastHeight = Height;
+            lastWaitTime = WaitTime;
+        }
+
+        /// <summary>
         /// Setzt den Stepper auf Anfangswerte zurück.
         /// </summary>
         private void Reset()
         {
+            lastWaitTime = 0;
             WaitTime = 0;
+            lastHeight = 0;
             Height = 0;
-            IsInvalid = false;
         }
 
         /// <summary>
@@ -119,13 +138,8 @@ namespace KugelmatikLibrary
 
             lock(locker)
             {
-                if (this.Height == height && this.WaitTime == waitTime)
-                    return;
-
                 this.Height = height;
                 this.WaitTime = waitTime;
-
-                IsInvalid = true;
             }
         }
 
