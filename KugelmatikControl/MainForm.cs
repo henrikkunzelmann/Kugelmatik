@@ -237,7 +237,7 @@ namespace KugelmatikControl
         private void moveAllTo0ToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Kugelmatik.MoveAllClusters(0);
-            Kugelmatik.SendData();
+            Kugelmatik.SendData(false, true);
         }
 
         private void stopToolStripMenuItem_Click(object sender, EventArgs e)

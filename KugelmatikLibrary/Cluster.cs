@@ -376,7 +376,7 @@ namespace KugelmatikLibrary
 
             lock (locker)
             {
-                if (!IsInvalid)
+                if (!IsInvalid && !sendAllSteppers)
                     return false;
 
                 bool anyDataSent = SendDataInternal(guaranteed, sendAllSteppers);
