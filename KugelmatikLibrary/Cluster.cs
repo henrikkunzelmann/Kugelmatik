@@ -251,14 +251,16 @@ namespace KugelmatikLibrary
 
             socket.BeginReceive(ReceivePacket, null);
 
-            // Ping senden und ein ResetRevision Paket senden damit die Revision wieder zurück gesetzt wird
+            // Ping senden
             SendPing();
 
             OnConnected += (sender, args) =>
             {
+                // ResetRevision Paket senden damit die Revision wieder zurück gesetzt wird
                 SendPacket(new PacketResetRevision(), true);
-                    // Daten abfragen
-                    SendGetData();
+                
+                // Daten abfragen
+                SendGetData();
                 SendInfo();
             };
         }
@@ -747,8 +749,7 @@ namespace KugelmatikLibrary
                         if (packet.Length < HeaderSize + sizeof(long))
                             throw new InvalidDataException("Packet is not long enough.");
 
-                        int timeSpan = Environment.TickCount - lastPing;
-                        if (timeSpan > 1000 * 10  || ping < 0)
+                        if (ping < 0)
                             if (OnConnected != null)
                                 OnConnected(this, EventArgs.Empty);
 
