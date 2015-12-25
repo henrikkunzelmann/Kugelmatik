@@ -1,3 +1,4 @@
+#include "cluster_led.h"
 // Kugelmatik V3
 // Firmware
 //  Henrik Kunzelmann 2015
@@ -48,9 +49,6 @@ const static byte ethernetMac[] = { 0x74, 0x69, 0x69, 0x2D, 0x30, LAN_ID }; // M
 #define FIX_STEPS 20000		// Steps die ein Stepper macht um einen Stepper zu fixen
 #define USE_BREAK false		// Wenn true, dann bremsen die Schrittmotoren
 
-#define LED_GREEN 2		// Port für grüne LED (Pin 4 SUBD)
-#define LED_RED 3		// Port für rote LED (Pin 5 SUBD)
-
 #define BLINK_PACKET false // Wenn true, dann blinkt die grüne Led wenn ein Kugelmatik Paket verarbeitet wird
 
 #define PROTOCOL_PORT 14804 // Port für das Protokoll über UDP
@@ -67,6 +65,7 @@ const static byte ethernetMac[] = { 0x74, 0x69, 0x69, 0x2D, 0x30, LAN_ID }; // M
 #include <EEPROM.h>
 #include <I2C.h>
 #include <MCP23017.h>
+#include "cluster_led.h"
 #include "constants.h"
 
 struct StepperData
@@ -112,94 +111,6 @@ boolean useBreak = USE_BREAK;
 byte currentBusyCommand = BUSY_NONE;
 boolean stopBusyCommand = false;
 byte lastError = ERROR_NONE;
-
-/// Funktionen für die LEDs
-boolean ledStateGreen = false; // Status der LED für LED_Green (grüne LED)
-boolean ledStateRed = false; // Status der LED für LED_Red (rote LED)
-
-
-// setzt die grüne LED an
-void turnGreenLedOn()
-{
-    ledStateGreen = true;
-    digitalWrite(LED_GREEN, ledStateGreen);
-}
-
-// setzt die grüne LED aus
-void turnGreenLedOff()
-{
-    ledStateGreen = false;
-    digitalWrite(LED_GREEN, ledStateGreen);
-}
-
-// wechselt den Status der grünen LED
-void toogleGreenLed()
-{
-    ledStateGreen = !ledStateGreen;
-    digitalWrite(LED_GREEN, ledStateGreen);
-}
-
-// lässt die grüne Led kurzzeitig blinken
-void blinkGreenLedShort()
-{
-    for (byte i = 0; i < 5; i++)
-    {
-        turnGreenLedOn();
-        delay(200);
-        turnGreenLedOff();
-        delay(200);
-		wdt_reset();
-    }
-}
-
-// stellt die rote LED an
-void turnRedLedOn()
-{
-    ledStateRed = true;
-    digitalWrite(LED_RED, ledStateRed);
-}
-
-// stellt die rote LED aus
-void turnRedLedOff()
-{
-    ledStateRed = false;
-    digitalWrite(LED_RED, ledStateRed);
-}
-
-// wechselt den Status der rote LED
-void toogleRedLed()
-{
-    ledStateRed = !ledStateRed;
-    digitalWrite(LED_RED, ledStateRed);
-}
-
-// läst die rote Led kurzzeitig blinken
-void blinkRedLedShort()
-{
-    for (byte i = 0; i < 5; i++)
-    {
-        turnRedLedOn();
-        delay(200);
-        turnRedLedOff();
-        delay(200);
-		wdt_reset();
-    }
-}
-
-// lässt beide LEDs kurzzeitig blinken
-void blinkBothLedsShort()
-{
-    for (byte i = 0; i < 5; i++)
-    {
-        turnRedLedOn();
-        turnGreenLedOn();
-        delay(200);
-        turnRedLedOff();
-        turnGreenLedOff();
-        delay(200);
-		wdt_reset();
-    }
-}
 
 // setzt den Chip zurück
 void softReset()

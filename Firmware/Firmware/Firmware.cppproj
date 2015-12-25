@@ -703,13 +703,16 @@ vmresolved.tools.path=C:\Program Files (x86)\Arduino\hardware\tools\avr
     </VisualMicroSettings>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="cluster_led.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="cluster_led.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="constants.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="Firmware.ino">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="PacketTypes.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="__vm\.Firmware.vsarduino.h">
