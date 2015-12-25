@@ -162,10 +162,10 @@ namespace KugelmatikLibrary
         /// Lässt alle Kugeln aller Cluster in der ganzen Kugelmatik auf eine Höhe fahren.
         /// </summary>
         /// <param name="height"></param>
-        public void MoveAllClusters(ushort height)
+        public void SetAllClusters(ushort height)
         {
             foreach (Cluster cluster in clusters)
-                cluster.MoveAllStepper(height);
+                cluster.SetAllStepper(height);
         }
 
         /// <summary>
@@ -291,6 +291,11 @@ namespace KugelmatikLibrary
             return anyDataSent;
         }
 
+        public void SetStepper(int x, int y, ushort height)
+        {
+            GetStepperByPosition(x, y).Set(height);
+        }
+
         public void SetRectangle(int x, int y, int rectWidth, int rectHeight, ushort stepperHeight)
         {
             if (x < 0 || x >= StepperCountX)
@@ -308,7 +313,7 @@ namespace KugelmatikLibrary
 
             for (int i = 0; i < rectWidth; i++)
                 for (int j = 0; j < rectHeight; j++)
-                    GetStepperByPosition(x + i , y + j).MoveTo(stepperHeight);
+                    GetStepperByPosition(x + i , y + j).Set(stepperHeight);
         }
 
         public void SetCircle(int x, int y, float radius, ushort stepperHeight)
@@ -328,7 +333,7 @@ namespace KugelmatikLibrary
             for (int i = -radiusInt; i <= radiusInt; i++)
                 for (int j = -radiusInt; j <= radiusInt; j++)
                     if (MathHelper.Distance(0, 0, i, j) <= radius)
-                        GetStepperByPosition(x + i, y + j).MoveTo(stepperHeight);
+                        GetStepperByPosition(x + i, y + j).Set(stepperHeight);
         }
     }
 }

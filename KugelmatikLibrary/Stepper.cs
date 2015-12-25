@@ -102,9 +102,9 @@ namespace KugelmatikLibrary
         /// Bewegt die Kugel auf die Tiefe height.
         /// </summary>
         /// <param name="height">Die Tiefe zu der die Kugel fahren soll.</param>
-        public void MoveTo(ushort height)
+        public void Set(ushort height)
         {
-            MoveTo(height, (byte)Kugelmatik.Config.WaitTime);
+            Set(height, (byte)Kugelmatik.Config.WaitTime);
         }
 
         /// <summary>
@@ -112,7 +112,7 @@ namespace KugelmatikLibrary
         /// </summary>
         /// <param name="height">Die Tiefe zu der die Kugel fahren soll.</param>
         /// <param name="waitTime">Die Wartezeit die der Schrittmotor zwischen jedem Tick warten soll.</param>
-        public void MoveTo(ushort height, byte waitTime)
+        public void Set(ushort height, byte waitTime)
         {
             if (height > Cluster.Kugelmatik.Config.MaxHeight)
                 throw new ArgumentOutOfRangeException("height");

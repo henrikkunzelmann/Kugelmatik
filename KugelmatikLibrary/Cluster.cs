@@ -334,13 +334,13 @@ namespace KugelmatikLibrary
         /// Bewegt alle Stepper zur selben Höhe.
         /// </summary>
         /// <param name="height"></param>
-        public void MoveAllStepper(ushort height)
+        public void SetAllStepper(ushort height)
         {
             if (IsDisposed)
                 throw new ObjectDisposedException(GetType().Name);
 
             for (int i = 0; i < steppers.Length; i++)
-                steppers[i].MoveTo(height);
+                steppers[i].Set(height);
         }
 
         /// <summary>

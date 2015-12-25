@@ -213,7 +213,7 @@ namespace KugelmatikControl
         {
             if (selectedStepper != null)
             {
-                selectedStepper.Stepper.Cluster.MoveAllStepper(selectedStepper.Stepper.Height);
+                selectedStepper.Stepper.Cluster.SetAllStepper(selectedStepper.Stepper.Height);
                 UpdateClusterHeight();
             }
         }
@@ -222,7 +222,7 @@ namespace KugelmatikControl
         {
             if (selectedStepper != null)
             {
-                selectedStepper.Stepper.Kugelmatik.MoveAllClusters(selectedStepper.Stepper.Height);
+                selectedStepper.Stepper.Kugelmatik.SetAllClusters(selectedStepper.Stepper.Height);
                 UpdateClusterHeight();
             }
         }
@@ -241,7 +241,7 @@ namespace KugelmatikControl
 
         private void moveToTopButton_Click(object sender, EventArgs e)
         {
-            CurrentCluster.MoveAllStepper(0);
+            CurrentCluster.SetAllStepper(0);
             CurrentCluster.SendData(false, true);
             UpdateClusterHeight();
         }
@@ -282,7 +282,7 @@ namespace KugelmatikControl
                 return;
 
             clusterHeightTrackBar.Value = (int)clusterHeight.Value;
-            CurrentCluster.MoveAllStepper((ushort)clusterHeight.Value);
+            CurrentCluster.SetAllStepper((ushort)clusterHeight.Value);
         }
 
         private void clusterHeightTrackBar_ValueChanged(object sender, EventArgs e)
@@ -291,7 +291,7 @@ namespace KugelmatikControl
                 return;
 
             clusterHeight.Value = clusterHeightTrackBar.Value;
-            CurrentCluster.MoveAllStepper((ushort)clusterHeightTrackBar.Value);
+            CurrentCluster.SetAllStepper((ushort)clusterHeightTrackBar.Value);
         }
 
         private void sendDataButton_Click(object sender, EventArgs e)

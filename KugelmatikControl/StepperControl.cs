@@ -113,7 +113,7 @@ namespace KugelmatikControl
                 return;
 
             heightNumber.Value = heightTrackBar.Value;
-            Stepper.MoveTo((ushort)heightTrackBar.Value);
+            Stepper.Set((ushort)heightTrackBar.Value);
         }
 
         private void heightNumber_ValueChanged(object sender, EventArgs e)
@@ -122,7 +122,7 @@ namespace KugelmatikControl
                 return;
 
             heightTrackBar.Value = (int)heightNumber.Value;
-            Stepper.MoveTo((ushort)heightNumber.Value);
+            Stepper.Set((ushort)heightNumber.Value);
         }
     }
 }
