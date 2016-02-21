@@ -256,6 +256,8 @@ namespace KugelmatikLibrary
 
             OnConnected += (sender, args) =>
             {
+                packetsToAcknowledge.Clear();
+
                 // ResetRevision Paket senden damit die Revision wieder zurück gesetzt wird
                 SendPacket(new PacketResetRevision(), true);
                 
@@ -511,15 +513,32 @@ namespace KugelmatikLibrary
             if (IsDisposed)
                 throw new ObjectDisposedException(GetType().Name);
 
-            // Zeit zwischen zwei Pins ist zu lange her, wir können davon ausgehen, dass das Cluster offline ist
-            if (Environment.TickCount - lastPing > 5000)
-                Ping = -1;
+            CheckConnection();
 
             // StopWatch zum Messen der Zeit für die Pings starten
             if (!stopwatch.IsRunning)
                 stopwatch.Start();
 
             SendPacket(new PacketPing(stopwatch.ElapsedMilliseconds), false);
+        }
+
+        /// <summary>
+        /// Überprüft die Verbindung.
+        /// </summary>
+        /// <returns>Ob eine Verbindung vorhanden ist.</returns>
+        public bool CheckConnection()
+        {
+            if (!IsOnline)
+                return false;
+
+            // Zeit zwischen zwei Pins ist zu lange her, wir können davon ausgehen, dass das Cluster offline ist
+            if (Environment.TickCount - lastPing > 5000)
+            {
+                Log.Warning("Lost connection to {0} (no ping received)", Address);
+                Ping = -1;
+            }
+
+            return IsOnline;
         }
 
         /// <summary>
@@ -749,9 +768,7 @@ namespace KugelmatikLibrary
                         if (packet.Length < HeaderSize + sizeof(long))
                             throw new InvalidDataException("Packet is not long enough.");
 
-                        if (ping < 0)
-                            if (OnConnected != null)
-                                OnConnected(this, EventArgs.Empty);
+                        bool wasNotConnected = !CheckConnection();
 
                         lastPing = Environment.TickCount;
 
@@ -759,6 +776,9 @@ namespace KugelmatikLibrary
                         Ping = (int)(stopwatch.ElapsedMilliseconds - time);
 
                         RemovePacketToAcknowlegde(revision);
+
+                        if (wasNotConnected && OnConnected != null)
+                            OnConnected(this, EventArgs.Empty);
                         break;
                     case PacketType.Ack:
                         IPacket acknowlegdedPacket;
