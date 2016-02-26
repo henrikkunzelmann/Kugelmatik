@@ -1,0 +1,98 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{C5F80730-F44F-4478-BDAE-6634EFC2CA88}</ProjectGuid>
+    <RootNamespace>Firmware</RootNamespace>
+    <ProjectName>Firmware</ProjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>
+    </PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>
+    </PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup />
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <ForcedIncludeFiles>%(ForcedIncludeFiles)</ForcedIncludeFiles>
+      <IgnoreStandardIncludePath>true</IgnoreStandardIncludePath>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>C:\Program Files (x86)\Arduino\hardware\avrnetio\avr\cores\avrnetio;C:\Program Files (x86)\Arduino\hardware\avrnetio\avr\variants\avrnetio;C:\Users\Henrik\Desktop\Projekte\Kugelmatik\Firmware;C:\Program Files (x86)\Arduino\libraries\ethercard;C:\Program Files (x86)\Arduino\libraries\ethercard\utility;C:\Program Files (x86)\Arduino\libraries\i2c;C:\Program Files (x86)\Arduino\libraries\i2c\utility;C:\Program Files (x86)\Arduino\libraries\MCP23017;C:\Program Files (x86)\Arduino\libraries\MCP23017\utility;C:\Program Files (x86)\Arduino\libraries;C:\Program Files (x86)\Arduino\hardware\avrnetio\avr\libraries;C:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\IDE\Extensions\s4fmyq1m.eui\Micro Platforms\default\debuggers;C:\Users\Henrik\Documents\Arduino\libraries;C:\Program Files (x86)\Arduino\hardware\tools\avr/avr/include/;C:\Program Files (x86)\Arduino\hardware\tools\avr//avr/include/avr/;C:\Program Files (x86)\Arduino\hardware\tools\avr/lib\gcc\avr\4.8.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <ForcedIncludeFiles>C:\Users\Henrik\Desktop\Projekte\Kugelmatik\Firmware\__vm\.Firmware.vsarduino.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
+      <PreprocessorDefinitions>__AVR_ATmega32__;ARDUINO=10607;ARDUINO_MAIN;__AVR__;__avr__;F_CPU=16000000L;__cplusplus=201103L;ARDUINO_ARCH_AVR;ARDUINO_AVR_AVRNETIO_AVRNETIO_AVR_ANIO32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <None Include="Firmware.ino">
+      <FileType>CppCode</FileType>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="cluster_led.h" />
+    <ClInclude Include="constants.h" />
+    <ClInclude Include="__vm\.Firmware.vsarduino.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="cluster_led.cpp" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+  <ProjectExtensions>
+    <VisualStudio>
+      <UserProperties arduino.upload.maximum_size="32256" arduino.upload.speed="115200" visualmicro.package.name="avrnetio" arduino.board.property_bag="name=avrnetio w/ atmega32 (optiboot.c)&#xD;&#xA;build.mcu=atmega32&#xD;&#xA;build.f_cpu=16000000L&#xD;&#xA;build.core=avrnetio&#xD;&#xA;build.variant=avrnetio&#xD;&#xA;upload.protocol=arduino&#xD;&#xA;upload.maximum_size=32256&#xD;&#xA;upload.speed=115200&#xD;&#xA;bootloader.path=optiboot&#xD;&#xA;bootloader.file=optiboot_anio32.hex&#xD;&#xA;bootloader.low_fuses=0xBF&#xD;&#xA;bootloader.high_fuses=0xDE&#xD;&#xA;bootloader.unlock_bits=0x0f&#xD;&#xA;bootloader.lock_bits=0x3f&#xD;&#xA;runtime.ide.path=C:\Program Files (x86)\Arduino&#xD;&#xA;build.system.path=C:\Program Files (x86)\Arduino\hardware\avrnetio\avr\system&#xD;&#xA;runtime.ide.version=10607&#xD;&#xA;target_package=avrnetio&#xD;&#xA;target_platform=avr&#xD;&#xA;runtime.hardware.path=C:\Program Files (x86)\Arduino\hardware\avrnetio&#xD;&#xA;originalid=avrnetio_avr_anio32&#xD;&#xA;intellisense.tools.path={runtime.tools.avr-gcc.path}/&#xD;&#xA;intellisense.include.paths={intellisense.tools.path}avr/include/;{intellisense.tools.path}/avr/include/avr/;{intellisense.tools.path}lib\gcc\avr\4.8.1\include&#xD;&#xA;tools.atprogram.cmd.path=%AVRSTUDIO_EXE_PATH%\atbackend\atprogram&#xD;&#xA;tools.atprogram.cmd.setwinpath=true&#xD;&#xA;tools.atprogram.program.params.verbose=-v&#xD;&#xA;tools.atprogram.program.params.quiet=-q&#xD;&#xA;tools.atprogram.program.pattern=&quot;{cmd.path}&quot; -d {build.mcu} {program.verbose} {program.extra_params} program -c -f &quot;{build.path}\{build.project_name}.hex&quot;&#xD;&#xA;tools.atprogram.program.xpattern=&quot;{cmd.path}&quot; {AVRSTUDIO_BACKEND_CONNECTION} -d {build.mcu} {program.verbose} {program.extra_params} program -c -f &quot;{build.path}\{build.project_name}.hex&quot;&#xD;&#xA;tools.atprogram.erase.params.verbose=-v&#xD;&#xA;tools.atprogram.erase.params.quiet=-q&#xD;&#xA;tools.atprogram.bootloader.params.verbose=-v&#xD;&#xA;tools.atprogram.bootloader.params.quiet=-q&#xD;&#xA;tools.atprogram.bootloader.pattern=&quot;{cmd.path}&quot; -d {build.mcu} {bootloader.verbose}  program -c -f &quot;{runtime.ide.path}/hardware/arduino/avr/bootloaders/{bootloader.file}&quot;&#xD;&#xA;tools.ctags.path={runtime.tools.ctags.path}&#xD;&#xA;tools.ctags.cmd.path={path}/ctags&#xD;&#xA;tools.ctags.pattern=&quot;{cmd.path}&quot; -u --language-force=c++ -f - --c++-kinds=svpf --fields=KSTtzns --line-directives &quot;{source_file}&quot;&#xD;&#xA;tools.avrdude.path={runtime.tools.avrdude.path}&#xD;&#xA;preproc.includes.flags=-w -x c++ -M -MG -MP&#xD;&#xA;preproc.includes.compatibility_flags={build.mbed_api_include} {build.nRF51822_api_include} {build.ble_api_include} {compiler.libsam.c.flags} {compiler.arm.cmsis.path} {build.variant_system_include}&#xD;&#xA;recipe.preproc.includes=&quot;{compiler.path}{compiler.cpp.cmd}&quot; {preproc.includes.flags} -DF_CPU={build.f_cpu} -DARDUINO={runtime.ide.version} -DARDUINO_{build.board} -DARDUINO_ARCH_{build.arch} {compiler.cpp.extra_flags} {build.extra_flags} {preproc.includes.compatibility_flags} {includes} &quot;{source_file}&quot;&#xD;&#xA;preproc.macros.flags=-w -x c++ -E -CC&#xD;&#xA;preproc.macros.compatibility_flags={build.mbed_api_include} {build.nRF51822_api_include} {build.ble_api_include} {compiler.libsam.c.flags} {compiler.arm.cmsis.path} {build.variant_system_include}&#xD;&#xA;recipe.preproc.macros=&quot;{compiler.path}{compiler.cpp.cmd}&quot; {compiler.cpreprocessor.flags} {compiler.cpp.flags} {preproc.macros.flags} -DF_CPU={build.f_cpu} -DARDUINO={runtime.ide.version} -DARDUINO_{build.board} -DARDUINO_ARCH_{build.arch} {compiler.cpp.extra_flags} {build.extra_flags} {preproc.macros.compatibility_flags} {includes} &quot;{source_file}&quot; -o &quot;{preprocessed_file_path}&quot;&#xD;&#xA;vm.platform.root.path=C:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\IDE\Extensions\s4fmyq1m.eui\Micro Platforms\arduino16x&#xD;&#xA;dragonisp.name=Dragon ISP&#xD;&#xA;dragonisp.communication=usb&#xD;&#xA;dragonisp.protocol=dragon_isp&#xD;&#xA;runtime.tools.avrdude.path=C:\Program Files (x86)\Arduino\hardware\tools\avr&#xD;&#xA;runtime.tools.avrdude-6.0.1-arduino5.path=C:\Program Files (x86)\Arduino\hardware\tools\avr&#xD;&#xA;runtime.tools.avr-gcc.path=C:\Program Files (x86)\Arduino\hardware\tools\avr&#xD;&#xA;runtime.tools.avr-gcc-4.8.1-arduino5.path=C:\Program Files (x86)\Arduino\hardware\tools\avr&#xD;&#xA;runtime.tools.esptool.path=C:\Users\Henrik\AppData\Local\arduino15\packages\esp8266\tools\esptool\0.4.6&#xD;&#xA;runtime.tools.esptool-0.4.6.path=C:\Users\Henrik\AppData\Local\arduino15\packages\esp8266\tools\esptool\0.4.6&#xD;&#xA;runtime.tools.mkspiffs.path=C:\Users\Henrik\AppData\Local\arduino15\packages\esp8266\tools\mkspiffs\0.1.2&#xD;&#xA;runtime.tools.mkspiffs-0.1.2.path=C:\Users\Henrik\AppData\Local\arduino15\packages\esp8266\tools\mkspiffs\0.1.2&#xD;&#xA;runtime.tools.xtensa-lx106-elf-gcc.path=C:\Users\Henrik\AppData\Local\arduino15\packages\esp8266\tools\xtensa-lx106-elf-gcc\1.20.0-26-gb404fb9-2&#xD;&#xA;runtime.tools.xtensa-lx106-elf-gcc-1.20.0-26-gb404fb9-2.path=C:\Users\Henrik\AppData\Local\arduino15\packages\esp8266\tools\xtensa-lx106-elf-gcc\1.20.0-26-gb404fb9-2&#xD;&#xA;ide.hint=For use with Arduino.cc 1.6.2+ ide&#xD;&#xA;ide.location.key=Arduino16x&#xD;&#xA;ide.location.ide.winreg=Arduino 1.6.x Application&#xD;&#xA;ide.location.sketchbook.winreg=Arduino 1.6.x Sketchbook&#xD;&#xA;ide.location.sketchbook.preferences=sketchbook.path&#xD;&#xA;ide.default.revision_name=1.6.7&#xD;&#xA;ide.default.version=10607&#xD;&#xA;ide.default.package=arduino&#xD;&#xA;ide.default.platform=avr&#xD;&#xA;ide.multiplatform=true&#xD;&#xA;ide.includes=arduino.h&#xD;&#xA;ide.exe_name=arduino&#xD;&#xA;ide.platformswithoutpackage=false&#xD;&#xA;ide.includes.fallback=wprogram.h&#xD;&#xA;ide.extension=ino&#xD;&#xA;ide.extension.fallback=pde&#xD;&#xA;ide.versionGTEQ=160&#xD;&#xA;ide.exe=arduino.exe&#xD;&#xA;ide.hosts=atmel&#xD;&#xA;ide.url=http://arduino.cc/en/Main/Software&#xD;&#xA;ide.help.reference.path=reference\arduino.cc\en\Reference&#xD;&#xA;ide.help.reference.path2=reference\www.arduino.cc\en\Reference&#xD;&#xA;ide.help.reference.serial=reference\www.arduino.cc\en\Serial&#xD;&#xA;vm.debug=true&#xD;&#xA;software=ARDUINO&#xD;&#xA;ssh.user.name=root&#xD;&#xA;ssh.user.default.password=arduino&#xD;&#xA;ssh.host.wwwfiles.path=/www/sd&#xD;&#xA;build.working_directory={runtime.ide.path}&#xD;&#xA;ide.location.preferences.portable={runtime.ide.path}\portable&#xD;&#xA;ide.location.preferences=%VM_APPDATA_LOCAL%\arduino15\preferences.txt&#xD;&#xA;ide.location.preferences_fallback=%VM_APPDATA_ROAMING%\arduino15\preferences.txt&#xD;&#xA;ide.location.contributions=%VM_APPDATA_LOCAL%\arduino15&#xD;&#xA;ide.location.contributions_fallback=%VM_APPDATA_ROAMING%\arduino15&#xD;&#xA;ide.contributions.boards.allow=true&#xD;&#xA;ide.contributions.boards.ignore_unless_rewrite_found=true&#xD;&#xA;ide.contributions.libraries.allow=true&#xD;&#xA;ide.contributions.boards.support.urls.wiki=https://github.com/arduino/Arduino/wiki/Unofficial-list-of-3rd-party-boards-support-urls&#xD;&#xA;ide.create_platforms_from_boardsTXT.teensy=build.core&#xD;&#xA;ide.appid=arduino16x&#xD;&#xA;location.sketchbook=C:\Users\Henrik\Documents\Arduino&#xD;&#xA;vm.core.include=arduino.h&#xD;&#xA;build.board=AVR_AVRNETIO_AVRNETIO_AVR_ANIO32&#xD;&#xA;vm.boardsource.path=C:\Program Files (x86)\Arduino\hardware\avrnetio\avr&#xD;&#xA;runtime.platform.path=C:\Program Files (x86)\Arduino\hardware\avrnetio\avr&#xD;&#xA;vm.platformname.name=avr&#xD;&#xA;build.arch=AVR&#xD;&#xA;" visualmicro.application.name="arduino16x" arduino.build.mcu="atmega32" arduino.build.auto_discover_includes="0" arduino.upload.protocol="arduino" arduino.build.f_cpu="16000000L" arduino.board.desc="avrnetio w/ atmega32 (optiboot.c)" arduino.board.name="avrnetio_avrnetio_avr_anio32" visualmicro.platform.name="avr" arduino.build.core="avrnetio" />
+    </VisualStudio>
+  </ProjectExtensions>
+</Project>
