@@ -257,6 +257,7 @@ namespace KugelmatikLibrary
             OnConnected += (sender, args) =>
             {
                 packetsToAcknowledge.Clear();
+                packetSendTime.Clear();
 
                 // ResetRevision Paket senden damit die Revision wieder zurück gesetzt wird
                 SendPacket(new PacketResetRevision(), true);
