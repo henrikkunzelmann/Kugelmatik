@@ -10,20 +10,9 @@
 
 // Defines
 #define BUILD_VERSION 14
+
 #define ENABLE_LOG false // aktiviert den Log der im EEPROM Speicher erzeugt wird
-
-
-#define BLINK_LED_ASYNC false // gibt an ob die LED async blinken soll, also unabhängig davon was die Firmware gerade macht
-#define WRITE_INTERSTRUCTION_POINTER false // gibt an ob der aktuelle Instruction Pointer gespeichert werden soll (experimentell)
-#define ENABLE_TIMER1 (BLINK_LED_ASYNC  || WRITE_INTERSTRUCTION_POINTER)
-
 #define ENABLE_WATCH_DOG true		// gibt an ob der WatchDog aktiviert sein soll, der Chip wird resetet wenn er sich aufhängt
-#define ENABLE_WATCH_DOG_SAVE false // WIP, WIRD NICHT UNTERSTÜTZT; gibt an ob nach einem Watch Dog Reset die Stepper Daten aus dem EEPROM gelesen werden sollen
-
-#define ENABLE_INTERRUPTS true // gibt an ob die Interrupts immer an sein sollen
-
-
-#define _DISABLE_INTERRUPTS (!ENABLE_INTERRUPTS && (!ENABLE_TIMER1 || (ENABLE_WATCH_DOG && ENABLE_WATCH_DOG_SAVE)))
 
 #define LAN_ID 0x11 // ID des Boards im LAN, wird benutzt um die Mac-Adresse zu generieren
 const static byte ethernetMac[] = { 0x74, 0x69, 0x69, 0x2D, 0x30, LAN_ID }; // Mac-Adresse des Boards
@@ -1018,16 +1007,6 @@ void setup()
 	wdt_disable(); // Watch Dog deaktivieren, da er noch aktiviert sein kann
 	printLogString("init");
 
-#if ENABLE_TIMER1
-	printLogString("timer1");
-
-	noInterrupts();
-	TCCR1B |= (1 << CS11);
-	TCNT1 = 0;
-	TIMSK |= (1 << TOIE1);
-	interrupts();
-#endif
-
 	// LEDs setzen
 	pinMode(LED_GREEN, OUTPUT);
 	pinMode(LED_RED, OUTPUT);
@@ -1064,13 +1043,7 @@ void setup()
 	turnGreenLedOff();
 
 #if ENABLE_WATCH_DOG
-	noInterrupts();
 	wdt_enable(WDTO_2S);
-
-#if ENABLE_WATCH_DOG_SAVE
-	WDTCSR |= 1 << WDIE;
-#endif
-	interrupts();
 #endif
 }
 
@@ -1156,9 +1129,6 @@ int freeRam() {
 
 void loop()
 {
-#if DISABLE_INTERRUPTS
-	noInterrupts();
-#endif
 	unsigned long procStart = micros();
 
 	updateSteppers(false);
@@ -1184,51 +1154,4 @@ void loop()
 		if (time - procStart >= tickTime)
 			break;
 	}
-
-#if DISABLE_INTERRUPTS
-	interrupts();
-#endif
-}
-
-int16_t tickCount = 0;
-
-ISR(TIMER1_OVF_vect) {
-	if (tickCount++ >= 128) {
-#if BLINK_LED_ASYNC
-		if (tickCount % 128 == 0)
-			toogleGreenLed();
-#endif
-#if WRITE_INTERSTRUCTION_POINTER
-		if (tickCount % 128 == 0) {
-			byte addr1 = 0;
-			byte addr2 = 0;
-			// Adresse von Stack nehmen
-			asm volatile ("pop %0" : "=w"(addr1));
-			asm volatile ("pop %0" : "=w"(addr2));
-
-			// Adresse wieder auf Stack kopieren
-			asm volatile ("push %0" ::  "w"(addr2));
-			asm volatile ("push %0" ::  "w"(addr1));
-
-			updateEEPROM(1, addr1);
-			updateEEPROM(2, addr2);
-		}
-#endif
-
-		tickCount = 0;
-	}
-}
-
-
-// wird aufgerufen wenn der WatchDog aktiviert wurde und der Chip zurück gesetzt wird
-ISR(WDT_vect) {
-	turnRedLedOn();
-	wdt_disable();
-
-	printLogString("watchdog");
-#if ENABLE_WATCH_DOG_SAVE
-	saveStepData();
-#endif
-
-	softReset();
 }
