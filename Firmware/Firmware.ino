@@ -277,39 +277,6 @@ void stopMove() {
 	}
 }
 
-#define STEPPER_DATA_START 128 // Bytes, Adresse im EEPROM an dem Stepper Data anfangen soll
-
-// speichert die CurrentSteps der Stepper im EEPROM
-void saveStepData() {
-	updateEEPROM(STEPPER_DATA_START, 1); // speichern, dass Daten vorhanden sind
-
-	int32_t dataPointer = STEPPER_DATA_START + 1;
-	for (byte i = 0; i < MCP_COUNT; i++) {
-		for (byte j = 0; j < STEPPER_COUNT; j++) {
-			StepperData* stepper = &mcps[i].Steppers[j];
-			updateEEPROM(dataPointer++, stepper->CurrentSteps & 0xFF);
-			updateEEPROM(dataPointer++, (stepper->CurrentSteps >> 8) & 0xFF);
-		}
-	}
-}
-
-// versucht die CurrentSteps der Stepper aus dem EEPROM zu lesen
-boolean tryLoadStepData() {
-	if (EEPROM.read(STEPPER_DATA_START) != 1)
-		return false; // keine Daten vorhanden
-
-	int32_t dataPointer = STEPPER_DATA_START + 1;
-	for (byte i = 0; i < MCP_COUNT; i++) {
-		for (byte j = 0; j < STEPPER_COUNT; j++) {
-			StepperData* stepper = &mcps[i].Steppers[j];
-			stepper->CurrentSteps |= EEPROM.read(dataPointer++);
-			stepper->CurrentSteps |= EEPROM.read(dataPointer++) << 8;
-		}
-	}
-	EEPROM.write(STEPPER_DATA_START, 0);
-	return true;
-}
-
 // liest einen unsigned short aus einem char-Array angefangen ab offset Bytes
 uint16_t readUInt16(const char* data, int32_t offset)
 {
@@ -1013,8 +980,6 @@ void setup()
 
 	turnGreenLedOn();
 	initAllMCPs();
-
-	tryLoadStepData();
 
 	delay(LAN_ID * 10); // Init verzögern damit das Netzwerk nicht überlastet wird
 
