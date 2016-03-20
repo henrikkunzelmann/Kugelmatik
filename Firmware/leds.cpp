@@ -2,7 +2,7 @@
 // 
 // 
 
-#include "cluster_led.h"
+#include "leds.h"
 #include <avr/wdt.h>
 
 
@@ -11,6 +11,11 @@
 boolean ledStateGreen = false; // Status der LED für LED_Green (grüne LED)
 boolean ledStateRed = false; // Status der LED für LED_Red (rote LED)
 
+void setupLeds()
+{
+	pinMode(LED_GREEN, OUTPUT);
+	pinMode(LED_RED, OUTPUT);
+}
 
 // setzt die grüne LED an
 void turnGreenLedOn()

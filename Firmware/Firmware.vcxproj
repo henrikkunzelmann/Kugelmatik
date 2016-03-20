@@ -63,10 +63,10 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>C:\Program Files (x86)\Arduino\hardware\avrnetio\avr\cores\avrnetio;C:\Program Files (x86)\Arduino\hardware\avrnetio\avr\variants\avrnetio;C:\Users\Henrik\Desktop\Projekte\Kugelmatik\Firmware;C:\Program Files (x86)\Arduino\libraries\ethercard;C:\Program Files (x86)\Arduino\libraries\ethercard\utility;C:\Program Files (x86)\Arduino\libraries\i2c;C:\Program Files (x86)\Arduino\libraries\i2c\utility;C:\Program Files (x86)\Arduino\libraries\MCP23017;C:\Program Files (x86)\Arduino\libraries\MCP23017\utility;C:\Program Files (x86)\Arduino\libraries;C:\Program Files (x86)\Arduino\hardware\avrnetio\avr\libraries;C:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\IDE\Extensions\s4fmyq1m.eui\Micro Platforms\default\debuggers;C:\Users\Henrik\Documents\Arduino\libraries;C:\Program Files (x86)\Arduino\hardware\tools\avr/avr/include/;C:\Program Files (x86)\Arduino\hardware\tools\avr//avr/include/avr/;C:\Program Files (x86)\Arduino\hardware\tools\avr/lib\gcc\avr\4.8.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\Henrik\AppData\Local\arduino15\packages\avrnetio\hardware\avr\1.0.0\cores\avrnetio;C:\Users\Henrik\AppData\Local\arduino15\packages\avrnetio\hardware\avr\1.0.0\variants\avrnetio;C:\Users\Henrik\Desktop\Projekte\Kugelmatik\Firmware;C:\Program Files (x86)\Arduino\libraries\EEPROM;C:\Program Files (x86)\Arduino\libraries\EEPROM\utility;C:\Users\Henrik\AppData\Local\arduino15\packages\avrnetio\hardware\avr\1.0.0\libraries\ethercard;C:\Users\Henrik\AppData\Local\arduino15\packages\avrnetio\hardware\avr\1.0.0\libraries\ethercard\utility;C:\Program Files (x86)\Arduino\libraries\i2c;C:\Program Files (x86)\Arduino\libraries\i2c\utility;C:\Program Files (x86)\Arduino\libraries\MCP23017;C:\Program Files (x86)\Arduino\libraries\MCP23017\utility;C:\Program Files (x86)\Arduino\libraries;C:\Users\Henrik\AppData\Local\arduino15\packages\avrnetio\hardware\avr\1.0.0\libraries;C:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\IDE\Extensions\s4fmyq1m.eui\Micro Platforms\default\debuggers;C:\Users\Henrik\Documents\Arduino\libraries;C:\Program Files (x86)\Arduino\hardware\tools\avr/avr/include/;C:\Program Files (x86)\Arduino\hardware\tools\avr//avr/include/avr/;C:\Program Files (x86)\Arduino\hardware\tools\avr/lib\gcc\avr\4.8.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ForcedIncludeFiles>C:\Users\Henrik\Desktop\Projekte\Kugelmatik\Firmware\__vm\.Firmware.vsarduino.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <WholeProgramOptimization>false</WholeProgramOptimization>
-      <PreprocessorDefinitions>__AVR_ATmega32__;ARDUINO=10607;ARDUINO_MAIN;__AVR__;__avr__;F_CPU=16000000L;__cplusplus=201103L;ARDUINO_ARCH_AVR;ARDUINO_AVR_AVRNETIO_AVRNETIO_AVR_ANIO32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>__AVR_ATmega32__;ARDUINO=10607;ARDUINO_MAIN;__AVR__;__avr__;F_CPU=16000000L;__cplusplus=201103L;ARDUINO_ARCH_AVR;ARDUINO_AVR_NET_IO;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -80,12 +80,20 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="cluster_led.h" />
+    <ClInclude Include="leds.h" />
+    <ClInclude Include="config.h" />
     <ClInclude Include="constants.h" />
+    <ClInclude Include="network.h" />
+    <ClInclude Include="stepper.h" />
+    <ClInclude Include="util.h" />
     <ClInclude Include="__vm\.Firmware.vsarduino.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="cluster_led.cpp" />
+    <ClCompile Include="leds.cpp" />
+    <ClCompile Include="config.cpp" />
+    <ClCompile Include="network.cpp" />
+    <ClCompile Include="stepper.cpp" />
+    <ClCompile Include="util.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

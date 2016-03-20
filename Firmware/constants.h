@@ -1,6 +1,7 @@
 #ifndef CONSTANTS_H_
 #define CONSTANTS_H_
 
+#define BUILD_VERSION 15
 
 #define PacketPing 1
 #define PacketAck 2
