@@ -83,6 +83,7 @@
     <ClInclude Include="leds.h" />
     <ClInclude Include="config.h" />
     <ClInclude Include="constants.h" />
+    <ClInclude Include="log.h" />
     <ClInclude Include="network.h" />
     <ClInclude Include="stepper.h" />
     <ClInclude Include="util.h" />
@@ -91,6 +92,7 @@
   <ItemGroup>
     <ClCompile Include="leds.cpp" />
     <ClCompile Include="config.cpp" />
+    <ClCompile Include="log.cpp" />
     <ClCompile Include="network.cpp" />
     <ClCompile Include="stepper.cpp" />
     <ClCompile Include="util.cpp" />

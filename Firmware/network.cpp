@@ -53,13 +53,13 @@ void initNetwork()
 	uint8_t rev = ether.begin(sizeof Ethernet::buffer, ethernetMac, 28);
 	if (rev == 0)
 	{
-		error(1, "ethernet begin failed");
+		error("init", "ethernet begin failed");
 		return; // wird niemals passieren da error() in eine Endloschleife geht
 	}
 
 	if (!ether.dhcpSetup())
 	{
-		error(2, "dhcp failed");
+		error("init", "dhcp failed");
 		return;
 	}
 

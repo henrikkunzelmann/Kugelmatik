@@ -5,11 +5,12 @@
 #include <avr/wdt.h> 
 
 #include "leds.h"
+#include "log.h"
 
 void softReset(); // setzt den Chip zurück
 
 // bringt den Chip in den Fehler-Modus und blockiert ihn 
-void error(byte code, char* message);
+void error(const char* tag, const char* message);
 
 void usdelay(uint16_t us);
 

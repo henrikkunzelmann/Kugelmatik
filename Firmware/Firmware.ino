@@ -29,6 +29,7 @@
 #include <MCP23017.h>
 #include "constants.h"
 #include "util.h"
+#include "log.h"
 #include "leds.h"
 #include "config.h"
 #include "stepper.h"

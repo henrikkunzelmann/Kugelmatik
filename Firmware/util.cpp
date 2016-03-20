@@ -7,8 +7,9 @@ void softReset()
 }
 
 // bringt den Chip in den Fehler-Modus und blockiert ihn 
-void error(byte code, char* message)
+void error(const char* tag, const char* message)
 {
+	Log::error(tag, message);
 	while (true) {
 		toogleRedLed();
 		delay(500);
