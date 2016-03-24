@@ -116,17 +116,16 @@ namespace KugelmatikLibrary
             cancellationToken.Cancel();
         }
 
-        private void SetSteppers()
+        private void SetSteppers(TimeSpan span)
         {
-            // Alle Kugeln auf Anfang bewegen lassen
             for (int x = 0; x < Kugelmatik.StepperCountX; x++)
                 for (int y = 0; y < Kugelmatik.StepperCountY; y++)
-                    Kugelmatik.GetStepperByPosition(x, y).Set(Choreography.GetHeight(Kugelmatik.Config, TimeSpan.Zero, x, y));
+                    Kugelmatik.GetStepperByPosition(x, y).Set(Choreography.GetHeight(Kugelmatik.Config, span, x, y));
         }
 
         private void Run()
         {
-            SetSteppers();
+            SetSteppers(TimeSpan.Zero);
             Kugelmatik.SendData(true);
 
             // warten bis alle Pakete bestätigt wurden
@@ -149,7 +148,7 @@ namespace KugelmatikLibrary
                 TimeSpan timeStamp = time.Elapsed;
 
                 // Daten setzen und zu den Clustern senden
-                SetSteppers();
+                SetSteppers(timeStamp);
                 Kugelmatik.SendData();
 
                 // alle 2 Sekunden Ping senden
