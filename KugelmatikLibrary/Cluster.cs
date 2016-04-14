@@ -263,8 +263,8 @@ namespace KugelmatikLibrary
                 SendPacket(new PacketResetRevision(), true);
                 
                 // Daten abfragen
-                // SendGetData();
-                // SendInfo();
+                SendGetData();
+                SendInfo();
             };
         }
 
