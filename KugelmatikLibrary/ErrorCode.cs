@@ -14,7 +14,7 @@ namespace KugelmatikLibrary
         InvalidY = 3,
         InvalidMagic = 4,
         BufferOverflow = 5,
-        UnkownPacket = 6,
+        UnknownPacket = 6,
         NotRunningBusy = 7,
         InvalidConfigValue = 8,
         InvalidHeight = 9,

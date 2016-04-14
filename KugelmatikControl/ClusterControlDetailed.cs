@@ -294,7 +294,7 @@ namespace KugelmatikControl
             CurrentCluster.SetAllStepper((ushort)clusterHeightTrackBar.Value);
         }
 
-        private void sendDataButton_Click(object sender, EventArgs e)
+        private void setDataButton_Click(object sender, EventArgs e)
         {
             CurrentCluster.SendSetData();
         }

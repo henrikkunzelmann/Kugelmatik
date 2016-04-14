@@ -37,6 +37,7 @@
             this.clusterHeightTrackBar = new System.Windows.Forms.TrackBar();
             this.clusterHeight = new System.Windows.Forms.NumericUpDown();
             this.label1 = new System.Windows.Forms.Label();
+            this.setDataButton = new System.Windows.Forms.Button();
             this.blinkButton = new System.Windows.Forms.Button();
             this.configButton = new System.Windows.Forms.Button();
             this.stopButton = new System.Windows.Forms.Button();
@@ -53,7 +54,6 @@
             this.blinkContextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.greenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.redToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.sendDataButton = new System.Windows.Forms.Button();
             splitContainer1 = new System.Windows.Forms.SplitContainer();
             ((System.ComponentModel.ISupportInitialize)(splitContainer1)).BeginInit();
             splitContainer1.Panel1.SuspendLayout();
@@ -89,7 +89,7 @@
             // 
             // splitContainer1.Panel2
             // 
-            splitContainer1.Panel2.Controls.Add(this.sendDataButton);
+            splitContainer1.Panel2.Controls.Add(this.setDataButton);
             splitContainer1.Panel2.Controls.Add(this.blinkButton);
             splitContainer1.Panel2.Controls.Add(this.configButton);
             splitContainer1.Panel2.Controls.Add(this.stopButton);
@@ -188,6 +188,17 @@
             this.label1.Size = new System.Drawing.Size(56, 15);
             this.label1.TabIndex = 0;
             this.label1.Text = "Cluster";
+            // 
+            // setDataButton
+            // 
+            this.setDataButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.setDataButton.Location = new System.Drawing.Point(165, 66);
+            this.setDataButton.Name = "setDataButton";
+            this.setDataButton.Size = new System.Drawing.Size(78, 23);
+            this.setDataButton.TabIndex = 7;
+            this.setDataButton.Text = "Set data";
+            this.setDataButton.UseVisualStyleBackColor = true;
+            this.setDataButton.Click += new System.EventHandler(this.setDataButton_Click);
             // 
             // blinkButton
             // 
@@ -354,17 +365,6 @@
             this.redToolStripMenuItem.Text = "Red";
             this.redToolStripMenuItem.Click += new System.EventHandler(this.redToolStripMenuItem_Click);
             // 
-            // sendDataButton
-            // 
-            this.sendDataButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.sendDataButton.Location = new System.Drawing.Point(165, 66);
-            this.sendDataButton.Name = "sendDataButton";
-            this.sendDataButton.Size = new System.Drawing.Size(78, 23);
-            this.sendDataButton.TabIndex = 7;
-            this.sendDataButton.Text = "Send data";
-            this.sendDataButton.UseVisualStyleBackColor = true;
-            this.sendDataButton.Click += new System.EventHandler(this.sendDataButton_Click);
-            // 
             // ClusterControlDetailed
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -419,6 +419,6 @@
         private System.Windows.Forms.TrackBar clusterHeightTrackBar;
         private System.Windows.Forms.NumericUpDown clusterHeight;
         private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.Button sendDataButton;
+        private System.Windows.Forms.Button setDataButton;
     }
 }

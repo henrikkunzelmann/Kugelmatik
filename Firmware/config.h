@@ -24,8 +24,9 @@ struct Config {
 	uint32_t homeTime;
 	uint32_t fixTime;
 
-	uint32_t maxSteps; // Maximale Anzahl an Schritten die die Firmware maximal machen darf (nach unten)
-	uint32_t fixSteps; // Anzahl an Schritten die die Firmware macht um eine Kugel nach unten zu fahren (ignoriert dabei maxSteps)
+	int16_t maxSteps; // Maximale Anzahl an Schritten die die Firmware maximal machen darf (nach unten)
+	int16_t homeSteps;
+	int16_t fixSteps; // Anzahl an Schritten die die Firmware macht um eine Kugel nach unten zu fahren (ignoriert dabei maxSteps)
 };
 
 // gibt die Standard Config zurück

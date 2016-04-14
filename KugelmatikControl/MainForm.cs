@@ -37,14 +37,33 @@ namespace KugelmatikControl
             Log.WriteToConsole = false;
             Log.WriteToDebug = false;
 
-            Config config = new Config();
+            LoadKugelmatik();
+        }
 
-            if (File.Exists(ConfigFile))
+        private void LoadKugelmatik()
+        {
+            if (choreography != null)
+            {
+                if (choreography.IsRunning)
+                    choreography.Stop();
+                choreography.Dispose();
+                choreography = null;
+            }
+            if (Kugelmatik != null)
+                Kugelmatik.Dispose();
+
+            Log.Info("Loading kugelmatik...");
+
+            Config config;
+            if (Kugelmatik != null)
+                config = Kugelmatik.Config;
+            else if (File.Exists(ConfigFile))
                 config = Config.LoadConfigFromFile(ConfigFile);
             else
+            {
+                config = new Config();
                 config.SaveToFile(ConfigFile);
-
-
+            }
 
             Kugelmatik = new Kugelmatik(config);
 
@@ -61,7 +80,7 @@ namespace KugelmatikControl
                     clusterControls[y * Kugelmatik.Config.KugelmatikWidth + x] = cluster;
                 }
 
-            UpdateChoreographyStatus();;
+            UpdateChoreographyStatus();
         }
 
         protected override void OnClosed(EventArgs e)
@@ -85,9 +104,9 @@ namespace KugelmatikControl
             // Daten senden
             if (!viewOnlyToolStripMenuItem.Checked)
             {
-                // alle 4 Ticks werden die Daten vollständig gesendet
+                // alle 8 Ticks werden die Daten vollständig gesendet
                 // damit werden out-of-sync Fehler behoben wenn ein Paket vom Cluster nicht verarbeitet wurde
-                if (tickCount % 4 == 0)
+                if (tickCount % 8 == 0)
                     Kugelmatik.SendData(false, true);
                 else
                     Kugelmatik.SendData();
@@ -107,7 +126,7 @@ namespace KugelmatikControl
             if (choreography != null)
             {
                 for (int i = 0; i < clusterControls.Length; i++)
-                    clusterControls[i].UpdateSteppers();
+                    clusterControls[i]?.UpdateSteppers();
 
                 clusterForm?.ClusterControl?.UpdateSteppers();
             }
@@ -135,9 +154,12 @@ namespace KugelmatikControl
         private void UpdateNetworkStatus()
         {
             // Ping berechnen
-            double avgPing = Kugelmatik.EnumerateClusters().Select(c => c.Ping).Average();
-            int maxPing = Kugelmatik.EnumerateClusters().Select(c => c.Ping).Max();
-            int pending = Kugelmatik.EnumerateClusters().Select(c => c.PendingAcknowledgePacketsCount).Sum();
+            var clusters = Kugelmatik.EnumerateClusters();
+            var pings = clusters.Select(c => c.Ping);
+
+            double avgPing = pings.Average();
+            int maxPing = pings.Max();
+            int pending = clusters.Select(c => c.PendingAcknowledgePacketsCount).Sum();
 
             networkStatusLabel.Text = string.Format(Properties.Resources.NetworkStatus,
                 avgPing < 0 ? "n/a" : string.Format("{0:0.0}ms", avgPing),
@@ -160,7 +182,8 @@ namespace KugelmatikControl
         private void SetAutomaticUpdate(bool value)
         {
             for (int i = 0; i < clusterControls.Length; i++)
-                clusterControls[i].AutomaticUpdate = value;
+                if (clusterControls[i] != null)
+                    clusterControls[i].AutomaticUpdate = value;
 
             if (clusterForm != null && clusterForm.ClusterControl != null)
                 foreach (StepperControl stepper in clusterForm.ClusterControl.EnumerateStepperControls())

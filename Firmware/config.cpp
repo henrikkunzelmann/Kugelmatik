@@ -5,7 +5,7 @@ Config* config;
 Config* getDefaultConfig() {
 	Config* config = new Config();
 
-	config->stepMode = StepBoth;
+	config->stepMode = StepFull;
 	config->brakeMode = BrakeSmart;
 
 	config->tickTime = 2000;
@@ -13,6 +13,7 @@ Config* getDefaultConfig() {
 	config->fixTime = 3500;
 
 	config->maxSteps = 8000;
+	config->homeSteps = 8000;
 	config->fixSteps = 8000;
 
 	return config;

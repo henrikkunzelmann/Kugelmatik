@@ -1,7 +1,7 @@
 #include "network.h"
 
-const static byte ethernetMac[] = { 0x74, 0x69, 0x69, 0x2D, 0x30, LAN_ID }; // Mac-Adresse des Boards
-byte Ethernet::buffer[ETHERNET_BUFFER_SIZE];	// Buffer für die Ethernet Pakete
+const static uint8_t ethernetMac[] = { 0x74, 0x69, 0x69, 0x2D, 0x30, LAN_ID }; // Mac-Adresse des Boards
+uint8_t Ethernet::buffer[ETHERNET_BUFFER_SIZE];	
 
 int32_t configRevision = 0;		// die letzte Revision des Config-Packets
 int32_t setDataRevision = 0;	// die letzte Revision des SetData-Packets
@@ -9,6 +9,8 @@ int32_t setDataRevision = 0;	// die letzte Revision des SetData-Packets
 byte currentBusyCommand = BUSY_NONE;
 boolean stopBusyCommand = false;
 byte lastError = ERROR_NONE;
+
+PacketBuffer* packet;
 
 
 // gibt true zurück wenn revision neuer ist als lastRevision
@@ -19,92 +21,97 @@ boolean checkRevision(int32_t lastRevision, int32_t revision)
 	return revision > lastRevision;
 }
 
-// liest einen unsigned short aus einem char-Array angefangen ab offset Bytes
-uint16_t readUInt16(const char* data, int32_t offset)
-{
-	uint16_t val = 0;
-	memcpy(&val, data + offset, sizeof(uint16_t));
-	return val;
-}
-
-// liest einen int aus einem char-Array angefangen ab offset Bytes
-int32_t readInt32(const char* data, int32_t offset)
-{
-	int32_t val = 0;
-	memcpy(&val, data + offset, sizeof(int32_t));
-	return val;
-}
-
-// schreibt einen unsigned short in einen char-Array angefangen ab offset Bytes
-void writeUInt16(char* data, int32_t offset, const uint16_t val)
-{
-	memcpy(data + offset, &val, sizeof(uint16_t));
-}
-
-
-// schreibt einen int in einen char-Array angefangen ab offset Bytes
-void writeInt32(char* data, int32_t offset, const int32_t val)
-{
-	memcpy(data + offset, &val, sizeof(int32_t));
-}
-
 void initNetwork()
 {
-	uint8_t rev = ether.begin(sizeof Ethernet::buffer, ethernetMac, 28);
+	uint8_t rev = ether.begin(ETHERNET_BUFFER_SIZE, ethernetMac, 28);
 	if (rev == 0)
 	{
-		error("init", "ethernet begin failed");
+		error("init", "ethernet begin failed", true);
 		return; // wird niemals passieren da error() in eine Endloschleife geht
 	}
 
-	if (!ether.dhcpSetup())
+	// warten bis Ethernet Kabel verbunden ist
+	while (!ether.isLinkUp())
 	{
-		error("init", "dhcp failed");
+		toogleGreenLed();
+		delay(300);
+	}
+	turnGreenLedOn();
+
+	if (!ether.dhcpSetup()) 
+	{
+		error("init", "dhcp failed", false);
 		return;
 	}
 
+	packet = new PacketBuffer(NULL, 0);
+	
 	ether.udpServerListenOnPort(&onPacketReceive, PROTOCOL_PORT);
+}
+
+void sendPacket()
+{
+	ether.makeUdpReply((char*)packet->getBuffer(), packet->getPosition(), PROTOCOL_PORT);
+}
+
+void writeHeader(bool guarenteed, byte packetType, int32_t revision)
+{
+	packet->resetPosition();
+	packet->setSize(packet->getBufferSize()); // Size überschreiben, da die Size vom Lesen gesetzt wird
+	packet->write('K');
+	packet->write('K');
+	packet->write('S');
+	packet->write(guarenteed);
+	packet->write(packetType);
+	packet->write(revision);
+}
+
+
+bool readPosition(PacketBuffer* packet, byte* x, byte* y)
+{
+	byte pos = packet->readUint8();
+	byte xvalue = (pos >> 4) & 0xF;
+	byte yvalue = pos & 0xF;
+
+	if (xvalue < 0 || xvalue >= CLUSTER_WIDTH)
+	{
+		lastError = ERROR_X_INVALID;
+		blinkGreenLedShort();
+		return false;
+	}
+	if (yvalue < 0 || yvalue >= CLUSTER_HEIGHT)
+	{
+		lastError = ERROR_Y_INVALID;
+		blinkGreenLedShort();
+		return false;
+	}
+
+	*x = xvalue;
+	*y = yvalue;
+	return true;
 }
 
 void sendAckPacket(int32_t revision)
 {
-	char packet[] = { 'K', 'K', 'S', 0, PacketAck, 0xDE, 0xAD, 0xBE, 0xEF };
-	writeInt32(packet, 5, revision);
-	ether.makeUdpReply(packet, sizeof(packet), PROTOCOL_PORT);
+	writeHeader(false, PacketAck, revision);
+	sendPacket();
 }
 
 void sendData(int32_t revision)
 {
-	char data[HEADER_SIZE + CLUSTER_WIDTH * CLUSTER_HEIGHT * 3];
-	data[0] = 'K';
-	data[1] = 'K';
-	data[2] = 'S';
-	data[3] = 0;
-	data[4] = PacketGetData;
-	writeInt32(data, 5, revision);
+	writeHeader(false, PacketGetData, revision);
 
-	int32_t offsetData = HEADER_SIZE;
 	for (byte x = 0; x < CLUSTER_WIDTH; x++) {
 		for (byte y = 0; y < CLUSTER_HEIGHT; y++)
 		{
-			byte index = y * CLUSTER_WIDTH + x;
-			MCPData* mcp = &mcps[mcpPosition[index]];
-			StepperData* stepper = &mcp->Steppers[stepperPosition[index]];
-			writeUInt16(data, offsetData, (uint16_t)stepper->CurrentSteps);
+			StepperData* stepper = getStepper(x, y);
 
-			offsetData += 2;
-
-			data[offsetData++] = stepper->WaitTime;
+			packet->write(max(0, stepper->GotoSteps)); // CurrentSteps));
+			packet->write(stepper->WaitTime);
 		}
 	}
 
-	if (offsetData > sizeof(data))
-	{
-		lastError = ERROR_BUFFER_OVERFLOW;
-		blinkRedLedShort();
-		return;
-	}
-	ether.makeUdpReply(data, sizeof(data), PROTOCOL_PORT);
+	sendPacket();
 }
 
 void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, const char* data, uint16_t len)
@@ -115,13 +122,19 @@ void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, c
 	if (len < HEADER_SIZE || data[0] != 'K' || data[1] != 'K' || data[2] != 'S')
 		return;
 
-	boolean isGuaranteed = data[3] > 0;
+	// data ist unser Etherner Buffer (verschoben um die UDP Header Länge)
+	// wir nutzen den selben Buffer zum Lesen und zum Schreiben
+	packet->setBuffer((uint8_t*)data, ETHERNET_BUFFER_SIZE - 28); // 28 Bytes für IP + UDP Header abziehen
+	packet->setSize(len);
+	packet->seek(3); 
+
+	boolean isGuaranteed = packet->readBoolean();
 
 	// erstes Byte nach dem Magicstring gibt den Paket-Typ an
-	char packetType = data[4];
+	uint8_t packetType = packet->readUint8();
 
 	// fortlaufende ID für die Pakete werden nach dem Magicstring und dem Paket-Typ geschickt
-	int32_t  revision = readInt32(data, 5);
+	int32_t revision = packet->readInt32();
 
 	// wenn ein busy-Befehl läuft dann werden nur Ping, Info und Stop verarbeitet
 	if (currentBusyCommand != BUSY_NONE && packetType != PacketPing && packetType != PacketInfo && packetType != PacketStop)
@@ -131,475 +144,242 @@ void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, c
 	if (isGuaranteed)
 		sendAckPacket(revision);
 
-	int32_t offset = HEADER_SIZE;
 	switch (packetType)
 	{
 	case PacketPing:
 		ether.makeUdpReply((char*)data, len, PROTOCOL_PORT); // das Ping-Packet funktioniert gleichzeitig auch als Echo-Funktion
 		break;
 	case PacketStepper:
-		if (len < HEADER_SIZE + 4)
+	{
+		byte x, y;
+		if (!readPosition(packet, &x, &y))
+			return;
+		uint16_t height = packet->readUint16();
+		byte waitTime = packet->readUint8();
+
+		setStepper(revision, x, y, height, waitTime);
+		break;
+	}
+	case PacketSteppers:
+	{
+		byte length = packet->readUint8();
+		uint16_t height = packet->readUint16();
+		byte waitTime = packet->readUint8();
+
+		for (byte i = 0; i < length; i++)
 		{
-			lastError = ERROR_PACKET_TOO_SHORT;
-			return blinkGreenLedShort();
+			byte x, y;
+			readPosition(packet, &x, &y);
+			setStepper(revision, x, y, height, waitTime);
 		}
-		else
+
+		break;
+	}
+	case PacketSteppersArray:
+	{
+		byte length = packet->readUint8();
+
+		for (byte i = 0; i < length; i++)
 		{
-			byte x = (data[offset] >> 4) & 0xF;
-			byte y = data[offset] & 0xF;
-			offset += 1;
+			byte x, y;
+			if (!readPosition(packet, &x, &y))
+				return;
 
-			uint16_t height = readUInt16(data, offset);
-			offset += 2;
+			uint16_t height = packet->readUint16();
+			byte waitTime = packet->readUint8();
 
-			byte waitTime = data[offset++];
 			setStepper(revision, x, y, height, waitTime);
 		}
 		break;
-	case PacketSteppers:
-		if (len < HEADER_SIZE + 5)
-		{
-			lastError = ERROR_PACKET_TOO_SHORT;
-			return blinkGreenLedShort();
-		}
-		else
-		{
-			byte length = data[offset];
-			offset += 1;
-
-			uint16_t  height = readUInt16(data, offset);
-			offset += 2;
-
-			byte waitTime = data[offset++];
-
-			if (len < offset + length)
-			{
-				lastError = ERROR_PACKET_TOO_SHORT;
-				return blinkGreenLedShort();
-			}
-
-			for (byte i = 0; i < length; i++)
-			{
-				byte x = data[offset] >> 4;
-				byte y = data[offset] & 0xF;
-				setStepper(revision, x, y, height, waitTime);
-
-				offset += 1;
-			}
-		}
-		break;
-	case PacketSteppersArray:
-		if (len < HEADER_SIZE + 1)
-		{
-			lastError = ERROR_PACKET_TOO_SHORT;
-			return blinkGreenLedShort();
-		}
-		else
-		{
-			byte length = data[offset];
-			offset += 1;
-
-			if (len < offset + length * 4)
-			{
-				lastError = ERROR_PACKET_TOO_SHORT;
-				return blinkGreenLedShort();
-			}
-
-			for (byte i = 0; i < length; i++)
-			{
-				byte x = data[offset] >> 4;
-				byte y = data[offset] & 0xF;
-				offset += 1;
-
-				uint16_t  height = readUInt16(data, offset);
-				offset += 2;
-
-				byte waitTime = data[offset++];
-
-				setStepper(revision, x, y, height, waitTime);
-			}
-		}
-		break;
+	}
 	case PacketSteppersRectangle:
-		if (len < HEADER_SIZE + 2 + 3)
+	{
+		byte minX, minY;
+		if (!readPosition(packet, &minX, &minY))
+			return;
+
+		byte maxX, maxY;
+		if (!readPosition(packet, &maxX, &maxY))
+			return;
+
+		uint16_t height = packet->readUint16();
+		byte waitTime = packet->readUint8();
+
+		if (minX > maxX || minY > maxY)
 		{
-			lastError = ERROR_PACKET_TOO_SHORT;
+			lastError = ERROR_INVALID_VALUE;
 			return blinkGreenLedShort();
 		}
-		else
-		{
-			byte minX = data[offset] >> 4;
-			byte minY = data[offset] & 0xF;
-			offset += 1;
 
-			byte maxX = data[offset] >> 4;
-			byte maxY = data[offset] & 0xF;
-			offset += 1;
-
-			uint16_t height = readUInt16(data, offset);
-			offset += 2;
-
-			byte waitTime = data[offset++];
-
-			if (minX < 0 || minY < 0 || maxX >= CLUSTER_WIDTH || maxY >= CLUSTER_HEIGHT)
-			{
-				lastError = ERROR_INVALID_VALUE;
-				return blinkGreenLedShort();
-			}
-			if (minX > maxX || minY > maxY)
-			{
-				lastError = ERROR_INVALID_VALUE;
-				return blinkGreenLedShort();
-			}
-
-			for (byte x = minX; x <= maxX; x++) {
-				for (byte y = minY; y <= maxY; y++) {
-					setStepper(revision, x, y, height, waitTime);
-				}
+		for (byte x = minX; x <= maxX; x++) {
+			for (byte y = minY; y <= maxY; y++) {
+				setStepper(revision, x, y, height, waitTime);
 			}
 		}
 		break;
+	}
 	case PacketSteppersRectangleArray:
-		if (len < HEADER_SIZE + 2)
+	{
+		byte minX, minY;
+		if (!readPosition(packet, &minX, &minY))
+			return;
+
+		byte maxX, maxY;
+		if (!readPosition(packet, &maxX, &maxY))
+			return;
+
+		if (minX > maxX || minY > maxY)
 		{
-			lastError = ERROR_PACKET_TOO_SHORT;
+			lastError = ERROR_INVALID_VALUE;
 			return blinkGreenLedShort();
 		}
-		else
-		{
-			byte minX = data[offset] >> 4;
-			byte minY = data[offset] & 0xF;
-			offset += 1;
 
-			byte maxX = data[offset] >> 4;
-			byte maxY = data[offset] & 0xF;
-			offset += 1;
+		byte area = (maxX - minX + 1) * (maxY - minY + 1); // +1, da max die letzte Kugel nicht beinhaltet
 
-			if (minX < 0 || minX >= CLUSTER_WIDTH || minY < 0 || minY >= CLUSTER_HEIGHT)
+		// beide for-Schleifen müssen mit dem Client übereinstimmen sonst stimmen die Positionen nicht		
+		for (byte x = minX; x <= maxX; x++) {
+			for (byte y = minY; y <= maxY; y++)
 			{
-				lastError = ERROR_INVALID_VALUE;
-				return blinkGreenLedShort();
-			}
-			if (minX > maxX || minY > maxY)
-			{
-				lastError = ERROR_INVALID_VALUE;
-				return blinkGreenLedShort();
-			}
+				uint16_t height = packet->readUint16();
+				byte waitTime = packet->readUint8();
 
-			byte area = (maxX - minX + 1) * (maxY - minY + 1); // +1, da max die letzte Kugel nicht beinhaltet
-			if (len < offset + 3 * area)
-			{
-				lastError = ERROR_PACKET_TOO_SHORT;
-				return blinkGreenLedShort();
-			}
-
-			// beide for-Schleifen müssen mit dem Client übereinstimmen sonst stimmen die Positionen nicht		
-			for (byte x = minX; x <= maxX; x++) {
-				for (byte y = minY; y <= maxY; y++)
-				{
-					uint16_t height = readUInt16(data, offset);
-					offset += 2;
-
-					byte waitTime = data[offset++];
-
-					setStepper(revision, x, y, height, waitTime);
-				}
+				setStepper(revision, x, y, height, waitTime);
 			}
 		}
 		break;
+	}
 	case PacketAllSteppers:
-		if (len < HEADER_SIZE + 3)
-		{
-			lastError = ERROR_PACKET_TOO_SHORT;
-			return blinkGreenLedShort();
-		}
-		else
-		{
-			uint16_t height = readUInt16(data, offset);
-			offset += 2;
-			byte waitTime = data[offset++];
-			setAllSteps(revision, height, waitTime);
-		}
+	{
+		uint16_t height = packet->readUint16();
+		byte waitTime = packet->readUint8();
+		setAllSteps(revision, height, waitTime);
 		break;
+	}
 	case PacketAllSteppersArray:
-		if (len < HEADER_SIZE + 3 * CLUSTER_WIDTH * CLUSTER_HEIGHT)
-		{
-			lastError = ERROR_PACKET_TOO_SHORT;
-			return blinkGreenLedShort();
-		}
-		else
-		{
-			// beide for-Schleifen müssen mit dem Client übereinstimmen sonst stimmen die Positionen nicht		
-			for (byte x = 0; x < CLUSTER_WIDTH; x++) {
-				for (byte y = 0; y < CLUSTER_HEIGHT; y++)
-				{
-					uint16_t height = readUInt16(data, offset);
-					offset += 2;
+	{
+		// beide for-Schleifen müssen mit dem Client übereinstimmen sonst stimmen die Positionen nicht		
+		for (byte x = 0; x < CLUSTER_WIDTH; x++) {
+			for (byte y = 0; y < CLUSTER_HEIGHT; y++)
+			{
+				uint16_t height = packet->readUint16();
+				byte waitTime = packet->readUint8();
 
-					byte waitTime = data[offset++];
-
-					setStepper(revision, x, y, height, waitTime);
-				}
+				setStepper(revision, x, y, height, waitTime);
 			}
 		}
 		break;
+	}
 	case PacketHome:
-		if (len < HEADER_SIZE + 4)
+	{
+		// 0xABCD wird benutzt damit man nicht ausversehen das Home-Paket schickt (wenn man z.B. den Paket-Type verwechselt)
+		int32_t magic = packet->readInt32();
+		if (magic != 0xABCD)
 		{
-			lastError = ERROR_PACKET_TOO_SHORT;
-			return blinkGreenLedShort();
+			lastError = ERROR_INVALID_MAGIC;
+			return blinkBothLedsShort();
 		}
-		else
-		{
-			// 0xABCD wird benutzt damit man nicht ausversehen das Home-Paket schickt (wenn man z.B. den Paket-Type verwechselt)
-			int32_t magic = readInt32(data, offset);
-			if (magic != 0xABCD)
-			{
-				lastError = ERROR_INVALID_MAGIC;
-				return blinkBothLedsShort();
+
+		stopMove();
+
+		bool stepperSet = false;
+
+		// Stepper für Home Befehl vorbereiten
+		for (int i = 0; i < CLUSTER_SIZE; i++) {
+			StepperData* stepper = getStepper(i);
+
+			if (checkRevision(stepper->LastRevision, revision)) {
+				forceStepper(stepper, revision, -config->homeSteps);
+				stepperSet = true;
 			}
+		}
 
-			// gotoSteps auf -MAX_STEPS setzen damit alle Kugeln voll nach oben fahren (negative Steps sind eigentlich verboten)
-			for (byte i = 0; i < MCP_COUNT; i++) {
-				for (byte j = 0; j < STEPPER_COUNT; j++)
-				{
-					StepperData* stepper = &mcps[i].Steppers[j];
-					if (checkRevision(stepper->LastRevision, revision))
-					{
-						stepper->LastRevision = revision;
-						stepper->CurrentSteps = 0;
-						stepper->GotoSteps = -config->maxSteps;
-						stepper->CurrentStepIndex = 0;
-						stepper->WaitTime = 0;
-						stepper->TickCount = 0;
-					}
-				}
-			}
+		if (stepperSet) {
+			runBusy(BUSY_HOME, config->homeSteps, config->homeTime);
 
-			currentBusyCommand = BUSY_HOME;
-
-			// alle Stepper nach oben Fahren lassen
-			turnRedLedOn();
-			for (int i = 0; i <= config->maxSteps; i++)
-			{
-				if (stopBusyCommand)
-					break;
-
-				if (i % 100 == 0)
-					toogleGreenLed();
-				updateSteppers(true);
-				usdelay(config->homeTime); // langsam bewegen
-
-				wdt_reset();
-
-				// Pakete empfangen
-#if RECEIVE_PACKETS_BUSY
-				ether.packetLoop(ether.packetReceive());
-#endif
-			}
-			currentBusyCommand = BUSY_NONE;
-			stopBusyCommand = false;
-			turnGreenLedOff();
-			turnRedLedOff();
 
 			// alle Stepper zurücksetzen
-			for (byte i = 0; i < MCP_COUNT; i++) {
-				for (byte j = 0; j < STEPPER_COUNT; j++)
-				{
-					StepperData* stepper = &mcps[i].Steppers[j];
-					stepper->GotoSteps = 0;
-					stepper->CurrentSteps = 0;
-					stepper->CurrentStepIndex = 0;
-					stepper->WaitTime = 0;
-					stepper->TickCount = 0;
-				}
+			for (int i = 0; i < CLUSTER_SIZE; i++) {
+				StepperData* stepper = getStepper(i);
+				if (stepper->LastRevision == revision)
+					resetStepper(stepper);
 			}
 		}
+			
 		break;
+	}
 	case PacketResetRevision:
-		for (byte i = 0; i < MCP_COUNT; i++) {
-			for (byte j = 0; j < STEPPER_COUNT; j++) {
-				StepperData* stepper = &mcps[i].Steppers[j];
-				stepper->LastRevision = 0;
-			}
-		}
+	{
+		configRevision = 0;
+		setDataRevision = 0;
+
+		for (int i = 0; i < CLUSTER_SIZE; i++)
+			getStepper(i)->LastRevision = 0;
 		break;
+	}
 	case PacketFix:
-		if (len < HEADER_SIZE + 5)
+	{
+		// 0xDCBA wird benutzt damit man nicht ausversehen das Fix-Paket schickt (wenn man z.B. den Paket-Type verwechselt)
+		int32_t magic = packet->readInt32();
+		if (magic != 0xDCBA)
 		{
-			lastError = ERROR_PACKET_TOO_SHORT;
-			return blinkGreenLedShort();
+			lastError = ERROR_INVALID_MAGIC;
+			return blinkBothLedsShort();
 		}
-		else
+
+		byte x, y;
+		if (!readPosition(packet, &x, &y))
+			return;
+
+		StepperData* stepper = getStepper(x, y);
+		if (checkRevision(stepper->LastRevision, revision))
 		{
-			// 0xDCBA wird benutzt damit man nicht ausversehen das Fix-Paket schickt (wenn man z.B. den Paket-Type verwechselt)
-			int32_t magic = readInt32(data, offset);
-			if (magic != 0xDCBA)
-			{
-				lastError = ERROR_INVALID_MAGIC;
-				return blinkBothLedsShort();
-			}
-			offset += 4;
+			stopMove();
 
-			byte x = (data[offset] >> 4) & 0xF;
-			byte y = data[offset] & 0xF;
-			offset += 1;
-
-			if (x < 0 || x >= CLUSTER_WIDTH)
-			{
-				lastError = ERROR_X_INVALID;
-				return blinkGreenLedShort();
-			}
-			if (y < 0 || y >= CLUSTER_HEIGHT)
-			{
-				lastError = ERROR_Y_INVALID;
-				return blinkGreenLedShort();
-			}
-
-			byte index = y * CLUSTER_WIDTH + x;
-			MCPData* data = &mcps[mcpPosition[index]];
-			StepperData* stepper = &data->Steppers[stepperPosition[index]];
-			if (checkRevision(stepper->LastRevision, revision))
-			{
-				stepper->LastRevision = revision;
-				stepper->CurrentSteps = 0;
-				stepper->GotoSteps = config->fixSteps;
-				stepper->WaitTime = 0;
-				stepper->TickCount = 0;
-
-				turnRedLedOn();
-				currentBusyCommand = BUSY_FIX;
-				for (int32_t i = 0; i < config->fixSteps; i++)
-				{
-					if (stopBusyCommand)
-						break;
-					if (i % 100 == 0)
-						toogleGreenLed();
-					updateSteppers(true);
-					usdelay(config->fixTime); // langsam bewegen
-
-					wdt_reset();
-
-					// Pakete empfangen
-#if RECEIVE_PACKETS_BUSY
-					ether.packetLoop(ether.packetReceive());
-#endif
-				}
-
-				currentBusyCommand = BUSY_NONE;
-				stopBusyCommand = false;
-				turnGreenLedOff();
-				turnRedLedOff();
-
-				// Stepper zurücksetzen
-				stepper->CurrentSteps = 0;
-				stepper->GotoSteps = 0;
-				stepper->CurrentStepIndex = 0;
-			}
+			forceStepper(stepper, revision, config->fixSteps);
+			runBusy(BUSY_FIX, config->fixSteps, config->fixTime);
+			resetStepper(stepper);
 		}
 		break;
+	}
 	case PacketHomeStepper:
-		if (len < HEADER_SIZE + 5)
+	{
+		// 0xDCBA wird benutzt damit man nicht ausversehen das HomeStepper-Paket schickt (wenn man z.B. den Paket-Type verwechselt)
+		int32_t magic = packet->readInt32();
+		if (magic != 0xABCD)
 		{
-			lastError = ERROR_PACKET_TOO_SHORT;
-			return blinkGreenLedShort();
+			lastError = ERROR_INVALID_MAGIC;
+			return blinkBothLedsShort();
 		}
-		else
+
+		byte x, y;
+		if (!readPosition(packet, &x, &y))
+			return;
+
+		StepperData* stepper = getStepper(x, y);
+		if (checkRevision(stepper->LastRevision, revision))
 		{
-			// 0xDCBA wird benutzt damit man nicht ausversehen das HomeStepper-Paket schickt (wenn man z.B. den Paket-Type verwechselt)
-			int32_t magic = readInt32(data, offset);
-			if (magic != 0xABCD)
-			{
-				lastError = ERROR_INVALID_MAGIC;
-				return blinkBothLedsShort();
-			}
-			offset += 4;
+			stopMove();
 
-			byte x = (data[offset] >> 4) & 0xF;
-			byte y = data[offset] & 0xF;
-			offset += 1;
-
-			if (x < 0 || x >= CLUSTER_WIDTH)
-			{
-				lastError = ERROR_X_INVALID;
-				return blinkGreenLedShort();
-			}
-			if (y < 0 || y >= CLUSTER_HEIGHT)
-			{
-				lastError = ERROR_Y_INVALID;
-				return blinkGreenLedShort();
-			}
-
-			int index = y * CLUSTER_WIDTH + x;
-			MCPData* data = &mcps[mcpPosition[index]];
-			StepperData* stepper = &data->Steppers[stepperPosition[index]];
-			if (checkRevision(stepper->LastRevision, revision))
-			{
-				// Stepper so setzen das er komplett hoch fährt
-				stepper->LastRevision = revision;
-				stepper->CurrentSteps = config->maxSteps;
-				stepper->GotoSteps = 0;
-				stepper->WaitTime = 0; // WaitTime zurück setzen
-				stepper->TickCount = 0;
-
-				currentBusyCommand = BUSY_HOME_STEPPER;
-				turnRedLedOn();
-				for (int32_t i = 0; i <= config->maxSteps; i++)
-				{
-					if (stopBusyCommand)
-						break;
-					if (i % 100 == 0)
-						toogleGreenLed();
-					updateSteppers(true);
-					usdelay(config->homeTime); // langsam bewegen
-
-					wdt_reset();
-
-					// Pakete empfangen
-#if RECEIVE_PACKETS_BUSY
-					ether.packetLoop(ether.packetReceive());
-#endif
-				}
-				currentBusyCommand = BUSY_NONE;
-				stopBusyCommand = false;
-				turnGreenLedOff();
-				turnRedLedOff();
-
-				// Stepper zurücksetzen
-				stepper->CurrentSteps = 0;
-				stepper->GotoSteps = 0;
-				stepper->CurrentStepIndex = 0;
-			}
+			forceStepper(stepper, revision, -config->homeSteps);
+			runBusy(BUSY_HOME_STEPPER, config->homeSteps, config->homeTime);
+			resetStepper(stepper);
 		}
 		break;
+	}
 	case PacketGetData:
 	{
 		sendData(revision);
+		break;
 	}
-	break;
 	case PacketInfo:
 	{
-		char data[HEADER_SIZE + 17];
-		data[0] = 'K';
-		data[1] = 'K';
-		data[2] = 'S';
-		data[3] = 0;
-		data[4] = PacketInfo; // Paket-Type Info
-		writeInt32(data, 5, revision);
-
-		int32_t offsetData = HEADER_SIZE;
-		data[offsetData++] = BUILD_VERSION;
-
-		data[offsetData++] = currentBusyCommand;
-
 		int32_t highestRevision = INT_MIN;
-		for (byte i = 0; i < MCP_COUNT; i++)
-			for (byte j = 0; j < STEPPER_COUNT; j++) {
-				StepperData* stepper = &mcps[i].Steppers[j];
+		for (int i = 0; i < CLUSTER_SIZE; i++) {
+			StepperData* stepper = getStepper(i);
 
-				if (stepper->LastRevision > highestRevision)
-					highestRevision = stepper->LastRevision;
-			}
+			if (stepper->LastRevision > highestRevision)
+				highestRevision = stepper->LastRevision;
+		}
 
 		if (configRevision > highestRevision)
 			highestRevision = configRevision;
@@ -607,66 +387,48 @@ void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, c
 		if (setDataRevision > highestRevision)
 			highestRevision = setDataRevision;
 
-		writeInt32(data, offsetData, highestRevision);
-		offsetData += 4;
+		writeHeader(false, PacketInfo, revision);
 
-		data[offsetData++] = (uint8_t)config->stepMode;
+		packet->write((uint8_t)BUILD_VERSION);
+		packet->write(currentBusyCommand);
+		packet->write(highestRevision);
+		packet->write((uint8_t)config->stepMode);
+		packet->write(config->tickTime);
+		packet->write((uint8_t)config->brakeMode);
+		packet->write(lastError);
+		packet->write((int16_t)freeRam());
 
-		writeInt32(data, offsetData, config->tickTime);
-		offsetData += 4;
-
-		data[offsetData++] = config->brakeMode;
-
-		data[offsetData++] = lastError;
-
-		writeInt32(data, offsetData, freeRam());
-		offset += 4;
-
-
-		if (offsetData > sizeof(data))
-		{
-			lastError = ERROR_BUFFER_OVERFLOW;
-			blinkRedLedShort();
-			return;
-		}
-		ether.makeUdpReply(data, sizeof(data), PROTOCOL_PORT);
-	}
-	break;
-	case PacketConfig:
-		if (len < HEADER_SIZE + 5)
-		{
-			lastError = ERROR_PACKET_TOO_SHORT;
-			return blinkGreenLedShort();
-		}
-		else
-		{
-			if (!checkRevision(configRevision, revision))
-				break;
-
-			configRevision = revision;
-
-			byte cStepMode = data[offset++];
-			if (cStepMode < 1 || cStepMode > 3)
-			{
-				lastError = ERROR_INVALID_CONFIG_VALUE;
-				return blinkBothLedsShort();
-			}
-
-			int32_t cTickTime = readInt32(data, offset);
-			offset += 4;
-			if (cTickTime < 50 || cTickTime > 15000)
-			{
-				lastError = ERROR_INVALID_CONFIG_VALUE;
-				return blinkBothLedsShort();
-			}
-
-			boolean cUseBreak = data[offset++] > 0;
-
-			config->stepMode = (StepMode)cStepMode;
-			config->tickTime = cTickTime;
-			config->brakeMode = cUseBreak ? BrakeNone : BrakeAlways;
-		}
+		sendPacket();
 		break;
+	}
+	case PacketConfig:
+	{
+		if (!checkRevision(configRevision, revision))
+			break;
+
+		configRevision = revision;
+
+		byte cStepMode = packet->readUint8();
+		if (cStepMode < StepHalf || cStepMode > StepBoth)
+		{
+			lastError = ERROR_INVALID_CONFIG_VALUE;
+			return blinkBothLedsShort();
+		}
+
+		int32_t cTickTime = packet->readInt32();
+		if (cTickTime < 50 || cTickTime > 15000)
+		{
+			lastError = ERROR_INVALID_CONFIG_VALUE;
+			return blinkBothLedsShort();
+		}
+
+		boolean cUseBreak = packet->readBoolean();
+
+		config->stepMode = (StepMode)cStepMode;
+		config->tickTime = cTickTime;
+		config->brakeMode = cUseBreak ? BrakeAlways : BrakeNone;
+		break;
+	}
 	case PacketBlinkGreen:
 		blinkGreenLedShort();
 		break;
@@ -674,56 +436,70 @@ void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, c
 		blinkRedLedShort();
 		break;
 	case PacketStop:
-#if ALLOW_STOP_BUSY
+	{
 		if (currentBusyCommand != BUSY_NONE)
 			stopBusyCommand = true;
-#endif
-#if ALLOW_STOP_MOVE
-		stopMove();
-
-		// Client informieren, dass es möglicherweise neue Daten gibt
-		sendData(revision);
-#endif
-		break;
-	case PacketSetData:
-		if (len < HEADER_SIZE + CLUSTER_WIDTH * CLUSTER_HEIGHT * 2)
-		{
-			lastError = ERROR_PACKET_TOO_SHORT;
-			return blinkGreenLedShort();
-		}
 		else
 		{
-			if (!checkRevision(setDataRevision, revision))
-				break;
+			stopMove();
 
-			setDataRevision = revision;
+			// Client informieren, dass es möglicherweise neue Daten gibt
+			sendData(revision);
+		}
+		break;
+	}
+	case PacketSetData:
+	{
+		if (!checkRevision(setDataRevision, revision))
+			break;
 
-			for (byte x = 0; x < CLUSTER_WIDTH; x++) {
-				for (byte y = 0; y < CLUSTER_HEIGHT; y++)
-				{
-					byte index = y * CLUSTER_WIDTH + x;
-					MCPData* mcp = &mcps[mcpPosition[index]];
-					StepperData* stepper = &mcp->Steppers[stepperPosition[index]];
+		setDataRevision = revision;
 
-					uint16_t height = readUInt16(data, offset);
-					offset += 2;
+		for (byte x = 0; x < CLUSTER_WIDTH; x++) {
+			for (byte y = 0; y < CLUSTER_HEIGHT; y++)
+			{
+				StepperData* stepper = getStepper(x, y);
 
-					if (height > config->maxSteps) {
-						lastError = ERROR_INVALID_HEIGHT;
-						return blinkBothLedsShort();
-					}
-
-					stepper->CurrentSteps = height;
-					stopMove();
+				uint16_t height = packet->readUint16();
+				if (height > config->maxSteps) {
+					lastError = ERROR_INVALID_HEIGHT;
+					return blinkBothLedsShort();
 				}
+
+				stepper->CurrentSteps = height;
+				stopMove();
 			}
 		}
 		break;
+	}
 	default:
-		lastError = ERROR_UNKOWN_PACKET;
+		lastError = ERROR_UNKNOWN_PACKET;
 		return blinkRedLedShort();
 	}
-#if BLINK_PACKET
-	turnGreenLedOn();
-#endif
+}
+
+void runBusy(uint8_t type, int steps, uint16_t delay)
+{
+	currentBusyCommand = type;
+	turnRedLedOn();
+	for (int i = 0; i <= delay; i++)
+	{
+		if (stopBusyCommand)
+			break;
+
+		//if (i % 100 == 0)
+		//	toogleGreenLed();
+
+		updateSteppers(true);
+		usdelay(delay); 
+
+		wdt_reset();
+
+		// Pakete empfangen
+		ether.packetLoop(ether.packetReceive());
+	}
+	currentBusyCommand = BUSY_NONE;
+	stopBusyCommand = false;
+	turnGreenLedOff();
+	turnRedLedOff();
 }

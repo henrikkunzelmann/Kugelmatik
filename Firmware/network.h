@@ -9,25 +9,30 @@
 #include "util.h"
 #include "constants.h"
 #include "config.h"
+#include "PacketBuffer.h"
 
 #define LAN_ID 0x11					// ID des Boards im LAN, wird benutzt um die Mac-Adresse zu generieren
 #define PROTOCOL_PORT 14804			// Port für das Protokoll über UDP
-#define ETHERNET_BUFFER_SIZE 550	// Größe des Ethernet Buffers in Bytes																		
+#define ETHERNET_BUFFER_SIZE 300	// Größe des Ethernet Buffers in Bytes																		
 #define HEADER_SIZE 9				// Größe des Paket-Headers in Bytes
+
+#define HEX_STR(x) ((x & HEX) >= 10 ? ('A' + (x - 10)) : ('0' + x))
 
 extern byte lastError;
 
 boolean checkRevision(int32_t lastRevision, int32_t revision);
 
-uint16_t readUInt16(const char* data, int32_t offset);
-int32_t readInt32(const char* data, int32_t offset);
-void writeUInt16(char* data, int32_t offset, const uint16_t val);
-void writeInt32(char* data, int32_t offset, const int32_t val);
 
 void initNetwork();
+
+void sendPacket();
+void writeHeader(bool guarenteed, byte packetType, int32_t revision);
+bool readPosition(PacketBuffer* packet, byte* x, byte* y);
 
 void sendAckPacket(int32_t revision);
 void sendData(int32_t revision);
 void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, const char* data, uint16_t len);
+
+void runBusy(uint8_t type, int steps, uint16_t delay);
 
 #endif

@@ -263,8 +263,8 @@ namespace KugelmatikLibrary
                 SendPacket(new PacketResetRevision(), true);
                 
                 // Daten abfragen
-                SendGetData();
-                SendInfo();
+                // SendGetData();
+                // SendInfo();
             };
         }
 
@@ -811,6 +811,7 @@ namespace KugelmatikLibrary
                                 byte waitTime = reader.ReadByte();
                                 stepper.Height = height;
                                 stepper.WaitTime = waitTime;
+                                stepper.OnDataSent();
                             }
                         RemovePacketToAcknowlegde(revision);
                         break;
@@ -866,7 +867,7 @@ namespace KugelmatikLibrary
 
                         int freeRam = -1;
                         if (buildVersion >= 14)
-                            freeRam = reader.ReadInt32();
+                            freeRam = reader.ReadInt16();
 
                         Info = new ClusterInfo(buildVersion, currentBusyCommand, highestRevision, new ClusterConfig((StepMode)stepMode, delayTime, useBreak), lastError, freeRam);
                         RemovePacketToAcknowlegde(revision);
