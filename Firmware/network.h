@@ -31,6 +31,8 @@ bool readPosition(PacketBuffer* packet, byte* x, byte* y);
 
 void sendAckPacket(int32_t revision);
 void sendData(int32_t revision);
+void sendInfo(int32_t revision);
+
 void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, const char* data, uint16_t len);
 
 void runBusy(uint8_t type, int steps, uint16_t delay);

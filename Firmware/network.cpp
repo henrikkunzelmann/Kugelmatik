@@ -114,6 +114,35 @@ void sendData(int32_t revision)
 	sendPacket();
 }
 
+void sendInfo(int32_t revision) {
+	int32_t highestRevision = INT_MIN;
+	for (int i = 0; i < CLUSTER_SIZE; i++) {
+		StepperData* stepper = getStepper(i);
+
+		if (stepper->LastRevision > highestRevision)
+			highestRevision = stepper->LastRevision;
+	}
+
+	if (configRevision > highestRevision)
+		highestRevision = configRevision;
+
+	if (setDataRevision > highestRevision)
+		highestRevision = setDataRevision;
+
+	writeHeader(false, PacketInfo, revision);
+
+	packet->write((uint8_t)BUILD_VERSION);
+	packet->write(currentBusyCommand);
+	packet->write(highestRevision);
+	packet->write((uint8_t)config->stepMode);
+	packet->write(config->tickTime);
+	packet->write((uint8_t)config->brakeMode);
+	packet->write(lastError);
+	packet->write((int16_t)freeRam());
+
+	sendPacket();
+}
+
 void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, const char* data, uint16_t len)
 {
 	// alle Kugelmatik V3 Pakete
@@ -373,32 +402,7 @@ void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, c
 	}
 	case PacketInfo:
 	{
-		int32_t highestRevision = INT_MIN;
-		for (int i = 0; i < CLUSTER_SIZE; i++) {
-			StepperData* stepper = getStepper(i);
-
-			if (stepper->LastRevision > highestRevision)
-				highestRevision = stepper->LastRevision;
-		}
-
-		if (configRevision > highestRevision)
-			highestRevision = configRevision;
-
-		if (setDataRevision > highestRevision)
-			highestRevision = setDataRevision;
-
-		writeHeader(false, PacketInfo, revision);
-
-		packet->write((uint8_t)BUILD_VERSION);
-		packet->write(currentBusyCommand);
-		packet->write(highestRevision);
-		packet->write((uint8_t)config->stepMode);
-		packet->write(config->tickTime);
-		packet->write((uint8_t)config->brakeMode);
-		packet->write(lastError);
-		packet->write((int16_t)freeRam());
-
-		sendPacket();
+		sendInfo(revision);
 		break;
 	}
 	case PacketConfig:
@@ -427,6 +431,8 @@ void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, c
 		config->stepMode = (StepMode)cStepMode;
 		config->tickTime = cTickTime;
 		config->brakeMode = cUseBreak ? BrakeAlways : BrakeNone;
+
+		sendInfo(revision);
 		break;
 	}
 	case PacketBlinkGreen:
