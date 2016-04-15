@@ -16,6 +16,7 @@ private:
 	uint32_t position; // aktuelle Position
 	uint32_t size; // Länge des Pakets
 
+	bool error;
 	bool allowRead;
 
 	bool assertRead(); // überprüft ob das Lesen zulässig ist
@@ -26,6 +27,8 @@ public:
 	explicit PacketBuffer(uint32_t size);
 	explicit PacketBuffer(uint8_t* data, uint32_t size);
 	~PacketBuffer();
+
+	bool getError();
 
 	void setBuffer(uint8_t* data, uint32_t size);
 
@@ -61,6 +64,8 @@ public:
 	void read(uint8_t* buffer, int length);
 	void read(uint8_t* buffer, int length, int offset);
 	void read(char* buffer, int length, int offset);
+
+	uint8_t* getBufferRegion(int size);
 
 	char* readString();
 

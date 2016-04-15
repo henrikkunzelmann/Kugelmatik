@@ -50,6 +50,8 @@ void initNetwork()
 
 void sendPacket()
 {
+	if (packet->getError())
+		return;
 	ether.makeUdpReply((char*)packet->getBuffer(), packet->getPosition(), PROTOCOL_PORT);
 }
 
@@ -150,6 +152,9 @@ void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, c
 
 	// data ist unser Etherner Buffer (verschoben um die UDP Header Länge)
 	// wir nutzen den selben Buffer zum Lesen und zum Schreiben
+	if (packet->getError()) // Fehler löschen
+		internalError();
+
 	packet->setBuffer((uint8_t*)data, ETHERNET_BUFFER_SIZE - 28); // 28 Bytes für IP + UDP Header abziehen
 	packet->setSize(len);
 	packet->seek(3); 
@@ -183,6 +188,9 @@ void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, c
 		uint16_t height = packet->readUint16();
 		byte waitTime = packet->readUint8();
 
+		if (packet->getError())
+			return;
+
 		setStepper(revision, x, y, height, waitTime);
 		break;
 	}
@@ -196,6 +204,9 @@ void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, c
 		{
 			byte x, y;
 			readPosition(packet, &x, &y);
+
+			if (packet->getError())
+				return;
 			setStepper(revision, x, y, height, waitTime);
 		}
 
@@ -214,6 +225,8 @@ void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, c
 			uint16_t height = packet->readUint16();
 			byte waitTime = packet->readUint8();
 
+			if (packet->getError())
+				return;
 			setStepper(revision, x, y, height, waitTime);
 		}
 		break;
@@ -234,11 +247,12 @@ void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, c
 		if (minX > maxX || minY > maxY)
 			return protocolError(ERROR_INVALID_VALUE);
 
-		for (byte x = minX; x <= maxX; x++) {
-			for (byte y = minY; y <= maxY; y++) {
+		if (packet->getError())
+			return;
+
+		for (byte x = minX; x <= maxX; x++) 
+			for (byte y = minY; y <= maxY; y++) 
 				setStepper(revision, x, y, height, waitTime);
-			}
-		}
 		break;
 	}
 	case PacketSteppersRectangleArray:
@@ -254,15 +268,16 @@ void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, c
 		if (minX > maxX || minY > maxY)
 			return protocolError(ERROR_INVALID_VALUE);
 
-
 		byte area = (maxX - minX + 1) * (maxY - minY + 1); // +1, da max die letzte Kugel nicht beinhaltet
 
 		// beide for-Schleifen müssen mit dem Client übereinstimmen sonst stimmen die Positionen nicht		
 		for (byte x = minX; x <= maxX; x++) {
-			for (byte y = minY; y <= maxY; y++)
-			{
+			for (byte y = minY; y <= maxY; y++) {
 				uint16_t height = packet->readUint16();
 				byte waitTime = packet->readUint8();
+
+				if (packet->getError())
+					return;
 
 				setStepper(revision, x, y, height, waitTime);
 			}
@@ -273,6 +288,9 @@ void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, c
 	{
 		uint16_t height = packet->readUint16();
 		byte waitTime = packet->readUint8();
+
+		if (packet->getError())
+			return;
 		setAllSteps(revision, height, waitTime);
 		break;
 	}
@@ -280,11 +298,12 @@ void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, c
 	{
 		// beide for-Schleifen müssen mit dem Client übereinstimmen sonst stimmen die Positionen nicht		
 		for (byte x = 0; x < CLUSTER_WIDTH; x++) {
-			for (byte y = 0; y < CLUSTER_HEIGHT; y++)
-			{
+			for (byte y = 0; y < CLUSTER_HEIGHT; y++) {
 				uint16_t height = packet->readUint16();
 				byte waitTime = packet->readUint8();
 
+				if (packet->getError())
+					return;
 				setStepper(revision, x, y, height, waitTime);
 			}
 		}
@@ -296,6 +315,9 @@ void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, c
 		int32_t magic = packet->readInt32();
 		if (magic != 0xABCD)
 			return protocolError(ERROR_INVALID_MAGIC);
+
+		if (packet->getError())
+			return;
 
 		stopMove();
 
@@ -339,12 +361,13 @@ void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, c
 		// 0xDCBA wird benutzt damit man nicht ausversehen das Fix-Paket schickt (wenn man z.B. den Paket-Type verwechselt)
 		int32_t magic = packet->readInt32();
 		if (magic != 0xDCBA)
-		{
 			return protocolError(ERROR_INVALID_MAGIC);
-		}
 
 		byte x, y;
 		if (!readPosition(packet, &x, &y))
+			return;
+
+		if (packet->getError())
 			return;
 
 		StepperData* stepper = getStepper(x, y);
@@ -369,6 +392,9 @@ void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, c
 
 		byte x, y;
 		if (!readPosition(packet, &x, &y))
+			return;
+
+		if (packet->getError())
 			return;
 
 		StepperData* stepper = getStepper(x, y);
@@ -409,6 +435,9 @@ void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, c
 
 		boolean cUseBreak = packet->readBoolean();
 
+		if (packet->getError())
+			return;
+
 		config->stepMode = (StepMode)cStepMode;
 		config->tickTime = cTickTime;
 		config->brakeMode = cUseBreak ? BrakeAlways : BrakeNone;
@@ -443,13 +472,15 @@ void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, c
 		setDataRevision = revision;
 
 		for (byte x = 0; x < CLUSTER_WIDTH; x++) {
-			for (byte y = 0; y < CLUSTER_HEIGHT; y++)
-			{
+			for (byte y = 0; y < CLUSTER_HEIGHT; y++) {
 				StepperData* stepper = getStepper(x, y);
 
 				uint16_t height = packet->readUint16();
 				if (height > config->maxSteps)
 					return protocolError(ERROR_INVALID_HEIGHT);
+
+				if (packet->getError())
+					return;
 
 				stepper->CurrentSteps = height;
 				stopMove();
@@ -471,8 +502,8 @@ void runBusy(uint8_t type, int steps, uint16_t delay)
 		if (stopBusyCommand)
 			break;
 
-		//if (i % 100 == 0)
-		//	toogleGreenLed();
+		if (i % 100 == 0)
+			toogleGreenLed();
 
 		updateSteppers(true);
 		usdelay(delay); 

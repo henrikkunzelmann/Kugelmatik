@@ -1,10 +1,4 @@
-// 
-// 
-// 
-
 #include "PacketBuffer.h"
-
-
 
 PacketBuffer::PacketBuffer(uint32_t size) {
 	this->data = new uint8_t[size];
@@ -12,6 +6,8 @@ PacketBuffer::PacketBuffer(uint32_t size) {
 
 	this->position = 0;
 	this->size = size;
+
+	this->error = false;
 }
 
 PacketBuffer::PacketBuffer(uint8_t* data, uint32_t size) {
@@ -34,6 +30,12 @@ PacketBuffer::~PacketBuffer()
 		free(data);
 }
 
+bool PacketBuffer::getError() {
+	bool err = error;
+	this->error = false;
+	return err;
+}
+
 uint8_t* PacketBuffer::getBuffer() const {
 	return data;
 }
@@ -43,17 +45,21 @@ uint32_t PacketBuffer::getBufferSize() const {
 }
 
 bool PacketBuffer::assertRead() {
-	if (!allowRead)
+	if (!allowRead) {
+		error = true;
 		internalError();
+	}
 	return allowRead;
 }
 
 bool PacketBuffer::assertPosition(uint32_t length) {
 	if (position + length > size) {
-		internalError();
+		error = true;
+		protocolError(ERROR_PACKET_TOO_SHORT);
 		return false;
 	}
 	if (position + length > bufferSize) {
+		error = true;
 		internalError();
 		return false;
 	}
@@ -94,7 +100,11 @@ uint32_t PacketBuffer::getSize() const {
 
 void PacketBuffer::setSize(uint32_t size) {
 	if (size > bufferSize)
+	{
+		error = true;
+		internalError();
 		return;
+	}
 
 	this->size = size;
 }
@@ -171,6 +181,10 @@ void PacketBuffer::read(char* buffer, int length, int offset) {
 	char* dest = buffer + offset;
 
 	memcpy(dest, source, length);
+}
+
+uint8_t* PacketBuffer::getBufferRegion(int size) {
+	return this->data + addAndAssertPosition(size);
 }
 
 char* PacketBuffer::readString() {
