@@ -19,5 +19,6 @@ namespace KugelmatikLibrary
         InvalidConfigValue = 8,
         InvalidHeight = 9,
         InvalidValue = 10,
+        Internal = 255
     }
 }

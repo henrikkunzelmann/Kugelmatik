@@ -68,20 +68,11 @@ void setStepper(StepperData* stepper, int32_t revision, uint16_t height, byte wa
 void setStepper(int32_t revision, byte x, byte y, uint16_t height, byte waitTime)
 {
 	if (x < 0 || x >= CLUSTER_WIDTH)
-	{
-		lastError = ERROR_X_INVALID;
-		return blinkRedLedShort();
-	}
+		return protocolError(ERROR_X_INVALID);
 	if (y < 0 || y >= CLUSTER_HEIGHT)
-	{
-		lastError = ERROR_Y_INVALID;
-		return blinkRedLedShort();
-	}
+		return protocolError(ERROR_Y_INVALID);
 	if (height > config->maxSteps)
-	{
-		lastError = ERROR_INVALID_HEIGHT;
-		return blinkRedLedShort();
-	}
+		return protocolError(ERROR_INVALID_HEIGHT);
 
 	setStepper(getStepper(x, y), revision, height, waitTime);
 }
@@ -89,10 +80,7 @@ void setStepper(int32_t revision, byte x, byte y, uint16_t height, byte waitTime
 void setAllSteps(int32_t revision, uint16_t height, byte waitTime)
 {
 	if (height > config->maxSteps)
-	{
-		lastError = ERROR_INVALID_HEIGHT;
-		return blinkRedLedShort();
-	}
+		return protocolError(ERROR_INVALID_HEIGHT);
 	for (int i = 0; i < CLUSTER_SIZE; i++) 
 		setStepper(getStepper(i), revision, height, waitTime);
 }

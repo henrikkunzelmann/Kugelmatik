@@ -18,7 +18,7 @@
 
 #define HEX_STR(x) ((x & HEX) >= 10 ? ('A' + (x - 10)) : ('0' + x))
 
-extern byte lastError;
+
 
 boolean checkRevision(int32_t lastRevision, int32_t revision);
 

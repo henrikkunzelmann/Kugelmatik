@@ -44,19 +44,17 @@ uint32_t PacketBuffer::getBufferSize() const {
 
 bool PacketBuffer::assertRead() {
 	if (!allowRead)
-		blinkRedLedShort();
+		internalError();
 	return allowRead;
 }
 
 bool PacketBuffer::assertPosition(uint32_t length) {
 	if (position + length > size) {
-		turnGreenLedOn();
-		blinkRedLedShort();
-		turnGreenLedOff();
+		internalError();
 		return false;
 	}
 	if (position + length > bufferSize) {
-		blinkRedLedShort();
+		internalError();
 		return false;
 	}
 	return true;

@@ -1,5 +1,7 @@
 #include "util.h"
 
+byte lastError = ERROR_NONE;
+
 void softReset()
 {
 	wdt_enable(WDTO_2S);	// Watch Dog aktivieren damit der Chip zurück gesetzt wird
@@ -18,6 +20,18 @@ void error(const char* tag, const char* message, bool blinkFast)
 			delay(500);
 		wdt_reset();
 	}
+}
+
+void internalError()
+{
+	lastError = ERROR_INTERNAL;
+	blinkRedLedShort(true);
+}
+
+void protocolError(uint8_t error)
+{
+	lastError = error;
+	blinkRedLedShort(true);
 }
 
 void usdelay(uint16_t us) {

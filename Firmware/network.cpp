@@ -8,7 +8,6 @@ int32_t setDataRevision = 0;	// die letzte Revision des SetData-Packets
 
 byte currentBusyCommand = BUSY_NONE;
 boolean stopBusyCommand = false;
-byte lastError = ERROR_NONE;
 
 PacketBuffer* packet;
 
@@ -75,14 +74,12 @@ bool readPosition(PacketBuffer* packet, byte* x, byte* y)
 
 	if (xvalue < 0 || xvalue >= CLUSTER_WIDTH)
 	{
-		lastError = ERROR_X_INVALID;
-		blinkGreenLedShort();
+		protocolError(ERROR_X_INVALID);
 		return false;
 	}
 	if (yvalue < 0 || yvalue >= CLUSTER_HEIGHT)
 	{
-		lastError = ERROR_Y_INVALID;
-		blinkGreenLedShort();
+		protocolError(ERROR_Y_INVALID);
 		return false;
 	}
 
@@ -235,10 +232,7 @@ void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, c
 		byte waitTime = packet->readUint8();
 
 		if (minX > maxX || minY > maxY)
-		{
-			lastError = ERROR_INVALID_VALUE;
-			return blinkGreenLedShort();
-		}
+			return protocolError(ERROR_INVALID_VALUE);
 
 		for (byte x = minX; x <= maxX; x++) {
 			for (byte y = minY; y <= maxY; y++) {
@@ -258,10 +252,8 @@ void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, c
 			return;
 
 		if (minX > maxX || minY > maxY)
-		{
-			lastError = ERROR_INVALID_VALUE;
-			return blinkGreenLedShort();
-		}
+			return protocolError(ERROR_INVALID_VALUE);
+
 
 		byte area = (maxX - minX + 1) * (maxY - minY + 1); // +1, da max die letzte Kugel nicht beinhaltet
 
@@ -303,10 +295,7 @@ void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, c
 		// 0xABCD wird benutzt damit man nicht ausversehen das Home-Paket schickt (wenn man z.B. den Paket-Type verwechselt)
 		int32_t magic = packet->readInt32();
 		if (magic != 0xABCD)
-		{
-			lastError = ERROR_INVALID_MAGIC;
-			return blinkBothLedsShort();
-		}
+			return protocolError(ERROR_INVALID_MAGIC);
 
 		stopMove();
 
@@ -351,8 +340,7 @@ void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, c
 		int32_t magic = packet->readInt32();
 		if (magic != 0xDCBA)
 		{
-			lastError = ERROR_INVALID_MAGIC;
-			return blinkBothLedsShort();
+			return protocolError(ERROR_INVALID_MAGIC);
 		}
 
 		byte x, y;
@@ -376,8 +364,7 @@ void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, c
 		int32_t magic = packet->readInt32();
 		if (magic != 0xABCD)
 		{
-			lastError = ERROR_INVALID_MAGIC;
-			return blinkBothLedsShort();
+			return protocolError(ERROR_INVALID_MAGIC);
 		}
 
 		byte x, y;
@@ -414,17 +401,11 @@ void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, c
 
 		byte cStepMode = packet->readUint8();
 		if (cStepMode < StepHalf || cStepMode > StepBoth)
-		{
-			lastError = ERROR_INVALID_CONFIG_VALUE;
-			return blinkBothLedsShort();
-		}
+			return protocolError(ERROR_INVALID_CONFIG_VALUE);
 
 		int32_t cTickTime = packet->readInt32();
 		if (cTickTime < 50 || cTickTime > 15000)
-		{
-			lastError = ERROR_INVALID_CONFIG_VALUE;
-			return blinkBothLedsShort();
-		}
+			return protocolError(ERROR_INVALID_CONFIG_VALUE);
 
 		boolean cUseBreak = packet->readBoolean();
 
@@ -436,10 +417,10 @@ void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, c
 		break;
 	}
 	case PacketBlinkGreen:
-		blinkGreenLedShort();
+		blinkGreenLedShort(false);
 		break;
 	case PacketBlinkRed:
-		blinkRedLedShort();
+		blinkRedLedShort(false);
 		break;
 	case PacketStop:
 	{
@@ -467,10 +448,8 @@ void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, c
 				StepperData* stepper = getStepper(x, y);
 
 				uint16_t height = packet->readUint16();
-				if (height > config->maxSteps) {
-					lastError = ERROR_INVALID_HEIGHT;
-					return blinkBothLedsShort();
-				}
+				if (height > config->maxSteps)
+					return protocolError(ERROR_INVALID_HEIGHT);
 
 				stepper->CurrentSteps = height;
 				stopMove();
@@ -479,8 +458,7 @@ void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, c
 		break;
 	}
 	default:
-		lastError = ERROR_UNKNOWN_PACKET;
-		return blinkRedLedShort();
+		return protocolError(ERROR_UNKNOWN_PACKET);
 	}
 }
 

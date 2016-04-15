@@ -17,9 +17,9 @@ void turnRedLedOff();
 void toogleRedLed();
 void toogleGreenLed();
 
-void blinkRedLedShort();
-void blinkGreenLedShort();
-void blinkBothLedsShort();
+void blinkRedLedShort(boolean fast);
+void blinkGreenLedShort(boolean fast);
+void blinkBothLedsShort(boolean fast);
 
 #endif
 

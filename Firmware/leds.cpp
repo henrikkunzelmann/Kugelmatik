@@ -60,42 +60,45 @@ void toogleRedLed()
 }
 
 // lässt die grüne Led kurzzeitig blinken
-void blinkGreenLedShort()
+void blinkGreenLedShort(boolean fast)
 {
-	for (byte i = 0; i < 5; i++)
+	int time = fast ? 250 : 500;
+	for (byte i = 0; i < 3; i++)
 	{
 		turnGreenLedOn();
-		delay(200);
+		delay(time);
 		turnGreenLedOff();
-		delay(200);
+		delay(time);
 		wdt_reset();
 	}
 }
 
 // läst die rote Led kurzzeitig blinken
-void blinkRedLedShort()
+void blinkRedLedShort(boolean fast)
 {
-	for (byte i = 0; i < 5; i++)
+	int time = fast ? 250 : 500;
+	for (byte i = 0; i < 3; i++)
 	{
 		turnRedLedOn();
-		delay(200);
+		delay(time);
 		turnRedLedOff();
-		delay(200);
+		delay(time);
 		wdt_reset();
 	}
 }
 
 // lässt beide LEDs kurzzeitig blinken
-void blinkBothLedsShort()
+void blinkBothLedsShort(boolean fast)
 {
-	for (byte i = 0; i < 5; i++)
+	int time = fast ? 250 : 500;
+	for (byte i = 0; i < 3; i++)
 	{
 		turnRedLedOn();
 		turnGreenLedOn();
-		delay(200);
+		delay(time);
 		turnRedLedOff();
 		turnGreenLedOff();
-		delay(200);
+		delay(time);
 		wdt_reset();
 	}
 }
