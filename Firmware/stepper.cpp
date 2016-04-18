@@ -152,8 +152,13 @@ void updateSteppers(boolean alwaysUseHalfStep)
 				gpioValue |= stepsStepper[stepperIndex] << (4 * j); // jeder Wert in stepsStepper ist 4 Bit lang
 
 				stepper->CurrentStepIndex = (byte)stepperIndex;
-
 				stepper->TickCount = stepper->WaitTime;
+				stepper->BrakeTicks = 0;
+			}
+			else if (config->brakeMode == BrakeSmart)
+			{
+				if (stepper->BrakeTicks++ < config->brakeTicks)
+					gpioValue |= stepsStepper[stepper->CurrentStepIndex] << (4 * j);
 			}
 			else if (config->brakeMode == BrakeAlways) // Bremse benutzen?
 				gpioValue |= stepsStepper[stepper->CurrentStepIndex] << (4 * j);

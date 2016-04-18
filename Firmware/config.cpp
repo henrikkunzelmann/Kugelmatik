@@ -16,5 +16,7 @@ Config* getDefaultConfig() {
 	config->homeSteps = 8000;
 	config->fixSteps = 8000;
 
+	config->brakeTicks = 10000;
+
 	return config;
 }

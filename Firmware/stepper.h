@@ -24,6 +24,7 @@ struct StepperData
 	uint8_t CurrentStepIndex;	// derzeitiger Stepper Wert Index, siehe stepsStepper
 	int16_t TickCount;			// derzeitige Tick Anzahl, wenn kleiner als 0 dann wird ein Schritt gemacht und die Variable auf WaitTime gesetzt
 	uint8_t WaitTime;			// Wert für TickCount nach jedem Schritt
+	int16_t BrakeTicks;			// Anzahl der Ticks seit letzter Bewegung
 };
 
 struct MCPData
