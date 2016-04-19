@@ -11,7 +11,6 @@ boolean stopBusyCommand = false;
 
 PacketBuffer* packet;
 
-
 // gibt true zurück wenn revision neuer ist als lastRevision
 boolean checkRevision(int32_t lastRevision, int32_t revision)
 {
@@ -178,14 +177,19 @@ void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, c
 	if (currentBusyCommand != BUSY_NONE && packetType != PacketPing && packetType != PacketInfo && packetType != PacketStop)
 		return;
 
+	handlePacket(packetType, revision);
+
 	// isGuaranteed gibt an ob der Sender eine Antwort erwartet
 	if (isGuaranteed)
 		sendAckPacket(revision);
+}
 
+void handlePacket(uint8_t packetType, int32_t revision)
+{
 	switch (packetType)
 	{
 	case PacketPing:
-		ether.makeUdpReply((char*)data, len, PROTOCOL_PORT); // das Ping-Packet funktioniert gleichzeitig auch als Echo-Funktion
+		ether.makeUdpReply((char*)packet->getBuffer(), packet->getSize(), PROTOCOL_PORT); // das Ping-Packet funktioniert gleichzeitig auch als Echo-Funktion
 		break;
 	case PacketStepper:
 	{
@@ -257,8 +261,8 @@ void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, c
 		if (packet->getError())
 			return;
 
-		for (byte x = minX; x <= maxX; x++) 
-			for (byte y = minY; y <= maxY; y++) 
+		for (byte x = minX; x <= maxX; x++)
+			for (byte y = minY; y <= maxY; y++)
 				setStepper(revision, x, y, height, waitTime);
 		break;
 	}
@@ -277,7 +281,7 @@ void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, c
 
 		byte area = (maxX - minX + 1) * (maxY - minY + 1); // +1, da max die letzte Kugel nicht beinhaltet
 
-		// beide for-Schleifen müssen mit dem Client übereinstimmen sonst stimmen die Positionen nicht		
+														   // beide for-Schleifen müssen mit dem Client übereinstimmen sonst stimmen die Positionen nicht		
 		for (byte x = minX; x <= maxX; x++) {
 			for (byte y = minY; y <= maxY; y++) {
 				uint16_t height = packet->readUint16();
@@ -351,7 +355,7 @@ void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, c
 					resetStepper(stepper);
 			}
 		}
-			
+
 		break;
 	}
 	case PacketResetRevision:
