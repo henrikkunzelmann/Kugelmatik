@@ -62,7 +62,7 @@ void toogleRedLed()
 // lässt die grüne Led kurzzeitig blinken
 void blinkGreenLedShort(boolean fast)
 {
-	int time = fast ? 250 : 500;
+	int time = fast ? TIME_FAST : TIME_SLOW;
 	for (byte i = 0; i < 3; i++)
 	{
 		turnGreenLedOn();
@@ -76,7 +76,7 @@ void blinkGreenLedShort(boolean fast)
 // läst die rote Led kurzzeitig blinken
 void blinkRedLedShort(boolean fast)
 {
-	int time = fast ? 250 : 500;
+	int time = fast ? TIME_FAST : TIME_SLOW;
 	for (byte i = 0; i < 3; i++)
 	{
 		turnRedLedOn();
@@ -90,7 +90,7 @@ void blinkRedLedShort(boolean fast)
 // lässt beide LEDs kurzzeitig blinken
 void blinkBothLedsShort(boolean fast)
 {
-	int time = fast ? 250 : 500;
+	int time = fast ? TIME_FAST : TIME_SLOW;
 	for (byte i = 0; i < 3; i++)
 	{
 		turnRedLedOn();
