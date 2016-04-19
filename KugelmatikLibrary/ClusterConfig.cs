@@ -68,9 +68,9 @@ namespace KugelmatikLibrary
             ClusterConfig config = new ClusterConfig();
             config.StepMode = StepMode.Full;
             config.BrakeMode = BrakeMode.Smart;
-            config.TickTime = 2000;
-            config.HomeTime = 3500;
-            config.FixTime = 3500;
+            config.TickTime = 1900;
+            config.HomeTime = 3000;
+            config.FixTime = 3000;
             
             config.MaxSteps = 8000;
             config.HomeSteps = 8000;

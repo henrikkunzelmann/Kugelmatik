@@ -8,9 +8,9 @@ Config* getDefaultConfig() {
 	config->stepMode = StepFull;
 	config->brakeMode = BrakeSmart;
 
-	config->tickTime = 2000;
-	config->homeTime = 3500;
-	config->fixTime = 3500;
+	config->tickTime = 1900;
+	config->homeTime = 3000;
+	config->fixTime = 3000;
 
 	config->maxSteps = 8000;
 	config->homeSteps = 8000;
