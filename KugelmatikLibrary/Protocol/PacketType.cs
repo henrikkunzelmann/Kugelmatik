@@ -29,6 +29,7 @@
 
         Stop = 19,
 
-        SetData = 20
+        SetData = 20,
+        Config2 = 21
     }
 }

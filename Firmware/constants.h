@@ -31,6 +31,8 @@
 
 #define PacketSetData 20
 
+#define PacketConfig2 21
+
 #define BUSY_NONE 0
 #define BUSY_HOME 1
 #define BUSY_FIX 2
@@ -47,6 +49,8 @@
 #define ERROR_INVALID_CONFIG_VALUE 8
 #define ERROR_INVALID_HEIGHT 9
 #define ERROR_INVALID_VALUE 10
+#define ERROR_NOT_ALLOWED_TO_READ 11
+#define ERROR_PACKET_SIZE_BUFFER_OVERFLOW 12
 #define ERROR_INTERNAL 255
 
-#endif /* CONSTANTS_H_ */
+#endif

@@ -47,7 +47,7 @@ uint32_t PacketBuffer::getBufferSize() const {
 bool PacketBuffer::assertRead() {
 	if (!allowRead) {
 		error = true;
-		internalError();
+		internalError(ERROR_NOT_ALLOWED_TO_READ);
 	}
 	return allowRead;
 }
@@ -60,7 +60,7 @@ bool PacketBuffer::assertPosition(uint32_t length) {
 	}
 	if (position + length > bufferSize) {
 		error = true;
-		internalError();
+		internalError(ERROR_BUFFER_OVERFLOW);
 		return false;
 	}
 	return true;
@@ -102,7 +102,7 @@ void PacketBuffer::setSize(uint32_t size) {
 	if (size > bufferSize)
 	{
 		error = true;
-		internalError();
+		internalError(ERROR_PACKET_SIZE_BUFFER_OVERFLOW);
 		return;
 	}
 

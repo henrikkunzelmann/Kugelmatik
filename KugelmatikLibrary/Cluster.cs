@@ -582,7 +582,7 @@ namespace KugelmatikLibrary
             if (IsDisposed)
                 throw new ObjectDisposedException(GetType().Name);
 
-            SendPacket(new PacketInfo(), true);
+            SendPacket(new PacketInfo(true), true);
         }
 
         /// <summary>
@@ -593,7 +593,10 @@ namespace KugelmatikLibrary
             if (IsDisposed)
                 throw new ObjectDisposedException(GetType().Name);
 
-            SendPacket(new PacketConfig(config), true);
+            if (Info != null && Info.BuildVersion >= 15)
+                SendPacket(new PacketConfig2(config), true);
+            else
+                SendPacket(new PacketConfig(config), true);
         }
 
         /// <summary>
@@ -786,7 +789,7 @@ namespace KugelmatikLibrary
                         if (!packetsToAcknowledge.TryGetValue(revision, out acknowlegdedPacket))
                         {
                             if (Kugelmatik.Config.VerbosePacketReceive)
-                                Log.Verbose("[{0}, {1}] Unkown acknowlegde: [{2}]", X, Y, revision);
+                                Log.Verbose("[{0}, {1}] Unknown acknowlegde: [{2}]", X, Y, revision);
                             break;
                         }
 
@@ -805,7 +808,7 @@ namespace KugelmatikLibrary
                                 Stepper stepper = GetStepperByPosition(x, y);
 
                                 ushort height = reader.ReadUInt16(); 
-                                if (height > Kugelmatik.Config.MaxHeight)
+                                if (height > Kugelmatik.ClusterConfig.MaxSteps)
                                     continue; // Höhe ignorieren
 
                                 byte waitTime = reader.ReadByte();
@@ -843,18 +846,24 @@ namespace KugelmatikLibrary
                             highestRevision = reader.ReadInt32();
                         }
 
-                        byte stepMode = reader.ReadByte();
-                        if (!Enum.IsDefined(typeof(StepMode), stepMode))
-                            throw new InvalidDataException("Unkown step mode");
-
-                        int delayTime = reader.ReadInt32();
-
-                        bool useBreak = false;
-                        if (buildVersion >= 6)
+                        ClusterConfig config = new ClusterConfig();
+                        if (buildVersion < 15)
                         {
-                            if (packet.Length < HeaderSize + 7)
-                                throw new InvalidDataException("Packet is not long enough.");
-                            useBreak = reader.ReadByte() > 0;
+                            byte stepMode = reader.ReadByte();
+                            if (!Enum.IsDefined(typeof(StepMode), stepMode))
+                                throw new InvalidDataException("Unknown step mode");
+
+                            int delayTime = reader.ReadInt32();
+
+                            bool useBreak = false;
+                            if (buildVersion >= 6)
+                            {
+                                if (packet.Length < HeaderSize + 7)
+                                    throw new InvalidDataException("Packet is not long enough.");
+                                useBreak = reader.ReadByte() > 0;
+                            }
+
+                            config = ClusterConfig.GetCompatibility((StepMode)stepMode, delayTime, useBreak);
                         }
 
                         ErrorCode lastError = ErrorCode.None;
@@ -869,7 +878,15 @@ namespace KugelmatikLibrary
                         if (buildVersion >= 14)
                             freeRam = reader.ReadInt16();
 
-                        Info = new ClusterInfo(buildVersion, currentBusyCommand, highestRevision, new ClusterConfig((StepMode)stepMode, delayTime, useBreak), lastError, freeRam);
+                        if (buildVersion >= 15)
+                        {
+                            ushort configSize = reader.ReadUInt16();
+                            if (configSize != ClusterConfig.Size)
+                                throw new InvalidDataException("Packet config size does not match config structure size");
+                            config = ClusterConfig.Read(reader);
+                        }
+
+                        Info = new ClusterInfo(buildVersion, currentBusyCommand, highestRevision, config, lastError, freeRam);
                         RemovePacketToAcknowlegde(revision);
                         break;
                     default:

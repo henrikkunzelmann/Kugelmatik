@@ -8,10 +8,10 @@ namespace KugelmatikLibrary
 {
     public class DistanceChoreography : IChoreography
     {
-        public ushort GetHeight(Config config, TimeSpan time, int x, int y)
+        public ushort GetHeight(Cluster cluster, TimeSpan time, int x, int y)
         {
-            float width = config.KugelmatikWidth * Cluster.Width;
-            float height = config.KugelmatikHeight * Cluster.Height;
+            float width = cluster.Kugelmatik.StepperCountX;
+            float height = cluster.Kugelmatik.StepperCountY;
 
             float dt = (float)time.TotalMilliseconds * 0.05f;
 
@@ -20,7 +20,7 @@ namespace KugelmatikLibrary
                 dist = 0;
             if (dist > 1)
                 dist = 1;
-            return (ushort)(dist * config.MaxHeight);
+            return (ushort)(dist * cluster.Kugelmatik.ClusterConfig.MaxSteps);
         }
     }
 }

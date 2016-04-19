@@ -39,7 +39,9 @@ namespace KugelmatikLibrary.Protocol
             { PacketType.Config, typeof(PacketConfig) },
             { PacketType.BlinkGreen, typeof(PacketBlinkGreen) },
             { PacketType.BlinkRed, typeof(PacketBlinkRed) },
-            { PacketType.Stop, typeof(PacketStop) }
+            { PacketType.Stop, typeof(PacketStop) },
+            { PacketType.SetData, typeof(PacketSetData) },
+            { PacketType.Config2, typeof(PacketConfig2) }
         };
     }
 }

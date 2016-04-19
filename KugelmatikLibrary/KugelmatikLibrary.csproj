@@ -43,12 +43,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BrakeMode.cs" />
     <Compile Include="BusyCommand.cs" />
     <Compile Include="ChoreographyManager.cs" />
     <Compile Include="Cluster.cs" />
     <Compile Include="ClusterConfig.cs" />
     <Compile Include="ClusterInfo.cs" />
     <Compile Include="Config.cs" />
+    <Compile Include="ConfigHelper.cs" />
+    <Compile Include="ConfigTypeConverter.cs" />
     <Compile Include="ErrorCode.cs" />
     <Compile Include="FileAddressProvider.cs" />
     <Compile Include="FixedAddressProvider.cs" />
@@ -63,6 +66,7 @@
     <Compile Include="MathHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Protocol\IPacket.cs" />
+    <Compile Include="Protocol\PacketConfig2.cs" />
     <Compile Include="Protocol\PacketSetData.cs" />
     <Compile Include="Protocol\PacketAllSteppersArray.cs" />
     <Compile Include="Protocol\PacketAllSteppers.cs" />

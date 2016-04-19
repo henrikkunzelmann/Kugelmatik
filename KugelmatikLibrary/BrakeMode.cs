@@ -6,8 +6,10 @@ using System.Threading.Tasks;
 
 namespace KugelmatikLibrary
 {
-    public interface IChoreography
+    public enum BrakeMode : byte
     {
-        ushort GetHeight(Cluster cluster, TimeSpan time, int x, int y);
+        None = 0,
+        Always = 1,
+        Smart = 2
     }
 }

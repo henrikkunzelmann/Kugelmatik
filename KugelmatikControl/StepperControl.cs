@@ -29,9 +29,9 @@ namespace KugelmatikControl
 
             // UI updaten
             heightNumber.Minimum = 0;
-            heightNumber.Maximum = stepper.Kugelmatik.Config.MaxHeight;
+            heightNumber.Maximum = stepper.Kugelmatik.ClusterConfig.MaxSteps;
             heightTrackBar.Minimum = 0;
-            heightTrackBar.Maximum = stepper.Kugelmatik.Config.MaxHeight;
+            heightTrackBar.Maximum = stepper.Kugelmatik.ClusterConfig.MaxSteps;
 
             ShowStepper(stepper);
             SetupOnClick(this);

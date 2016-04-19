@@ -30,7 +30,7 @@ namespace KugelmatikLibrary
         /// <summary>
         /// Gibt die Einstellungen des Clusters zurück.
         /// </summary>
-        [TypeConverter(typeof(ExpandableObjectConverter))]
+        [TypeConverter(typeof(ConfigTypeConverter))]
         public ClusterConfig Config { get; private set; }
 
         /// <summary>
@@ -81,7 +81,7 @@ namespace KugelmatikLibrary
             return BuildVersion == other.BuildVersion
                 && CurrentBusyCommand == other.CurrentBusyCommand
                 && HighestRevision == other.HighestRevision
-                && Config == other.Config
+                && Config.Equals(other.Config)
                 && LastError == other.LastError
                 && FreeRam == other.FreeRam;
         }

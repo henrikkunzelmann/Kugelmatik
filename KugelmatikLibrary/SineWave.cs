@@ -26,7 +26,7 @@ namespace KugelmatikLibrary
             this.Frequency = frequency;
         }
 
-        public ushort GetHeight(Config config, TimeSpan time, int x, int y)
+        public ushort GetHeight(Cluster cluster, TimeSpan time, int x, int y)
         {
             float v = x;
             if (WaveDirection == Direction.Y)
@@ -39,7 +39,7 @@ namespace KugelmatikLibrary
             sinWave /= 2; // normalisieren
 
             // in Schritte umwandeln
-            return (ushort)(sinWave * config.MaxHeight);
+            return (ushort)(sinWave * cluster.Kugelmatik.ClusterConfig.MaxSteps);
         }
 
         public enum Direction

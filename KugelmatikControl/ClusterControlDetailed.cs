@@ -123,10 +123,10 @@ namespace KugelmatikControl
             updatingClusterHeight = true;
 
             clusterHeight.Minimum = 0;
-            clusterHeight.Maximum = CurrentCluster.Kugelmatik.Config.MaxHeight;
+            clusterHeight.Maximum = CurrentCluster.Kugelmatik.ClusterConfig.MaxSteps;
 
             clusterHeightTrackBar.Minimum = 0;
-            clusterHeightTrackBar.Maximum = CurrentCluster.Kugelmatik.Config.MaxHeight;
+            clusterHeightTrackBar.Maximum = CurrentCluster.Kugelmatik.ClusterConfig.MaxSteps;
 
             int avgHeight = (int)CurrentCluster.EnumerateSteppers().Average(s => s.Height);
             clusterHeight.Value = avgHeight;
@@ -258,7 +258,7 @@ namespace KugelmatikControl
 
         private void configButton_Click(object sender, EventArgs e)
         {
-            CurrentCluster.SendConfig(new ClusterConfig(CurrentCluster.Kugelmatik.Config));
+            CurrentCluster.SendConfig(CurrentCluster.Kugelmatik.ClusterConfig);
         }
 
         private void blinkButton_Click(object sender, EventArgs e)

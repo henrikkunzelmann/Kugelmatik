@@ -27,11 +27,11 @@ namespace KugelmatikControl
 
             // UI initialisieren
             minHeight.Minimum = 0;
-            minHeight.Maximum = Kugelmatik.Config.MaxHeight;
+            minHeight.Maximum = Kugelmatik.ClusterConfig.MaxSteps;
 
 
             maxHeight.Minimum = 0;
-            maxHeight.Maximum = Kugelmatik.Config.MaxHeight;
+            maxHeight.Maximum = Kugelmatik.ClusterConfig.MaxSteps;
             maxHeight.Value = maxHeight.Maximum;
         }
 
@@ -113,7 +113,7 @@ namespace KugelmatikControl
 
         private void maxHeight_ValueChanged(object sender, EventArgs e)
         {
-            minHeight.Maximum = Math.Max(Kugelmatik.Config.MaxHeight, maxHeight.Value);
+            minHeight.Maximum = Math.Max(Kugelmatik.ClusterConfig.MaxSteps, maxHeight.Value);
         }
     }
 }

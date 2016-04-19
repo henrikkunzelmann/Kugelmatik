@@ -8,10 +8,10 @@ namespace KugelmatikLibrary
 {
     public class Ripple : IChoreography
     {
-        public ushort GetHeight(Config config, TimeSpan time, int x, int y)
+        public ushort GetHeight(Cluster cluster, TimeSpan time, int x, int y)
         {
-            float width = config.KugelmatikWidth * Cluster.Width;
-            float height = config.KugelmatikHeight * Cluster.Height;
+            float width = cluster.Kugelmatik.StepperCountX;
+            float height = cluster.Kugelmatik.StepperCountY;
 
             float dt = (float)time.TotalSeconds * 0.1f;
 
@@ -19,7 +19,7 @@ namespace KugelmatikLibrary
             val += 1;
             val /= 2;
 
-            return (ushort)(val * config.MaxHeight);
+            return (ushort)(val * cluster.Kugelmatik.ClusterConfig.MaxSteps);
         }
     }
 }

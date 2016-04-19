@@ -24,7 +24,12 @@ void error(const char* tag, const char* message, bool blinkFast)
 
 void internalError()
 {
-	lastError = ERROR_INTERNAL;
+	internalError(ERROR_INTERNAL);
+}
+
+void internalError(uint8_t error)
+{
+	lastError = error;
 	blinkRedLedShort(true);
 }
 

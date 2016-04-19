@@ -19,6 +19,8 @@ namespace KugelmatikLibrary
         InvalidConfigValue = 8,
         InvalidHeight = 9,
         InvalidValue = 10,
+        NotAllowedToRead = 11,
+        PacketSizeBufferOverflow = 12,
         Internal = 255
     }
 }

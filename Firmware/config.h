@@ -11,9 +11,9 @@ enum StepMode : byte {
 };
 
 enum BrakeMode : byte {
-	BrakeNone,
-	BrakeAlways,
-	BrakeSmart
+	BrakeNone = 0,
+	BrakeAlways = 1,
+	BrakeSmart = 2
 };
 
 struct Config {

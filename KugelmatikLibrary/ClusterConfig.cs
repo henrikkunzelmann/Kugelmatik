@@ -1,99 +1,118 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace KugelmatikLibrary
 {
     /// <summary>
-    /// Stellt die Einstellung eines Clusters dar.
+    /// Einstellungen eines Clusters.
     /// </summary>
-    public class ClusterConfig : IEquatable<ClusterConfig>
+    [StructLayout(LayoutKind.Sequential, Pack = 1, CharSet = CharSet.Ansi)]
+    [TypeConverter(typeof(ConfigTypeConverter))]
+    public struct ClusterConfig
     {
-        /// <summary>
-        /// Gibt den Schrittmodus zurück, welcher das Cluster benutzt.
-        /// </summary>
-        public StepMode StepMode { get; private set; }
+        [DescriptionAttribute("Schrittmodus")]
+        [MarshalAs(UnmanagedType.U1)]
+        public StepMode StepMode;
 
-        /// <summary>
-        /// Gibt die Wartezeit (Ticktime) zwischen zwei Schritten zurück.
-        /// </summary>
-        public int TickTime { get; private set; }
+        [DescriptionAttribute("Bremsmodus")]
+        [MarshalAs(UnmanagedType.U1)]
+        public BrakeMode BrakeMode;
 
-        /// <summary>
-        /// Gibt zurück, ob das Cluster die Bremse benutzt.
-        /// </summary>
-        public bool UseBreak { get; private set; }
+        [DescriptionAttribute("Zeit (in Mikrosekunden) zwischen zwei Schritten")]
+        [Range(200, 10000)]
+        public uint TickTime;
 
-        public ClusterConfig()
+        [Category("Kugelmatik")]
+        [DescriptionAttribute("Zeit (in Mikrosekunden) zwischen zwei Schritten (beim Home-Befehl)")]
+        [Range(200, 10000)]
+        public uint HomeTime;
+
+        [Category("Kugelmatik")]
+        [DescriptionAttribute("Zeit (in Mikrosekunden) zwischen zwei Schritten (beim Fix-Befehl)")]
+        [Range(200, 10000)]
+        public uint FixTime;
+
+        [Category("Kugelmatik")]
+        [DescriptionAttribute("Anzahl der Schritte die eine Kugel maximal nach unten darf")]
+        [Range(1, 8000)]
+        public short MaxSteps;
+
+        [Category("Kugelmatik")]
+        [DescriptionAttribute("Anzahl der Schritte für den Home-Befehl")]
+        [Range(1, 8000)]
+        public short HomeSteps;
+
+        [Category("Kugelmatik")]
+        [DescriptionAttribute("Anzahl der Schritte für den Fix-Befehl")]
+        [Range(1, 10000)]
+        public short FixSteps;
+
+        [Category("Kugelmatik")]
+        [DescriptionAttribute("Zeit (in Ticks) wie lange die Bremse gehalten wird (für SmartBrake)")]
+        [Range(0, ushort.MaxValue)]
+        public ushort BrakeTicks;
+
+        public static ushort Size
         {
-            StepMode = StepMode.Half;
-            TickTime = 4000;
-            UseBreak = false;
+            get { return (ushort)Marshal.SizeOf(typeof(ClusterConfig)); }
         }
 
-        public ClusterConfig(Config config)
+        public static ClusterConfig GetDefault()
         {
-            if (config == null)
-                throw new ArgumentNullException("config");
-
-            StepMode = config.ClusterStepMode;
-            TickTime = config.ClusterTickTime;
-            UseBreak = config.ClusterUseBreak;
+            ClusterConfig config = new ClusterConfig();
+            config.StepMode = StepMode.Full;
+            config.BrakeMode = BrakeMode.Smart;
+            config.TickTime = 2000;
+            config.HomeTime = 3500;
+            config.FixTime = 3500;
+            
+            config.MaxSteps = 8000;
+            config.HomeSteps = 8000;
+            config.FixSteps = 8000;
+            
+            config.BrakeTicks = 10000;
+            return config;
         }
 
-        public ClusterConfig(StepMode stepMode, int delayTime, bool useBreak)
+        public static ClusterConfig GetCompatibility(StepMode stepMode, int delayTime, bool useBrake)
         {
-            if (delayTime < 50 || delayTime > 15000)
+            if (delayTime < 200 || delayTime > 10000)
                 throw new ArgumentOutOfRangeException("delayTime");
 
-            this.StepMode = stepMode;
-            this.TickTime = delayTime;
-            this.UseBreak = useBreak;
+            ClusterConfig config = GetDefault();
+            config.StepMode = stepMode;
+            config.TickTime = (uint)delayTime;
+            config.BrakeMode = useBrake ? BrakeMode.Always : BrakeMode.None;
+            return config;
         }
 
-        public static bool operator ==(ClusterConfig a, ClusterConfig b)
+        public static ClusterConfig Read(BinaryReader reader)
         {
-            if (object.ReferenceEquals(a, b))
-                return true;
-            if (object.ReferenceEquals(a, null))
-                return false;
-            return a.Equals(b);
+            byte[] buffer = new byte[Size];
+            reader.Read(buffer, 0, buffer.Length);
+
+            GCHandle handle = GCHandle.Alloc(buffer, GCHandleType.Pinned);
+            ClusterConfig settings = (ClusterConfig)Marshal.PtrToStructure(handle.AddrOfPinnedObject(), typeof(ClusterConfig));
+            handle.Free();
+
+            return settings;
         }
 
-        public static bool operator !=(ClusterConfig a, ClusterConfig b)
+        public void Write(BinaryWriter writer)
         {
-            return !(a == b);
-        }
+            byte[] buffer = new byte[Size];
 
+            GCHandle handle = GCHandle.Alloc(buffer, GCHandleType.Pinned);
+            Marshal.StructureToPtr(this, handle.AddrOfPinnedObject(), false);
+            handle.Free();
 
-        public override bool Equals(object obj)
-        {
-            if (obj is ClusterConfig)
-                return Equals(obj as ClusterConfig);
-            return false;
-        }
-
-        public bool Equals(ClusterConfig other)
-        {
-            if (other == null)
-                return false;
-            return StepMode == other.StepMode 
-                && TickTime == other.TickTime 
-                && UseBreak == other.UseBreak;
-        }
-
-        public override int GetHashCode()
-        {
-            unchecked
-            {
-                int hash = 13;
-                hash = (hash * 7) + StepMode.GetHashCode();
-                hash = (hash * 7) + TickTime.GetHashCode();
-                hash = (hash * 7) + UseBreak.GetHashCode();
-                return hash;
-            }
+            writer.Write(buffer, 0, buffer.Length);
         }
     }
 }

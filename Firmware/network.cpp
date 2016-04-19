@@ -113,7 +113,7 @@ void sendData(int32_t revision)
 	sendPacket();
 }
 
-void sendInfo(int32_t revision) {
+void sendInfo(int32_t revision, boolean wantConfig2) {
 	int32_t highestRevision = INT_MIN;
 	for (int i = 0; i < CLUSTER_SIZE; i++) {
 		StepperData* stepper = getStepper(i);
@@ -133,11 +133,18 @@ void sendInfo(int32_t revision) {
 	packet->write((uint8_t)BUILD_VERSION);
 	packet->write(currentBusyCommand);
 	packet->write(highestRevision);
-	packet->write((uint8_t)config->stepMode);
-	packet->write(config->tickTime);
-	packet->write((uint8_t)config->brakeMode);
+	if (!wantConfig2) {
+		packet->write((uint8_t)config->stepMode);
+		packet->write(config->tickTime);
+		packet->write((uint8_t)config->brakeMode);
+	}
 	packet->write(lastError);
 	packet->write((int16_t)freeRam());
+
+	if (wantConfig2) {
+		packet->write((uint16_t)sizeof(Config));
+		packet->write((uint8_t*)config, sizeof(Config));
+	}
 
 	sendPacket();
 }
@@ -415,7 +422,11 @@ void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, c
 	}
 	case PacketInfo:
 	{
-		sendInfo(revision);
+		bool wantConfig2 = false;
+		if (packet->getPosition() < packet->getSize())
+			wantConfig2 = packet->readBoolean();
+
+		sendInfo(revision, wantConfig2);
 		break;
 	}
 	case PacketConfig:
@@ -442,7 +453,7 @@ void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, c
 		config->tickTime = cTickTime;
 		config->brakeMode = cUseBreak ? BrakeAlways : BrakeNone;
 
-		sendInfo(revision);
+		sendInfo(revision, false);
 		break;
 	}
 	case PacketBlinkGreen:
@@ -486,6 +497,31 @@ void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, c
 				stopMove();
 			}
 		}
+		break;
+	}
+	case PacketConfig2:
+	{
+		if (!checkRevision(configRevision, revision))
+			break;
+
+		configRevision = revision;
+
+		uint16_t size = packet->readUint16();
+		if (size != sizeof(Config))
+			return protocolError(ERROR_INVALID_CONFIG_VALUE);
+
+		Config* newConfig = getDefaultConfig();
+		packet->read((uint8_t*)newConfig, sizeof(Config));
+
+		if (packet->getError()) {
+			delete newConfig;
+			return;
+		}
+
+		delete config;
+		config = newConfig;
+
+		sendInfo(revision, true);
 		break;
 	}
 	default:

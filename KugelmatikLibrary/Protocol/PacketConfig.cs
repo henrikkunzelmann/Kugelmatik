@@ -27,7 +27,7 @@ namespace KugelmatikLibrary.Protocol
             if (!Enum.IsDefined(typeof(StepMode), stepMode))
                 throw new InvalidDataException("Unkown step mode: " + stepMode);
 
-            Config = new ClusterConfig((StepMode)stepMode,
+            Config = ClusterConfig.GetCompatibility((StepMode)stepMode,
                 reader.ReadInt32(),
                 reader.ReadByte() > 0);
         }
@@ -39,7 +39,7 @@ namespace KugelmatikLibrary.Protocol
 
             writer.Write((byte)Config.StepMode);
             writer.Write(Config.TickTime);
-            writer.Write((byte)(Config.UseBreak ? 1 : 0));
+            writer.Write(Config.BrakeMode == BrakeMode.Always);
         }
     }
 }

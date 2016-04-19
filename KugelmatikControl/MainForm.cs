@@ -16,6 +16,7 @@ namespace KugelmatikControl
     public partial class MainForm : Form
     {
         public const string ConfigFile = "config.txt";
+        public const string ClusterConfigFile = "cluster.txt";
 
         public Kugelmatik Kugelmatik { get; private set; }
 
@@ -54,19 +55,24 @@ namespace KugelmatikControl
 
             Log.Info("Loading kugelmatik...");
 
+            // Config kopieren oder laden
             Config config;
+            ClusterConfig clusterConfig;
+
             if (Kugelmatik != null)
+            {
                 config = Kugelmatik.Config;
-            else if (File.Exists(ConfigFile))
-                config = Config.LoadConfigFromFile(ConfigFile);
+                clusterConfig = Kugelmatik.ClusterConfig;
+            }
             else
             {
-                config = new Config();
-                config.SaveToFile(ConfigFile);
+                config = LoadOrDefault(ConfigFile, Config.GetDefault());
+                clusterConfig = LoadOrDefault(ClusterConfigFile, ClusterConfig.GetDefault());
             }
 
-            Kugelmatik = new Kugelmatik(config);
+            Kugelmatik = new Kugelmatik(config, clusterConfig);
 
+            // UI erstellen
             clusterControls = new ClusterControl[Kugelmatik.Config.KugelmatikWidth * Kugelmatik.Config.KugelmatikHeight];
 
             const int padding = 5;
@@ -81,6 +87,15 @@ namespace KugelmatikControl
                 }
 
             UpdateChoreographyStatus();
+        }
+
+        private static T LoadOrDefault<T>(string file, T defaultValue)
+        {
+            if (File.Exists(file))
+                return ConfigHelper.LoadConfigFromFile(file, defaultValue);
+
+            ConfigHelper.SaveToFile(file, defaultValue);
+            return defaultValue;
         }
 
         protected override void OnClosed(EventArgs e)
@@ -249,7 +264,7 @@ namespace KugelmatikControl
 
         private void optionsToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            ShowForm(configForm, () => configForm = new ConfigForm(Kugelmatik.Config));
+            ShowForm(configForm, () => configForm = new ConfigForm(Kugelmatik));
         }
 
         private void getDataToolStripMenuItem_Click(object sender, EventArgs e)
@@ -299,7 +314,7 @@ namespace KugelmatikControl
 
         private void configToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Kugelmatik.SendConfig(new ClusterConfig(Kugelmatik.Config));
+            Kugelmatik.SendConfig(Kugelmatik.ClusterConfig);
         }
 
         private void dataToolStripMenuItem_Click(object sender, EventArgs e)
@@ -340,12 +355,12 @@ namespace KugelmatikControl
 
         private void upDownUpDownToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            StartChoreography(new FunctionChoreography((config, time, x, y) =>
+            StartChoreography(new FunctionChoreography((cluster, time, x, y) =>
             {
                 float d = (float)((y + time.TotalSeconds * 0.5f) % 10);
                 if (d >= 5)
                     d = 10 - d;
-                return (ushort)(d / 5 * config.MaxHeight);
+                return (ushort)(d / 5 * cluster.Kugelmatik.ClusterConfig.MaxSteps);
             }));
         }
     }

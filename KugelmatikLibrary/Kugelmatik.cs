@@ -10,7 +10,12 @@ namespace KugelmatikLibrary
         /// <summary>
         /// Gibt die Config-Instanz zurück mit dem die Kugelmatik initalisiert wurde.
         /// </summary>
-        public Config Config { get; private set; }
+        public Config Config { get; set; }
+
+        /// <summary>
+        /// Gibt die ClusterConfig-Instanz zurück mit dem die Cluster eingestellt werden.
+        /// </summary>
+        public ClusterConfig ClusterConfig { get; set; }
 
         private Cluster[] clusters;
 
@@ -69,12 +74,10 @@ namespace KugelmatikLibrary
             }
         }
 
-        public Kugelmatik(Config config)
+        public Kugelmatik(Config config, ClusterConfig clusterConfig)
         {
-            if (config == null)
-                throw new ArgumentNullException("config");
-
             this.Config = config;
+            this.ClusterConfig = clusterConfig;
 
             IAddressProvider addressProvider;
             if (!string.IsNullOrWhiteSpace(config.AddressFile))
@@ -87,12 +90,10 @@ namespace KugelmatikLibrary
             InitClusters(addressProvider);
         }
 
-        public Kugelmatik(Config config, IAddressProvider addressProvider)
+        public Kugelmatik(Config config, ClusterConfig clusterConfig, IAddressProvider addressProvider)
         {
-            if (config == null)
-                throw new ArgumentNullException("config");
-
             this.Config = config;
+            this.ClusterConfig = clusterConfig;
             InitClusters(addressProvider);
         }
 
@@ -271,9 +272,6 @@ namespace KugelmatikLibrary
         /// </summary>
         public void SendConfig(ClusterConfig config)
         {
-            if (config == null)
-                throw new ArgumentNullException("config");
-
             foreach (Cluster cluster in clusters)
                 cluster.SendConfig(config);
         }

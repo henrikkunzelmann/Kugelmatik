@@ -46,7 +46,7 @@ namespace KugelmatikLibrary
             get { return height; }
             internal set
             {
-                if (value > Cluster.Kugelmatik.Config.MaxHeight)
+                if (value >  Kugelmatik.ClusterConfig.MaxSteps)
                     throw new ArgumentOutOfRangeException();
 
                 if (height != value)
@@ -133,7 +133,7 @@ namespace KugelmatikLibrary
         /// <param name="waitTime">Die Wartezeit die der Schrittmotor zwischen jedem Tick warten soll.</param>
         public void Set(ushort height, byte waitTime)
         {
-            if (height > Cluster.Kugelmatik.Config.MaxHeight)
+            if (height > Cluster.Kugelmatik.ClusterConfig.MaxSteps)
                 throw new ArgumentOutOfRangeException("height");
 
             lock(locker)

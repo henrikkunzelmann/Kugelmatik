@@ -14,6 +14,7 @@ void softReset(); // setzt den Chip zurück
 // bringt den Chip in den Fehler-Modus und blockiert ihn 
 void error(const char* tag, const char* message, bool blinkFast);
 void internalError();
+void internalError(uint8_t error);
 void protocolError(uint8_t error);
 
 void usdelay(uint16_t us);

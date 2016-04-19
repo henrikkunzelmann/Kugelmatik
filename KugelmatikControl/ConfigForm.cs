@@ -13,26 +13,39 @@ namespace KugelmatikControl
 {
     public partial class ConfigForm : Form
     {
-        private Config config;
+        private Kugelmatik kugelmatik;
 
-        public ConfigForm(Config config)
+        public ConfigForm(Kugelmatik kugelmatik)
         {
-            this.config = config;
+            this.kugelmatik = kugelmatik;
 
             InitializeComponent();
 
-            propertyGrid.SelectedObject = config;
+            propertyGrid.SelectedObject = kugelmatik.Config;
+            clusterPropertyGrid.SelectedObject = kugelmatik.ClusterConfig;
+        }
+
+        private void SaveConfig()
+        {
+            Config config = (Config)propertyGrid.SelectedObject;
+            ClusterConfig clusterConfig = (ClusterConfig)clusterPropertyGrid.SelectedObject;
+
+            kugelmatik.Config = config;
+            kugelmatik.ClusterConfig = clusterConfig;
+
+            ConfigHelper.SaveToFile(MainForm.ConfigFile, config);
+            ConfigHelper.SaveToFile(MainForm.ClusterConfigFile, clusterConfig);
         }
 
         protected override void OnClosed(EventArgs e)
         {
-            config.SaveToFile(MainForm.ConfigFile);
+            SaveConfig();
             base.OnClosed(e);
         }
 
         private void saveButton_Click(object sender, EventArgs e)
         {
-            config.SaveToFile(MainForm.ConfigFile);
+            SaveConfig();
         }
     }
 }
