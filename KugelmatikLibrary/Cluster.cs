@@ -619,9 +619,11 @@ namespace KugelmatikLibrary
                 throw new ObjectDisposedException(GetType().Name);
 
             ushort[] heights = new ushort[Width * Height];
+
+            int i = 0;
             for (int x = 0; x < Width; x++)
                 for (int y = 0; y < Height; y++)
-                    heights[y * Width + x] = GetStepperByPosition(x, y).Height;
+                    heights[i++] = GetStepperByPosition(x, y).Height;
             SendPacket(new PacketSetData(heights), true);
         }
 

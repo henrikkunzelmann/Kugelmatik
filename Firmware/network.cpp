@@ -105,7 +105,7 @@ void sendData(int32_t revision)
 		{
 			StepperData* stepper = getStepper(x, y);
 
-			packet->write(max(0, stepper->GotoSteps)); // CurrentSteps));
+			packet->write(max(0, stepper->CurrentSteps));
 			packet->write(stepper->WaitTime);
 		}
 	}
@@ -499,7 +499,8 @@ void handlePacket(uint8_t packetType, int32_t revision)
 					return;
 
 				stepper->CurrentSteps = height;
-				stopMove();
+				stepper->GotoSteps = height;
+				stepper->TickCount = 0;
 			}
 		}
 		break;
