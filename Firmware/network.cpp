@@ -34,6 +34,7 @@ void initNetwork()
 		toogleGreenLed();
 		delay(300);
 	}
+
 	turnGreenLedOn();
 
 	if (!ether.dhcpSetup()) 

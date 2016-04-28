@@ -138,9 +138,9 @@ namespace KugelmatikProxy
                 if (!Enum.IsDefined(typeof(PacketType), packetType))
                 {
                     if (isFromCluster)
-                        Log.Debug("[Cluster] [{0}] [rev: {1}{2}]", "unkown: " + packetType, rev, guranteed ? " guaranteed" : "");
+                        Log.Debug("[Cluster] [{0}] [rev: {1}{2}]", "unknown: " + packetType, rev, guranteed ? " guaranteed" : "");
                     else
-                        Log.Debug("[{0}] [rev: {1}{2}]", "unkown: " + packetType, rev, guranteed ? " guaranteed" : "");
+                        Log.Debug("[{0}] [rev: {1}{2}]", "unknown: " + packetType, rev, guranteed ? " guaranteed" : "");
                     return;
                 }
 

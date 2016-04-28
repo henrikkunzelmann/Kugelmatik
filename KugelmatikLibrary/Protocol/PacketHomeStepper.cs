@@ -26,7 +26,7 @@ namespace KugelmatikLibrary.Protocol
 
             int magicValue = reader.ReadInt32();
             if (magicValue != MagicValue)
-                throw new InvalidDataException("Unkown magic value: " + magicValue);
+                throw new InvalidDataException("Unknown magic value: " + magicValue);
 
             this.Position = new StepperPosition(reader.ReadByte());
         }

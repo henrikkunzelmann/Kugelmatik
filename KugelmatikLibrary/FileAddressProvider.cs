@@ -40,7 +40,7 @@ namespace KugelmatikLibrary
                             fallback = new KugelmatikAddressProvider();
                             break;
                         default:
-                            Log.Error("FileAddressProvider: unkown fallback {0}", value);
+                            Log.Error("FileAddressProvider: unknown fallback {0}", value);
                             break;
                     }
                 }

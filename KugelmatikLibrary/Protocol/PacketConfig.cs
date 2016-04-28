@@ -25,7 +25,7 @@ namespace KugelmatikLibrary.Protocol
             byte stepMode = reader.ReadByte();
 
             if (!Enum.IsDefined(typeof(StepMode), stepMode))
-                throw new InvalidDataException("Unkown step mode: " + stepMode);
+                throw new InvalidDataException("Unknown step mode: " + stepMode);
 
             Config = ClusterConfig.GetCompatibility((StepMode)stepMode,
                 reader.ReadInt32(),

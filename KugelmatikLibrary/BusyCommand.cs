@@ -12,6 +12,6 @@ namespace KugelmatikLibrary
         Home = 1,
         Fix = 2,
         HomeStepper = 3,
-        Unkown = 255
+        Unknown = 255
     }
 }

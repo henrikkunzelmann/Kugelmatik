@@ -835,7 +835,7 @@ namespace KugelmatikLibrary
                         {
                             if (packet.Length < HeaderSize + 8)
                                 throw new InvalidDataException("Packet is not long enough.");
-                            currentBusyCommand = reader.ReadByte() > 0 ? BusyCommand.Unkown : BusyCommand.None;
+                            currentBusyCommand = reader.ReadByte() > 0 ? BusyCommand.Unknown : BusyCommand.None;
                         }
 
                         int highestRevision = 0;
