@@ -37,7 +37,11 @@ void initNetwork()
 
 	turnGreenLedOn();
 
-	if (!ether.dhcpSetup()) 
+	char hostName[] = "Kugelmatik-00";
+	hostName[11] = HEX_STR(LAN_ID >> 4);
+	hostName[12] = HEX_STR(LAN_ID & 0xF);
+
+	if (!ether.dhcpSetup(hostName, true)) 
 	{
 		error("init", "dhcp failed", false);
 		return;
