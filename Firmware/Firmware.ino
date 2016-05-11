@@ -22,7 +22,6 @@
 #include <avr/interrupt.h>
 #include <limits.h>
 #include <EtherCard.h>
-#include <EEPROM.h>
 #include <I2C.h>
 #include <MCP23017.h>
 #include "constants.h"
