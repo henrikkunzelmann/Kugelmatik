@@ -16,14 +16,12 @@
 #define ETHERNET_BUFFER_SIZE 300	// Größe des Ethernet Buffers in Bytes	
 #define HEADER_SIZE 9				// Größe des Paket-Headers in Bytes
 
-#define HEX_STR(x) ((x & HEX) >= 10 ? ('A' + (x - 10)) : ('0' + x))
-
-
-
 boolean checkRevision(int32_t lastRevision, int32_t revision);
 
 
 void initNetwork();
+
+char getHexChar(int x);
 
 void sendPacket();
 void writeHeader(bool guarenteed, byte packetType, int32_t revision);

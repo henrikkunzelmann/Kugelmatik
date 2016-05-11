@@ -19,6 +19,14 @@ boolean checkRevision(int32_t lastRevision, int32_t revision)
 	return revision > lastRevision;
 }
 
+char getHexChar(int x)
+{
+	x &= 0xF;
+	if (x >= 10)
+		return 'A' + (x - 10);
+	return '0' + x;
+}
+
 void initNetwork()
 {
 	uint8_t rev = ether.begin(ETHERNET_BUFFER_SIZE, ethernetMac, 28);
@@ -38,8 +46,8 @@ void initNetwork()
 	turnGreenLedOn();
 
 	char hostName[] = "Kugelmatik-00";
-	hostName[11] = HEX_STR(LAN_ID >> 4);
-	hostName[12] = HEX_STR(LAN_ID & 0xF);
+	hostName[11] = getHexChar(LAN_ID >> 4);
+	hostName[12] = getHexChar(LAN_ID);
 
 	if (!ether.dhcpSetup(hostName, true)) 
 	{
