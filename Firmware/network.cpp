@@ -148,7 +148,7 @@ void sendInfo(int32_t revision, boolean wantConfig2) {
 	if (!wantConfig2) {
 		packet->write((uint8_t)config->stepMode);
 		packet->write(config->tickTime);
-		packet->write((uint8_t)config->brakeMode);
+		packet->write(config->brakeMode != BrakeNone);
 	}
 	packet->write(lastError);
 	packet->write((int16_t)freeRam());
@@ -468,7 +468,7 @@ void handlePacket(uint8_t packetType, int32_t revision)
 
 		config->stepMode = (StepMode)cStepMode;
 		config->tickTime = cTickTime;
-		config->brakeMode = cUseBreak ? BrakeAlways : BrakeNone;
+		config->brakeMode = cUseBreak ? BrakeSmart : BrakeNone;
 
 		sendInfo(revision, false);
 		break;
