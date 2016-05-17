@@ -44,6 +44,7 @@ void resetStepper(StepperData* stepper)
 	stepper->GotoSteps = 0;
 	stepper->TickCount = 0;
 	stepper->WaitTime = 0;
+	stepper->BrakeTicks = 0;
 }
 
 void forceStepper(StepperData* stepper, int32_t revision, int16_t height)
@@ -157,8 +158,10 @@ void updateSteppers(boolean alwaysUseHalfStep)
 			}
 			else if (config->brakeMode == BrakeSmart)
 			{
-				if (stepper->BrakeTicks++ < config->brakeTicks)
+				if (stepper->BrakeTicks < config->brakeTicks) {
 					gpioValue |= stepsStepper[stepper->CurrentStepIndex] << (4 * j);
+					stepper->BrakeTicks++;
+				}
 			}
 			else if (config->brakeMode == BrakeAlways) // Bremse benutzen?
 				gpioValue |= stepsStepper[stepper->CurrentStepIndex] << (4 * j);
