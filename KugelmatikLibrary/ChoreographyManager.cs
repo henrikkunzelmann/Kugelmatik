@@ -114,6 +114,7 @@ namespace KugelmatikLibrary
                 throw new InvalidOperationException("Already canceled");
 
             cancellationToken.Cancel();
+            task.Wait();
         }
 
         private void SetSteppers(TimeSpan span)
