@@ -41,8 +41,25 @@ namespace KugelmatikControl
             LoadKugelmatik();
         }
 
+        private void CloseAllWindows()
+        {
+            CloseWindow(logForm);
+            CloseWindow(configForm);
+            CloseWindow(clusterForm);
+            CloseWindow(pingPongForm);
+            CloseWindow(heightViewForm);
+        }
+
+        private void CloseWindow(Form form)
+        {
+            if (form != null && form.Visible)
+                form.Close();
+        }
+
         private void LoadKugelmatik()
         {
+            CloseAllWindows();
+
             if (choreography != null)
             {
                 if (choreography.IsRunning)
