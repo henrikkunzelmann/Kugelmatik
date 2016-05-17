@@ -771,9 +771,6 @@ namespace KugelmatikLibrary
                 switch (type)
                 {
                     case PacketType.Ping:
-                        if (packet.Length < HeaderSize + sizeof(long))
-                            throw new InvalidDataException("Packet is not long enough.");
-
                         bool wasNotConnected = !CheckConnection();
 
                         lastPing = Environment.TickCount;
@@ -801,9 +798,6 @@ namespace KugelmatikLibrary
                         RemovePacketToAcknowlegde(revision);
                         break;
                     case PacketType.GetData:
-                        if (packet.Length < HeaderSize + 3 * Width * Height)
-                            throw new InvalidDataException("Packet is not long enough.");
-
                         for (int x = 0; x < Width; x++) // for-Schleife muss mit Firmware übereinstimmen
                             for (int y = 0; y < Height; y++)
                             {
@@ -821,32 +815,17 @@ namespace KugelmatikLibrary
                         RemovePacketToAcknowlegde(revision);
                         break;
                     case PacketType.Info:
-                        if (packet.Length < HeaderSize + 6)
-                            throw new InvalidDataException("Packet is not long enough.");
-
                         byte buildVersion = reader.ReadByte();
 
                         BusyCommand currentBusyCommand = BusyCommand.None;
                         if (buildVersion >= 11)
-                        {
-                            if (packet.Length < HeaderSize + 8)
-                                throw new InvalidDataException("Packet is not long enough.");
                             currentBusyCommand = (BusyCommand)reader.ReadByte();
-                        }
                         else if(buildVersion >= 8)
-                        {
-                            if (packet.Length < HeaderSize + 8)
-                                throw new InvalidDataException("Packet is not long enough.");
                             currentBusyCommand = reader.ReadByte() > 0 ? BusyCommand.Unknown : BusyCommand.None;
-                        }
 
                         int highestRevision = 0;
                         if (buildVersion >= 9)
-                        {
-                            if (packet.Length < HeaderSize + 12)
-                                throw new InvalidDataException("Packet is not long enough.");
                             highestRevision = reader.ReadInt32();
-                        }
 
                         ClusterConfig config = new ClusterConfig();
                         if (buildVersion < 15)
@@ -859,22 +838,14 @@ namespace KugelmatikLibrary
 
                             bool useBreak = false;
                             if (buildVersion >= 6)
-                            {
-                                if (packet.Length < HeaderSize + 7)
-                                    throw new InvalidDataException("Packet is not long enough.");
                                 useBreak = reader.ReadByte() > 0;
-                            }
 
                             config = ClusterConfig.GetCompatibility((StepMode)stepMode, delayTime, useBreak);
                         }
 
                         ErrorCode lastError = ErrorCode.None;
                         if (buildVersion >= 12)
-                        {
-                            if (packet.Length < HeaderSize + 8)
-                                throw new InvalidDataException("Packet is not long enough.");
                             lastError = (ErrorCode)reader.ReadByte();
-                        }
 
                         int freeRam = -1;
                         if (buildVersion >= 14)
