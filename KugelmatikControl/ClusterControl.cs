@@ -108,7 +108,7 @@ namespace KugelmatikControl
         /// <param name="cluster"></param>
         public static void SetClusterBoxColor(GroupBox groupBox, Cluster cluster)
         {
-            SetClusterBoxColor(groupBox, cluster.Ping);
+            SetClusterBoxColor(groupBox, cluster.Ping, cluster.Info);
         }
 
         /// <summary>
@@ -116,9 +116,11 @@ namespace KugelmatikControl
         /// </summary>
         /// <param name="groupBox"></param>
         /// <param name="cluster"></param>
-        public static void SetClusterBoxColor(GroupBox groupBox, int ping)
+        public static void SetClusterBoxColor(GroupBox groupBox, int ping, ClusterInfo info)
         {
-            if (ping >= 150)
+            if (info != null && info.CurrentBusyCommand != BusyCommand.None)
+                groupBox.ForeColor = Color.DarkBlue;
+            else if (ping >= 150)
                 groupBox.ForeColor = Color.DarkOrange;
             else if (ping >= 0)
                 groupBox.ForeColor = Color.DarkGreen;

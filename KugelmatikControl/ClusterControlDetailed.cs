@@ -174,7 +174,7 @@ namespace KugelmatikControl
                 ping == -1 ? "offline" : (ping + "ms"),
                 CurrentCluster.Address == null ? "none" : CurrentCluster.Address.ToString());
 
-            ClusterControl.SetClusterBoxColor(clusterBox, ping);
+            ClusterControl.SetClusterBoxColor(clusterBox, ping, info);
         }
 
         private void ShowStepper(StepperControl stepper)
@@ -200,13 +200,19 @@ namespace KugelmatikControl
         private void homeStepperButton_Click(object sender, EventArgs e)
         {
             if (selectedStepper != null)
+            {
                 selectedStepper.Stepper.SendHome();
+                selectedStepper.Stepper.Cluster.SendInfo();
+            }
         }
 
         private void fixStepperButton_Click(object sender, EventArgs e)
         {
             if (selectedStepper != null)
+            {
                 selectedStepper.Stepper.SendFix();
+                selectedStepper.Stepper.Cluster.SendInfo();
+            }
         }
 
         private void setClusterButton_Click(object sender, EventArgs e)
@@ -230,6 +236,7 @@ namespace KugelmatikControl
         private void homeButton_Click(object sender, EventArgs e)
         {
             CurrentCluster.SendHome();
+            CurrentCluster.SendInfo();
             UpdateClusterHeight();
         }
 
@@ -254,6 +261,7 @@ namespace KugelmatikControl
         private void stopButton_Click(object sender, EventArgs e)
         {
             CurrentCluster.SendStop();
+            CurrentCluster.SendInfo();
         }
 
         private void configButton_Click(object sender, EventArgs e)

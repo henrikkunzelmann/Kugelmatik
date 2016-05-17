@@ -131,8 +131,7 @@ namespace KugelmatikControl
             if (tickCount % 5 == 0)
                 Kugelmatik.ResendPendingPackets();
 
-            // alle 10 Ticks Board Informationen neu anfordern
-            if (tickCount % 10 == 0)
+            if (tickCount % 3 == 0)
                 Kugelmatik.SendInfo();
 
             if (viewOnlyToolStripMenuItem.Checked && tickCount % 2 == 0)
