@@ -73,6 +73,7 @@ namespace KugelmatikControl
             Kugelmatik = new Kugelmatik(config, clusterConfig);
 
             // UI erstellen
+            clustersPanel.Controls.Clear();
             clusterControls = new ClusterControl[Kugelmatik.Config.KugelmatikWidth * Kugelmatik.Config.KugelmatikHeight];
 
             const int padding = 5;
@@ -362,6 +363,11 @@ namespace KugelmatikControl
                     d = 10 - d;
                 return (ushort)(d / 5 * cluster.Kugelmatik.ClusterConfig.MaxSteps);
             }));
+        }
+
+        private void reloadClustersToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            LoadKugelmatik();
         }
     }
 }
