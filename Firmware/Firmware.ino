@@ -43,8 +43,6 @@ void setup()
 
 	turnGreenLedOn();
 
-	delay(LAN_ID * 10); // Init verzögern damit das Netzwerk nicht überlastet wird
-
 	initNetwork();
 
 	initAllMCPs();

@@ -45,9 +45,12 @@ void initNetwork()
 
 	turnGreenLedOn();
 
+	uint8_t lanID = ether.mymac[5];
+	delay(lanID * 20); // Init verzögern damit das Netzwerk nicht überlastet wird
+
 	char hostName[] = "Kugelmatik-00";
-	hostName[11] = getHexChar(LAN_ID >> 4);
-	hostName[12] = getHexChar(LAN_ID);
+	hostName[11] = getHexChar(lanID >> 4);
+	hostName[12] = getHexChar(lanID);
 
 	if (!ether.dhcpSetup(hostName, true)) 
 	{
