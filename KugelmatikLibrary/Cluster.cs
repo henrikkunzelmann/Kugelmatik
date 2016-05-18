@@ -803,7 +803,7 @@ namespace KugelmatikLibrary
                             {
                                 Stepper stepper = GetStepperByPosition(x, y);
 
-                                ushort height = reader.ReadUInt16(); 
+                                ushort height = reader.ReadUInt16();
                                 if (height > Kugelmatik.ClusterConfig.MaxSteps)
                                     continue; // Höhe ignorieren
 
@@ -820,7 +820,7 @@ namespace KugelmatikLibrary
                         BusyCommand currentBusyCommand = BusyCommand.None;
                         if (buildVersion >= 11)
                             currentBusyCommand = (BusyCommand)reader.ReadByte();
-                        else if(buildVersion >= 8)
+                        else if (buildVersion >= 8)
                             currentBusyCommand = reader.ReadByte() > 0 ? BusyCommand.Unknown : BusyCommand.None;
 
                         int highestRevision = 0;
@@ -844,8 +844,13 @@ namespace KugelmatikLibrary
                         }
 
                         ErrorCode lastError = ErrorCode.None;
-                        if (buildVersion >= 12)
-                            lastError = (ErrorCode)reader.ReadByte();
+                        if (buildVersion >= 12) {
+                            int error = reader.ReadByte();
+                            if (!Enum.IsDefined(typeof(ErrorCode), error))
+                                lastError = ErrorCode.UnknownError;
+                            else
+                                lastError = (ErrorCode)error;
+                        }
 
                         int freeRam = -1;
                         if (buildVersion >= 14)

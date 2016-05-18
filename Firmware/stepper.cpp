@@ -25,6 +25,25 @@ void initMCP(byte index)
 
 	// alle Pins (0xFFFF) auf OUTPUT stellen
 	data->MCP->setPinDirOUT(0xFFFF);
+
+	data->isOK = (data->MCP->writeGPIOS(0) == 0);
+
+#if !IGNORE_MCP_FAULTS
+	if (!data->isOK)
+	{
+		internalError(ERROR_MCP_FAULT_1 + index);
+
+		turnRedLedOn();
+		for (byte i = 0; i <= index; i++)
+		{
+			turnGreenLedOn();
+			delay(TIME_SLOW);
+			turnGreenLedOff();
+			delay(TIME_SLOW);
+		}
+		turnRedLedOff();
+	}
+#endif
 }
 
 StepperData* getStepper(byte x, byte y)
@@ -104,9 +123,11 @@ void updateSteppers(boolean alwaysUseHalfStep)
 	{
 		uint16_t gpioValue = 0;
 
+		MCPData* mcp = &mcps[i];
+
 		for (byte j = 0; j < MCP_STEPPER_COUNT; j++)
 		{
-			StepperData* stepper = &(mcps[i].Steppers[j]);
+			StepperData* stepper = &mcp->Steppers[j];
 
 			byte stepSize = 0;
 			int32_t diff = abs(stepper->CurrentSteps - stepper->GotoSteps);
@@ -166,6 +187,11 @@ void updateSteppers(boolean alwaysUseHalfStep)
 			else if (config->brakeMode == BrakeAlways) // Bremse benutzen?
 				gpioValue |= stepsStepper[stepper->CurrentStepIndex] << (4 * j);
 		}
-		mcps[i].MCP->writeGPIOS(gpioValue);
+		mcp->isOK = (mcp->MCP->writeGPIOS(gpioValue));
+
+#if !IGNORE_MCP_FAULTS
+		if (!mcp->isOK)
+			internalError(ERROR_MCP_FAULT_1 + i);
+#endif
 	}
 }

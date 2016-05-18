@@ -21,6 +21,17 @@ namespace KugelmatikLibrary
         InvalidValue = 10,
         NotAllowedToRead = 11,
         PacketSizeBufferOverflow = 12,
-        Internal = 255
+
+        McpFault1 = 13,
+        McpFault2 = 14,
+        McpFault3 = 15,
+        McpFault4 = 16,
+        McpFault5 = 17,
+        McpFault6 = 18,
+        McpFault7 = 19,
+        McpFault8 = 20,
+
+        Internal = 255,
+        UnknownError
     }
 }

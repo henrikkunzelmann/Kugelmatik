@@ -11,6 +11,8 @@
 #define MCP_COUNT 8				// Anzahl der MCP Chips
 #define MCP_STEPPER_COUNT 4		// Anzahl der Stepper pro MCP Chip
 
+#define IGNORE_MCP_FAULTS false
+
 #define CLUSTER_WIDTH 5		// Anzahl Stepper in der Breite (X)
 #define CLUSTER_HEIGHT 6	// Anzahl Stepper in der Höhe (Y)
 
@@ -31,6 +33,7 @@ struct MCPData
 {
 	StepperData Steppers[MCP_STEPPER_COUNT]; // Schrittmotoren pro MCP
 	MCP23017* MCP;
+	boolean isOK;
 };
 
 // Anweisung die der Schrittmotor machen soll
