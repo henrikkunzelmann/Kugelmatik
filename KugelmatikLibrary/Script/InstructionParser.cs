@@ -13,7 +13,7 @@ namespace KugelmatikLibrary.Script
             if (codeLine.Length == 0 || codeLine[0] == '#' || codeLine.StartsWith("//"))
                 return null;
 
-            string[] code = codeLine.ToUpper().Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+            string[] code = codeLine.ToUpper().Split(new char[] { ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries);
 
             int time = ParseTime(last == null ? 0 : last.Timestamp, code, 0);
             Target target;
