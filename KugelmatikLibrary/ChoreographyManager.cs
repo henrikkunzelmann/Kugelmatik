@@ -33,7 +33,7 @@ namespace KugelmatikLibrary
         /// <summary>
         /// Gibt die Choreographie die verwaltet und abgespielt wird zurück.
         /// </summary>
-        public IChoreography Choreography { get; private set; }
+        public Choreography Choreography { get; private set; }
 
         /// <summary>
         /// Gibt zurück ob der ChoreographyManager läuft.
@@ -46,8 +46,13 @@ namespace KugelmatikLibrary
         private CancellationTokenSource cancellationToken;
         private Task task;
 
-
         public ChoreographyManager(Kugelmatik kugelmatik, int targetFPS, IChoreography choreography)
+            : this(kugelmatik, targetFPS, new ChoreographyDirect(choreography))
+        {
+            
+        }
+
+        public ChoreographyManager(Kugelmatik kugelmatik, int targetFPS, Choreography choreography)
         {
             if (kugelmatik == null)
                 throw new ArgumentNullException("kugelmatik");
@@ -117,19 +122,9 @@ namespace KugelmatikLibrary
             task.Wait();
         }
 
-        private void SetSteppers(TimeSpan span)
-        {
-            for (int x = 0; x < Kugelmatik.StepperCountX; x++)
-                for (int y = 0; y < Kugelmatik.StepperCountY; y++)
-                {
-                    Stepper stepper = Kugelmatik.GetStepperByPosition(x, y);
-                    stepper.Set(Choreography.GetHeight(stepper.Cluster, span, x, y));
-                }
-        }
-
         private void Run()
         {
-            SetSteppers(TimeSpan.Zero);
+            Choreography.Tick(Kugelmatik, TimeSpan.Zero);
             Kugelmatik.SendData(true);
 
             // warten bis alle Pakete bestätigt wurden
@@ -152,7 +147,7 @@ namespace KugelmatikLibrary
                 TimeSpan timeStamp = time.Elapsed;
 
                 // Daten setzen und zu den Clustern senden
-                SetSteppers(timeStamp);
+                Choreography.Tick(Kugelmatik, timeStamp);
                 Kugelmatik.SendData();
 
                 // alle 2 Sekunden Ping senden

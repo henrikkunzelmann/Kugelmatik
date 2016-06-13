@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.IO;
 using System.Windows.Forms;
 using KugelmatikLibrary;
+using KugelmatikLibrary.Script;
 using KugelmatikControl.PingPong;
 
 namespace KugelmatikControl
@@ -244,6 +245,11 @@ namespace KugelmatikControl
 
         private void StartChoreography(IChoreography c)
         {
+            StartChoreography(new ChoreographyDirect(c));
+        }
+
+        private void StartChoreography(Choreography c)
+        {
             // wenn schon eine Choreography läuft, dann stoppen
             if (choreography != null)
             {
@@ -384,6 +390,27 @@ namespace KugelmatikControl
         private void reloadClustersToolStripMenuItem_Click(object sender, EventArgs e)
         {
             LoadKugelmatik();
+        }
+
+        private void scriptToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (scriptFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                try
+                {
+                    StartChoreography(KugelmatikScript.LoadScript(scriptFileDialog.FileName));
+                }
+                catch(CompileException ex)
+                {
+                    MessageBox.Show(string.Format("Compile error in line {0}: {1}", ex.Line, ex.Message), "Compile error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    Log.Error(ex.ToString());
+                }
+                catch(Exception ex)
+                {
+                    MessageBox.Show("Internal error: \r\n" + ex.ToString(), "Internal error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    Log.Error(ex.ToString());
+                }
+            }
         }
     }
 }

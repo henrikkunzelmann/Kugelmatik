@@ -45,6 +45,8 @@
   <ItemGroup>
     <Compile Include="BrakeMode.cs" />
     <Compile Include="BusyCommand.cs" />
+    <Compile Include="Choreography.cs" />
+    <Compile Include="ChoreographyDirect.cs" />
     <Compile Include="ChoreographyManager.cs" />
     <Compile Include="Cluster.cs" />
     <Compile Include="ClusterConfig.cs" />
@@ -92,9 +94,23 @@
     <Compile Include="Protocol\StepperPosition.cs" />
     <Compile Include="Range.cs" />
     <Compile Include="Ripple.cs" />
+    <Compile Include="Script\CompileException.cs" />
+    <Compile Include="Script\Instruction.cs" />
+    <Compile Include="Script\InstructionParser.cs" />
+    <Compile Include="Script\InstructionSub.cs" />
+    <Compile Include="Script\InstructionAdd.cs" />
+    <Compile Include="Script\InstructionMove.cs" />
+    <Compile Include="Script\KugelmatikScript.cs" />
+    <Compile Include="Script\Target.cs" />
+    <Compile Include="Script\TargetAll.cs" />
+    <Compile Include="Script\TargetCluster.cs" />
+    <Compile Include="Script\TargetStepper.cs" />
     <Compile Include="SineWave.cs" />
     <Compile Include="StepMode.cs" />
     <Compile Include="Stepper.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Script\ScriptTest.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
