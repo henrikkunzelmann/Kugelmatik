@@ -222,11 +222,13 @@ namespace KugelmatikLibrary
         public Cluster(Kugelmatik kugelmatik, int x, int y, IPAddress address)
         {
             if (kugelmatik == null)
-                throw new ArgumentNullException("kugelmatik");
+                throw new ArgumentNullException(nameof(kugelmatik);
             if (x < 0 || x >= 16)
-                throw new ArgumentOutOfRangeException("x");
+                throw new ArgumentOutOfRangeException(nameof(x));
             if (y < 0 || y >= 16)
-                throw new ArgumentOutOfRangeException("y");
+                throw new ArgumentOutOfRangeException(nameof(y));
+            if (address == null)
+                throw new ArgumentNullException(nameof(address));
 
             this.Kugelmatik = kugelmatik;
             this.X = x;
@@ -283,14 +285,9 @@ namespace KugelmatikLibrary
 
             if (disposing)
             {
-                if (socket != null)
-                    socket.Close();
-
-                if (packetBuffer != null)
-                    packetBuffer.Dispose();
-
-                if (packetWriter != null)
-                    packetWriter.Dispose();
+                socket?.Close();
+                packetBuffer?.Dispose();
+                packetWriter?.Dispose();
             }
 
             IsDisposed = true;
@@ -513,9 +510,9 @@ namespace KugelmatikLibrary
 
             CheckConnection();
 
-            // StopWatch zum Messen der Zeit für die Pings starten
+            // Stopwatch zum Messen der Zeit für die Pings starten
             if (!stopwatch.IsRunning)
-                stopwatch.Start();
+                stopwatch.Restart();
 
             SendPacket(new PacketPing(stopwatch.ElapsedMilliseconds), false);
         }
@@ -544,9 +541,6 @@ namespace KugelmatikLibrary
         /// </summary>
         public void SendHome()
         {
-            if (IsDisposed)
-                throw new ObjectDisposedException(GetType().Name);
-
             lock (locker)
             {
                 SendPacket(new PacketHome(), true);
@@ -565,9 +559,6 @@ namespace KugelmatikLibrary
         /// </summary>
         public void SendGetData()
         {
-            if (IsDisposed)
-                throw new ObjectDisposedException(GetType().Name);
-
             SendPacket(new PacketGetData(), false);
         }
 
@@ -576,9 +567,6 @@ namespace KugelmatikLibrary
         /// </summary>
         public void SendInfo()
         {
-            if (IsDisposed)
-                throw new ObjectDisposedException(GetType().Name);
-
             SendPacket(new PacketInfo(true), true);
         }
 
@@ -601,9 +589,6 @@ namespace KugelmatikLibrary
         /// </summary>
         public void SendStop()
         {
-            if (IsDisposed)
-                throw new ObjectDisposedException(GetType().Name);
-
             SendPacket(new PacketStop(), true);
         }
 
