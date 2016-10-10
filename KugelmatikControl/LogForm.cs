@@ -1,14 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using KugelmatikLibrary;
+using System;
 using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using KugelmatikLibrary;
 
 namespace KugelmatikControl
 {

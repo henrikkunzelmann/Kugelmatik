@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using KugelmatikLibrary;
+using System;
 using System.Drawing;
 using System.Windows.Forms;
-using KugelmatikLibrary;
 
 namespace KugelmatikControl.PingPong
 {

@@ -1,16 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.IO;
-using System.Windows.Forms;
+﻿using KugelmatikControl.PingPong;
 using KugelmatikLibrary;
 using KugelmatikLibrary.Script;
-using KugelmatikControl.PingPong;
+using System;
+using System.Data;
+using System.Drawing;
+using System.IO;
+using System.Linq;
+using System.Windows.Forms;
 
 namespace KugelmatikControl
 {
@@ -374,17 +370,6 @@ namespace KugelmatikControl
         private void viewOnlyToolStripMenuItem_Click(object sender, EventArgs e)
         {
             viewOnlyToolStripMenuItem.Checked = !viewOnlyToolStripMenuItem.Checked;
-        }
-
-        private void upDownUpDownToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            StartChoreography(new FunctionChoreography((cluster, time, x, y) =>
-            {
-                float d = (float)((y + time.TotalSeconds * 0.5f) % 10);
-                if (d >= 5)
-                    d = 10 - d;
-                return (ushort)(d / 5 * cluster.Kugelmatik.ClusterConfig.MaxSteps);
-            }));
         }
 
         private void reloadClustersToolStripMenuItem_Click(object sender, EventArgs e)
