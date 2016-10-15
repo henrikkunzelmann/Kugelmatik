@@ -346,7 +346,7 @@ namespace KugelmatikControl
         private void stopToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (CheckChoreography(true))
-                StopChoreography();
+                Kugelmatik.SendStop();
         }
 
         private void sineWaveToolStripMenuItem_Click(object sender, EventArgs e)
@@ -406,6 +406,11 @@ namespace KugelmatikControl
             StartChoreography(new Ripple());
         }
 
+        private void stopChoreographyToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            StopChoreography();
+        }
+
         private void viewOnlyToolStripMenuItem_Click(object sender, EventArgs e)
         {
             viewOnlyToolStripMenuItem.Checked = !viewOnlyToolStripMenuItem.Checked;
@@ -435,6 +440,12 @@ namespace KugelmatikControl
                     Log.Error(ex.ToString());
                 }
             }
+        }
+
+        private void stopButton_Click(object sender, EventArgs e)
+        {
+            if (CheckChoreography(true))
+                Kugelmatik.SendStop();
         }
     }
 }
