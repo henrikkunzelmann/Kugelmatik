@@ -222,7 +222,7 @@ namespace KugelmatikLibrary
         public Cluster(Kugelmatik kugelmatik, int x, int y, IPAddress address)
         {
             if (kugelmatik == null)
-                throw new ArgumentNullException(nameof(kugelmatik);
+                throw new ArgumentNullException(nameof(kugelmatik));
             if (x < 0 || x >= 16)
                 throw new ArgumentOutOfRangeException(nameof(x));
             if (y < 0 || y >= 16)
