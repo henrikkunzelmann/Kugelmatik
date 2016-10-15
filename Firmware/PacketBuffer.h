@@ -1,9 +1,6 @@
-// Packet.h
-
 #ifndef _PACKETBUFFER_h
 #define _PACKETBUFFER_h
 
-#include "arduino.h"
 #include "BinaryHelper.h"
 #include "leds.h"
 #include "util.h"
@@ -21,7 +18,9 @@ private:
 
 	bool assertRead(); // überprüft ob das Lesen zulässig ist
 	bool assertPosition(uint32_t length); // überprüft die Position
-	uint32_t addAndAssertPosition(uint32_t length); // addiert einen Wert zur Position, überprüft die Position und gibt die alte Position zurück
+	bool assertPositionRead(uint32_t length); // überprüft assertRead und überprüft die Position
+	bool assertPositionWrite(uint32_t length); // setzt allowRead auf false und überprüft die Position
+	uint32_t addPosition(uint32_t length); // addiert einen Wert zur Position und gibt die alte Position zurück
 
 public:
 	explicit PacketBuffer(uint32_t size);
