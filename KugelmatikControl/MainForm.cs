@@ -169,7 +169,7 @@ namespace KugelmatikControl
         public void ShowCluster(Cluster cluster)
         {
             if (clusterForm == null || clusterForm.IsDisposed)
-                clusterForm = new ClusterForm();
+                clusterForm = new ClusterForm(this);
 
             if (!clusterForm.Visible)
                 clusterForm.Show(this);
@@ -247,18 +247,60 @@ namespace KugelmatikControl
         private void StartChoreography(Choreography c)
         {
             // wenn schon eine Choreography läuft, dann stoppen
-            if (choreography != null)
-            {
-                if (choreography.IsRunning)
-                    choreography.Stop();
-                choreography.Dispose();
-            }
+            StopChoreographyInternal();
 
             choreography = new ChoreographyManager(Kugelmatik, 60, c);
             choreography.Start();
 
             UpdateChoreographyStatus();
             SetAutomaticUpdate(false);
+        }
+
+        private void StopChoreography()
+        {
+            StopChoreographyInternal();
+            UpdateChoreographyStatus();
+            SetAutomaticUpdate(true);
+        }
+
+        private void StopChoreographyInternal()
+        {
+            if (choreography != null && choreography.IsRunning)
+            {
+                choreography.Stop();
+                choreography.Dispose();
+            }
+        }
+
+        public bool CheckChoreography()
+        {
+            return CheckChoreography(false);
+        }
+
+        public bool CheckChoreography(bool forceStop)
+        {
+            if (choreography == null || !choreography.IsRunning)
+                return true;
+
+            // Choreography soll direkt gestoppt werden
+            if (forceStop)
+            {
+                StopChoreographyInternal();
+                return true;
+            }
+
+            // Benutzer erst fragen
+            DialogResult result = MessageBox.Show("Command not ran, because a choreography is running. Do you want to stop the choreography? No will run the command anyway.",
+                "Warning: Stop the choreography?", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Warning);
+
+            if (result == DialogResult.Cancel)
+                return false;
+
+            if (result == DialogResult.Yes)
+                StopChoreographyInternal();
+
+            return true;
+
         }
 
         private void Cluster_Click(object sender, EventArgs e)
@@ -278,7 +320,8 @@ namespace KugelmatikControl
 
         private void homeToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Kugelmatik.SendHome();
+            if (CheckChoreography())
+                Kugelmatik.SendHome();
         }
 
         private void optionsToolStripMenuItem_Click(object sender, EventArgs e)
@@ -293,17 +336,17 @@ namespace KugelmatikControl
 
         private void moveAllTo0ToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Kugelmatik.SetAllClusters(0);
-            Kugelmatik.SendData(false, true);
+            if (CheckChoreography())
+            {
+                Kugelmatik.SetAllClusters(0);
+                Kugelmatik.SendData(false, true);
+            }
         }
 
         private void stopToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (choreography != null && choreography.IsRunning)
-                choreography.Stop();
-
-            UpdateChoreographyStatus();
-            SetAutomaticUpdate(true);
+            if (CheckChoreography(true))
+                StopChoreography();
         }
 
         private void sineWaveToolStripMenuItem_Click(object sender, EventArgs e)
@@ -326,11 +369,6 @@ namespace KugelmatikControl
             ShowForm(logForm, () => logForm = new LogForm());
         }
 
-        private void stopToolStripMenuItem1_Click(object sender, EventArgs e)
-        {
-            Kugelmatik.SendStop();
-        }
-
         private void configToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Kugelmatik.SendConfig(Kugelmatik.ClusterConfig);
@@ -343,7 +381,8 @@ namespace KugelmatikControl
 
         private void pingPongToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            ShowForm(pingPongForm, () => pingPongForm = new PingPongForm(Kugelmatik));
+            if (CheckChoreography())
+                ShowForm(pingPongForm, () => pingPongForm = new PingPongForm(Kugelmatik));
         }
 
         private void heightViewToolStripMenuItem_Click(object sender, EventArgs e)

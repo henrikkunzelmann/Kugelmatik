@@ -216,7 +216,7 @@
             this.stopToolStripMenuItem1.Name = "stopToolStripMenuItem1";
             this.stopToolStripMenuItem1.Size = new System.Drawing.Size(146, 22);
             this.stopToolStripMenuItem1.Text = "Stop";
-            this.stopToolStripMenuItem1.Click += new System.EventHandler(this.stopToolStripMenuItem1_Click);
+            this.stopToolStripMenuItem1.Click += new System.EventHandler(this.stopToolStripMenuItem_Click);
             // 
             // toolStripSeparator4
             // 

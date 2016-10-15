@@ -6,11 +6,13 @@ namespace KugelmatikControl
 {
     public partial class ClusterForm : Form
     {
+        public MainForm Form { get; private set; }
         public Cluster Cluster { get; private set; }
         public ClusterControlDetailed ClusterControl { get; private set; }
 
-        public ClusterForm()
+        public ClusterForm(MainForm form)
         {
+            this.Form = form;
             InitializeComponent();
         }
 
@@ -34,7 +36,7 @@ namespace KugelmatikControl
 
             if (ClusterControl == null)
             {
-                ClusterControl = new ClusterControlDetailed(cluster);
+                ClusterControl = new ClusterControlDetailed(Form, cluster);
                 ClusterControl.Dock = DockStyle.Fill;
                 Controls.Add(ClusterControl);
             }

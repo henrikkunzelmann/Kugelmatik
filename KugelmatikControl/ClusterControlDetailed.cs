@@ -10,6 +10,8 @@ namespace KugelmatikControl
 {
     public partial class ClusterControlDetailed : UserControl
     {
+        public MainForm Form { get; private set; }
+
         /// <summary>
         /// Gibt das derzeitige gezeitige Cluster zurück.
         /// </summary>
@@ -20,10 +22,12 @@ namespace KugelmatikControl
 
         private bool updatingClusterHeight = false;
 
-        public ClusterControlDetailed(Cluster cluster)
+        public ClusterControlDetailed(MainForm form, Cluster cluster)
         {
             if (cluster == null)
-                throw new ArgumentNullException("cluster");
+                throw new ArgumentNullException(nameof(cluster));
+
+            this.Form = form;
 
             InitializeComponent();
             
@@ -89,7 +93,7 @@ namespace KugelmatikControl
         public void ShowCluster(Cluster cluster)
         {
             if (cluster == null)
-                throw new ArgumentNullException("cluster");
+                throw new ArgumentNullException(nameof(cluster));
 
             if (CurrentCluster == cluster)
                 return;
@@ -197,8 +201,11 @@ namespace KugelmatikControl
         {
             if (selectedStepper != null)
             {
-                selectedStepper.Stepper.SendHome();
-                selectedStepper.Stepper.Cluster.SendInfo();
+                if (Form.CheckChoreography())
+                {
+                    selectedStepper.Stepper.SendHome();
+                    selectedStepper.Stepper.Cluster.SendInfo();
+                }
             }
         }
 
@@ -206,8 +213,11 @@ namespace KugelmatikControl
         {
             if (selectedStepper != null)
             {
-                selectedStepper.Stepper.SendFix();
-                selectedStepper.Stepper.Cluster.SendInfo();
+                if (Form.CheckChoreography())
+                {
+                    selectedStepper.Stepper.SendFix();
+                    selectedStepper.Stepper.Cluster.SendInfo();
+                }
             }
         }
 
@@ -215,8 +225,11 @@ namespace KugelmatikControl
         {
             if (selectedStepper != null)
             {
-                selectedStepper.Stepper.Cluster.SetAllStepper(selectedStepper.Stepper.Height);
-                UpdateClusterHeight();
+                if (Form.CheckChoreography())
+                {
+                    selectedStepper.Stepper.Cluster.SetAllStepper(selectedStepper.Stepper.Height);
+                    UpdateClusterHeight();
+                }
             }
         }
 
@@ -224,16 +237,22 @@ namespace KugelmatikControl
         {
             if (selectedStepper != null)
             {
-                selectedStepper.Stepper.Kugelmatik.SetAllClusters(selectedStepper.Stepper.Height);
-                UpdateClusterHeight();
+                if (Form.CheckChoreography())
+                {
+                    selectedStepper.Stepper.Kugelmatik.SetAllClusters(selectedStepper.Stepper.Height);
+                    UpdateClusterHeight();
+                }
             }
         }
 
         private void homeButton_Click(object sender, EventArgs e)
         {
-            CurrentCluster.SendHome();
-            CurrentCluster.SendInfo();
-            UpdateClusterHeight();
+            if (Form.CheckChoreography())
+            {
+                CurrentCluster.SendHome();
+                CurrentCluster.SendInfo();
+                UpdateClusterHeight();
+            }
         }
 
         private void getDataButton_Click(object sender, EventArgs e)
@@ -244,9 +263,12 @@ namespace KugelmatikControl
 
         private void moveToTopButton_Click(object sender, EventArgs e)
         {
-            CurrentCluster.SetAllStepper(0);
-            CurrentCluster.SendData(false, true);
-            UpdateClusterHeight();
+            if (Form.CheckChoreography())
+            {
+                CurrentCluster.SetAllStepper(0);
+                CurrentCluster.SendData(false, true);
+                UpdateClusterHeight();
+            }
         }
 
         private void infoButton_Click(object sender, EventArgs e)
@@ -256,8 +278,11 @@ namespace KugelmatikControl
 
         private void stopButton_Click(object sender, EventArgs e)
         {
-            CurrentCluster.SendStop();
-            CurrentCluster.SendInfo();
+            if (Form.CheckChoreography(true))
+            {
+                CurrentCluster.SendStop();
+                CurrentCluster.SendInfo();
+            }
         }
 
         private void configButton_Click(object sender, EventArgs e)
