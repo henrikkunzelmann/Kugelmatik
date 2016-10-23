@@ -72,6 +72,20 @@ namespace KugelmatikLibrary
             }
         }
 
+        /// <summary>
+        /// Gibt zurück ob ein Cluster verfügbar ist.
+        /// </summary>
+        public bool AnyClusterOnline
+        {
+            get
+            {
+                foreach (Cluster cluster in clusters)
+                    if (cluster.IsOnline)
+                        return true;
+                return false;
+            }
+        }
+
         public Kugelmatik(Config config, ClusterConfig clusterConfig)
         {
             this.Config = config;

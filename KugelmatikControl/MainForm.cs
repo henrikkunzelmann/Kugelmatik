@@ -115,8 +115,7 @@ namespace KugelmatikControl
 
         protected override void OnClosed(EventArgs e)
         {
-            if (choreography != null)
-                choreography.Dispose();
+            StopChoreographyInternal();
 
             if (Kugelmatik != null)
                 Kugelmatik.Dispose();
@@ -152,12 +151,14 @@ namespace KugelmatikControl
                 Kugelmatik.SendGetData();
 
             // wenn eine Choreograpie läuft, dann werden alle Stepper per Tick geupdatet, da AutomaticUpdate auf false ist
-            if (choreography != null)
+            if (choreography != null && choreography.IsRunning)
             {
                 for (int i = 0; i < clusterControls.Length; i++)
                     clusterControls[i]?.UpdateSteppers();
 
                 clusterForm?.ClusterControl?.UpdateSteppers();
+
+                CheckChoreographyAutoStop();
             }
 
             UpdateChoreographyStatus();
@@ -246,6 +247,13 @@ namespace KugelmatikControl
 
         private void StartChoreography(Choreography c)
         {
+            if (autoStopToolStripMenuItem.Checked && !Kugelmatik.AnyClusterOnline)
+            {
+                MessageBox.Show("Can not start choreography because all clusters are offline", "Choreography not started", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+
             // wenn schon eine Choreography läuft, dann stoppen
             StopChoreographyInternal();
 
@@ -265,10 +273,13 @@ namespace KugelmatikControl
 
         private void StopChoreographyInternal()
         {
-            if (choreography != null && choreography.IsRunning)
+            if (choreography != null)
             {
-                choreography.Stop();
+                if (choreography.IsRunning)
+                    choreography.Stop();
+
                 choreography.Dispose();
+                choreography = null;
             }
         }
 
@@ -285,7 +296,7 @@ namespace KugelmatikControl
             // Choreography soll direkt gestoppt werden
             if (forceStop)
             {
-                StopChoreographyInternal();
+                StopChoreography();
                 return true;
             }
 
@@ -297,10 +308,21 @@ namespace KugelmatikControl
                 return false;
 
             if (result == DialogResult.Yes)
-                StopChoreographyInternal();
+                StopChoreography();
 
             return true;
+        }
 
+        public void CheckChoreographyAutoStop()
+        {
+            if (!autoStopToolStripMenuItem.Checked)
+                return;
+
+            if (!Kugelmatik.AnyClusterOnline)
+            {
+                StopChoreography();
+                MessageBox.Show("Choreography stopped because all clusters are offline", "Choreography stopped", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
         }
 
         private void Cluster_Click(object sender, EventArgs e)
@@ -446,6 +468,11 @@ namespace KugelmatikControl
         {
             if (CheckChoreography(true))
                 Kugelmatik.SendStop();
+        }
+
+        private void autoStopToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            CheckChoreographyAutoStop();
         }
     }
 }
