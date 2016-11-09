@@ -58,6 +58,7 @@
             this.toolStripSeparator5 = new System.Windows.Forms.ToolStripSeparator();
             this.scriptToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.stopChoreographyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.autoStopToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this.pingPongToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -68,7 +69,6 @@
             this.choreographyStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.scriptFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.stopButton = new System.Windows.Forms.Button();
-            this.autoStopToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.clustersPanel = new KugelmatikControl.NoScrollingPanel();
             this.menuStrip1.SuspendLayout();
             this.statusStrip.SuspendLayout();
@@ -260,7 +260,7 @@
             this.toolStripSeparator5,
             this.scriptToolStripMenuItem});
             this.startToolStripMenuItem.Name = "startToolStripMenuItem";
-            this.startToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.startToolStripMenuItem.Size = new System.Drawing.Size(129, 22);
             this.startToolStripMenuItem.Text = "Start";
             // 
             // sineWaveToolStripMenuItem
@@ -299,19 +299,29 @@
             // stopChoreographyToolStripMenuItem
             // 
             this.stopChoreographyToolStripMenuItem.Name = "stopChoreographyToolStripMenuItem";
-            this.stopChoreographyToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.stopChoreographyToolStripMenuItem.Size = new System.Drawing.Size(129, 22);
             this.stopChoreographyToolStripMenuItem.Text = "Stop";
             this.stopChoreographyToolStripMenuItem.Click += new System.EventHandler(this.stopChoreographyToolStripMenuItem_Click);
+            // 
+            // autoStopToolStripMenuItem
+            // 
+            this.autoStopToolStripMenuItem.Checked = true;
+            this.autoStopToolStripMenuItem.CheckOnClick = true;
+            this.autoStopToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.autoStopToolStripMenuItem.Name = "autoStopToolStripMenuItem";
+            this.autoStopToolStripMenuItem.Size = new System.Drawing.Size(129, 22);
+            this.autoStopToolStripMenuItem.Text = "Auto stop";
+            this.autoStopToolStripMenuItem.Click += new System.EventHandler(this.autoStopToolStripMenuItem_Click);
             // 
             // toolStripSeparator3
             // 
             this.toolStripSeparator3.Name = "toolStripSeparator3";
-            this.toolStripSeparator3.Size = new System.Drawing.Size(149, 6);
+            this.toolStripSeparator3.Size = new System.Drawing.Size(126, 6);
             // 
             // pingPongToolStripMenuItem
             // 
             this.pingPongToolStripMenuItem.Name = "pingPongToolStripMenuItem";
-            this.pingPongToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.pingPongToolStripMenuItem.Size = new System.Drawing.Size(129, 22);
             this.pingPongToolStripMenuItem.Text = "Ping pong";
             this.pingPongToolStripMenuItem.Click += new System.EventHandler(this.pingPongToolStripMenuItem_Click);
             // 
@@ -361,6 +371,7 @@
             // 
             // stopButton
             // 
+            this.stopButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.stopButton.BackColor = System.Drawing.Color.DarkRed;
             this.stopButton.ForeColor = System.Drawing.Color.White;
             this.stopButton.Location = new System.Drawing.Point(546, 0);
@@ -370,16 +381,6 @@
             this.stopButton.Text = "Stop";
             this.stopButton.UseVisualStyleBackColor = false;
             this.stopButton.Click += new System.EventHandler(this.stopButton_Click);
-            // 
-            // autoStopToolStripMenuItem
-            // 
-            this.autoStopToolStripMenuItem.Checked = true;
-            this.autoStopToolStripMenuItem.CheckOnClick = true;
-            this.autoStopToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.autoStopToolStripMenuItem.Name = "autoStopToolStripMenuItem";
-            this.autoStopToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
-            this.autoStopToolStripMenuItem.Text = "Auto stop";
-            this.autoStopToolStripMenuItem.Click += new System.EventHandler(this.autoStopToolStripMenuItem_Click);
             // 
             // clustersPanel
             // 
