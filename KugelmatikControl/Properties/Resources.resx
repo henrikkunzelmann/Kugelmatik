@@ -127,7 +127,7 @@
     <value>{0}, {1} (Ping: {2}, IP: {3})</value>
   </data>
   <data name="ClusterInfoLong" xml:space="preserve">
-    <value>Version: {0}</value>
+    <value>Version: {0} {1}</value>
   </data>
   <data name="NetworkStatus" xml:space="preserve">
     <value>Ping: avg {0} max {1}    Pending: {2}</value>

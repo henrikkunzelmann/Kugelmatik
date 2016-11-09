@@ -8,10 +8,10 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace KugelmatikControl.Properties
-{
-
-
+namespace KugelmatikControl.Properties {
+    using System;
+    
+    
     /// <summary>
     ///   Eine stark typisierte Ressourcenklasse zum Suchen von lokalisierten Zeichenfolgen usw.
     /// </summary>
@@ -88,7 +88,7 @@ namespace KugelmatikControl.Properties
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Version: {0} ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die Version: {0} {1} ähnelt.
         /// </summary>
         internal static string ClusterInfoLong {
             get {

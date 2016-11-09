@@ -71,8 +71,16 @@ namespace KugelmatikControl
                     Cluster.IsOnline ? (Cluster.Ping + "ms") : "n/a",
                     Cluster.Address == null ? "none" : Cluster.Address.ToString());
 
-                infoText.Text = string.Format(Properties.Resources.ClusterInfoLong,
-                    Cluster.Info == null ? "n/a" : Cluster.Info.BuildVersion.ToString());
+                if (Cluster.Info == null)
+                {
+                    infoText.Text = string.Format(Properties.Resources.ClusterInfoLong, "n/a", "");
+                }
+                else
+                {
+                    infoText.Text = string.Format(Properties.Resources.ClusterInfoLong,
+                        Cluster.Info.BuildVersion.ToString(),
+                        Cluster.Info.LastError == ErrorCode.None ? "" : "(error)");
+                }
 
                 SetClusterBoxColor(clusterBox, Cluster);
             }
@@ -118,7 +126,7 @@ namespace KugelmatikControl
             else if (info != null && info.CurrentBusyCommand != BusyCommand.None)
                 groupBox.ForeColor = Color.DarkBlue;
             else if (info != null && info.LastError != ErrorCode.None)
-                groupBox.ForeColor = Color.DarkRed;
+                groupBox.ForeColor = Color.Brown;
             else if (ping >= 150)
                 groupBox.ForeColor = Color.DarkOrange;
             else
