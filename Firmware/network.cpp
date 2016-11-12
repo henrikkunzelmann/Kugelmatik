@@ -58,8 +58,8 @@ void initNetwork()
 	hostName[12] = getHexChar(lanID);
 
 	Serial.println(F("Link up..."));
-	Serial.printf(F("ether.dhcpSetup(), using hostname: %s"), hostName);
-	Serial.println();
+	Serial.print(F("ether.dhcpSetup(), using hostname: "));
+	Serial.println(hostName);
 
 	if (!ether.dhcpSetup(hostName, true)) 
 	{
@@ -566,8 +566,9 @@ void handlePacket(uint8_t packetType, int32_t revision)
 
 void runBusy(uint8_t type, int steps, uint16_t delay)
 {
-	Serial.printf(F("runBusy(type = %d, steps = %d)", type, steps));
-	Serial.println();
+	Serial.print(F("runBusy(type = "));
+	Serial.print(type);
+	Serial.println(F(")"));
 
 	currentBusyCommand = type;
 	turnRedLedOn();

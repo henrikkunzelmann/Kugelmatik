@@ -37,8 +37,8 @@ void setup()
 {
 	wdt_disable(); // Watch Dog deaktivieren, da er noch aktiviert sein kann
 
-	Serial.printf(F("Kugelmatik Firmware booting up, version: %d"), BUILD_VERSION);
-	Serial.println();
+	Serial.print(F("Kugelmatik Firmware booting up, version: "));
+	Serial.println(BUILD_VERSION);
 
 	config = getDefaultConfig();
 

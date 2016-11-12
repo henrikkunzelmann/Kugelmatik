@@ -12,8 +12,11 @@ void softReset()
 // bringt den Chip in den Fehler-Modus und blockiert ihn 
 void error(const char* tag, const char* message, bool blinkFast)
 {
-	Serial.printf(F("error(tag = %s, message = %s)"), tag, message);
-	Serial.println();
+	Serial.print(F("error(tag = "));
+	Serial.print(tag);
+	Serial.print(F(", message = "));
+	Serial.print(message);
+	Serial.println(F(")"));
 
 	while (true) {
 		toogleRedLed();
@@ -33,8 +36,9 @@ void internalError()
 
 void internalError(uint8_t error)
 {
-	Serial.printf(F("internalError(error = %d)", error));
-	Serial.println();
+	Serial.print(F("protocolError(error = "));
+	Serial.print(error);
+	Serial.println(")");
 
 	lastError = error;
 	blinkRedLedShort(true);
@@ -42,8 +46,9 @@ void internalError(uint8_t error)
 
 void protocolError(uint8_t error)
 {
-	Serial.printf(F("protocolError(error = %d)", error));
-	Serial.println();
+	Serial.print(F("protocolError(error = "));
+	Serial.print(error);
+	Serial.println(")");
 
 	lastError = error;
 	blinkRedLedShort(true);
