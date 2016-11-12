@@ -29,12 +29,17 @@ char getHexChar(int x)
 
 void initNetwork()
 {
+	Serial.println(F("initNetwork()"));
+	Serial.println(F("ether.begin()"));
+
 	uint8_t rev = ether.begin(ETHERNET_BUFFER_SIZE, ethernetMac, 28);
 	if (rev == 0)
 	{
 		error("init", "ethernet begin failed", true);
 		return; // wird niemals passieren da error() in eine Endloschleife geht
 	}
+
+	Serial.println(F("Waiting for link..."));
 
 	// warten bis Ethernet Kabel verbunden ist
 	while (!ether.isLinkUp())
@@ -52,6 +57,10 @@ void initNetwork()
 	hostName[11] = getHexChar(lanID >> 4);
 	hostName[12] = getHexChar(lanID);
 
+	Serial.println(F("Link up..."));
+	Serial.printf(F("ether.dhcpSetup(), using hostname: %s"), hostName);
+	Serial.println();
+
 	if (!ether.dhcpSetup(hostName, true)) 
 	{
 		error("init", "dhcp failed", false);
@@ -60,6 +69,7 @@ void initNetwork()
 
 	packet = new PacketBuffer(NULL, 0);
 	
+	Serial.println(F("Network boot done!"));
 	ether.udpServerListenOnPort(&onPacketReceive, PROTOCOL_PORT);
 }
 
@@ -254,6 +264,7 @@ void handlePacket(uint8_t packetType, int32_t revision)
 
 			if (packet->getError())
 				return;
+
 			setStepper(revision, x, y, height, waitTime);
 		}
 		break;
@@ -340,11 +351,11 @@ void handlePacket(uint8_t packetType, int32_t revision)
 	{
 		// 0xABCD wird benutzt damit man nicht ausversehen das Home-Paket schickt (wenn man z.B. den Paket-Type verwechselt)
 		int32_t magic = packet->readInt32();
-		if (magic != 0xABCD)
-			return protocolError(ERROR_INVALID_MAGIC);
 
 		if (packet->getError())
 			return;
+		if (magic != 0xABCD)
+			return protocolError(ERROR_INVALID_MAGIC);
 
 		stopMove();
 
@@ -413,9 +424,7 @@ void handlePacket(uint8_t packetType, int32_t revision)
 		// 0xDCBA wird benutzt damit man nicht ausversehen das HomeStepper-Paket schickt (wenn man z.B. den Paket-Type verwechselt)
 		int32_t magic = packet->readInt32();
 		if (magic != 0xABCD)
-		{
 			return protocolError(ERROR_INVALID_MAGIC);
-		}
 
 		byte x, y;
 		if (!readPosition(packet, &x, &y))
@@ -502,6 +511,9 @@ void handlePacket(uint8_t packetType, int32_t revision)
 
 		setDataRevision = revision;
 
+
+		Serial.println(F("PacketSetData received"));
+
 		for (byte x = 0; x < CLUSTER_WIDTH; x++) {
 			for (byte y = 0; y < CLUSTER_HEIGHT; y++) {
 				StepperData* stepper = getStepper(x, y);
@@ -542,6 +554,8 @@ void handlePacket(uint8_t packetType, int32_t revision)
 		delete config;
 		config = newConfig;
 
+		Serial.println(F("Config2 set by network!"));
+
 		sendInfo(revision, true);
 		break;
 	}
@@ -552,6 +566,9 @@ void handlePacket(uint8_t packetType, int32_t revision)
 
 void runBusy(uint8_t type, int steps, uint16_t delay)
 {
+	Serial.printf(F("runBusy(type = %d, steps = %d)", type, steps));
+	Serial.println();
+
 	currentBusyCommand = type;
 	turnRedLedOn();
 	for (int i = 0; i <= delay; i++)

@@ -37,20 +37,23 @@ void setup()
 {
 	wdt_disable(); // Watch Dog deaktivieren, da er noch aktiviert sein kann
 
+	Serial.printf(F("Kugelmatik Firmware booting up, version: %d"), BUILD_VERSION);
+	Serial.println();
+
 	config = getDefaultConfig();
 
 	setupLeds();
 
 	turnGreenLedOn();
-
 	initNetwork();
-
 	initAllMCPs();
 	turnGreenLedOff();
 
 #if ENABLE_WATCH_DOG
 	wdt_enable(WDTO_2S);
 #endif
+
+	Serial.println(F("Done booting! Ready."));
 }
 
 void loop()

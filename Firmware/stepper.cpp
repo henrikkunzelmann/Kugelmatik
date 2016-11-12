@@ -4,6 +4,8 @@ MCPData mcps[MCP_COUNT];
 
 void initAllMCPs()
 {
+	Serial.println(F("initAllMCPs()"));
+
 	for (byte i = 0; i < MCP_COUNT; i++)
 		initMCP(i);
 }
@@ -43,6 +45,8 @@ void initMCP(byte index)
 		}
 		turnRedLedOff();
 	}
+#else
+	Serial.println(F("IGNORE_MCP_FAULTS is set to true, skipping MCP boot test"));
 #endif
 }
 
@@ -107,6 +111,8 @@ void setAllSteps(int32_t revision, uint16_t height, byte waitTime)
 
 
 void stopMove() {
+	Serial.println(F("stopMove()"));
+
 	for (int i = 0; i < CLUSTER_SIZE; i++) {
 		StepperData* stepper = getStepper(i);
 
