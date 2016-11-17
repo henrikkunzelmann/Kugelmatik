@@ -193,10 +193,12 @@ void updateSteppers(boolean alwaysUseHalfStep)
 			else if (config->brakeMode == BrakeAlways) // Bremse benutzen?
 				gpioValue |= stepsStepper[stepper->CurrentStepIndex] << (4 * j);
 		}
+
+		boolean wasOK = mcp->isOK;
 		mcp->isOK = (mcp->MCP->writeGPIOS(gpioValue));
 
 #if !IGNORE_MCP_FAULTS
-		if (!mcp->isOK)
+		if (wasOK && !mcp->isOK)
 			internalError(ERROR_MCP_FAULT_1 + i);
 #endif
 	}

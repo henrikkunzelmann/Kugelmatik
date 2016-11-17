@@ -1,7 +1,3 @@
-// 
-// 
-// 
-
 #include "leds.h"
 #include <avr/wdt.h>
 
