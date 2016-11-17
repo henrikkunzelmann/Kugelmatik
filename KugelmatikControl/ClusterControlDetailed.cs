@@ -197,11 +197,21 @@ namespace KugelmatikControl
                 stepperBox.Visible = false;
         }
 
+        public bool CheckOnlineStatus()
+        {
+            if (!CurrentCluster.IsOnline)
+            {
+                Form.ShowClusterOfflineError();
+                return false;
+            }
+            return true;
+        }
+
         private void homeStepperButton_Click(object sender, EventArgs e)
         {
             if (selectedStepper != null)
             {
-                if (Form.CheckChoreography())
+                if (CheckOnlineStatus() && Form.CheckChoreography())
                 {
                     selectedStepper.Stepper.SendHome();
                     selectedStepper.Stepper.Cluster.SendInfo();
@@ -213,7 +223,7 @@ namespace KugelmatikControl
         {
             if (selectedStepper != null)
             {
-                if (Form.CheckChoreography())
+                if (CheckOnlineStatus() && Form.CheckChoreography())
                 {
                     selectedStepper.Stepper.SendFix();
                     selectedStepper.Stepper.Cluster.SendInfo();
@@ -237,7 +247,7 @@ namespace KugelmatikControl
         {
             if (selectedStepper != null)
             {
-                if (Form.CheckChoreography())
+                if (Form.CheckOnlineStatus() && Form.CheckChoreography())
                 {
                     selectedStepper.Stepper.Kugelmatik.SetAllClusters(selectedStepper.Stepper.Height);
                     UpdateClusterHeight();
@@ -247,7 +257,7 @@ namespace KugelmatikControl
 
         private void homeButton_Click(object sender, EventArgs e)
         {
-            if (Form.CheckChoreography())
+            if (CheckOnlineStatus() && Form.CheckChoreography())
             {
                 CurrentCluster.SendHome();
                 CurrentCluster.SendInfo();
@@ -325,7 +335,8 @@ namespace KugelmatikControl
 
         private void setDataButton_Click(object sender, EventArgs e)
         {
-            CurrentCluster.SendSetData();
+            if (CheckOnlineStatus())
+                CurrentCluster.SendSetData();
         }
     }
 }
