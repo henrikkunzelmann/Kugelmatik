@@ -72,14 +72,15 @@ namespace KugelmatikControl
                     Cluster.Address == null ? "none" : Cluster.Address.ToString());
 
                 if (Cluster.Info == null)
-                {
                     infoText.Text = string.Format(Properties.Resources.ClusterInfoLong, "n/a", "");
-                }
                 else
                 {
+                    string errorText = "";
+                    if (Cluster.Info.LastError != ErrorCode.None)
+                        errorText = string.Format("(error: {0})", Cluster.Info.LastError);
+
                     infoText.Text = string.Format(Properties.Resources.ClusterInfoLong,
-                        Cluster.Info.BuildVersion.ToString(),
-                        Cluster.Info.LastError == ErrorCode.None ? "" : "(error)");
+                        Cluster.Info.BuildVersion.ToString(), errorText);
                 }
 
                 SetClusterBoxColor(clusterBox, Cluster);
