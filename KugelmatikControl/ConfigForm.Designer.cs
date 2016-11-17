@@ -29,8 +29,9 @@
         private void InitializeComponent()
         {
             System.Windows.Forms.TabControl tabControl1;
-            this.propertyGrid = new System.Windows.Forms.PropertyGrid();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ConfigForm));
             this.clientTabPage = new System.Windows.Forms.TabPage();
+            this.propertyGrid = new System.Windows.Forms.PropertyGrid();
             this.clusterTabPage = new System.Windows.Forms.TabPage();
             this.clusterPropertyGrid = new System.Windows.Forms.PropertyGrid();
             this.saveButton = new System.Windows.Forms.Button();
@@ -39,15 +40,6 @@
             this.clientTabPage.SuspendLayout();
             this.clusterTabPage.SuspendLayout();
             this.SuspendLayout();
-            // 
-            // propertyGrid
-            // 
-            this.propertyGrid.CategoryForeColor = System.Drawing.SystemColors.InactiveCaptionText;
-            this.propertyGrid.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.propertyGrid.Location = new System.Drawing.Point(0, 0);
-            this.propertyGrid.Name = "propertyGrid";
-            this.propertyGrid.Size = new System.Drawing.Size(417, 428);
-            this.propertyGrid.TabIndex = 0;
             // 
             // tabControl1
             // 
@@ -69,6 +61,15 @@
             this.clientTabPage.TabIndex = 0;
             this.clientTabPage.Text = "Client";
             this.clientTabPage.UseVisualStyleBackColor = true;
+            // 
+            // propertyGrid
+            // 
+            this.propertyGrid.CategoryForeColor = System.Drawing.SystemColors.InactiveCaptionText;
+            this.propertyGrid.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.propertyGrid.Location = new System.Drawing.Point(0, 0);
+            this.propertyGrid.Name = "propertyGrid";
+            this.propertyGrid.Size = new System.Drawing.Size(417, 428);
+            this.propertyGrid.TabIndex = 0;
             // 
             // clusterTabPage
             // 
@@ -107,6 +108,7 @@
             this.ClientSize = new System.Drawing.Size(425, 454);
             this.Controls.Add(this.saveButton);
             this.Controls.Add(tabControl1);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "ConfigForm";
             this.Text = "Config";
             tabControl1.ResumeLayout(false);

@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(StepByStepHomeForm));
             this.stopButton = new System.Windows.Forms.Button();
             this.statusText = new System.Windows.Forms.Label();
             this.skipButton = new System.Windows.Forms.Button();
@@ -82,6 +83,7 @@
             this.Controls.Add(this.skipButton);
             this.Controls.Add(this.statusText);
             this.Controls.Add(this.stopButton);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "StepByStepHomeForm";
             this.Text = "StepByStepHomeForm";
             this.ResumeLayout(false);

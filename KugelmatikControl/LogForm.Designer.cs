@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(LogForm));
             this.clearButton = new System.Windows.Forms.Button();
             this.logTextBox = new System.Windows.Forms.TextBox();
             this.flushTimer = new System.Windows.Forms.Timer(this.components);
@@ -71,6 +72,7 @@
             this.ClientSize = new System.Drawing.Size(528, 390);
             this.Controls.Add(this.clearButton);
             this.Controls.Add(this.logTextBox);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "LogForm";
             this.Text = "Log";
             this.ResumeLayout(false);

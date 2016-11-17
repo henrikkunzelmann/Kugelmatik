@@ -33,13 +33,14 @@
             System.Windows.Forms.Label label3;
             System.Windows.Forms.Label label2;
             System.Windows.Forms.Label label1;
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(HeightViewForm));
+            this.findRangeCheckBox = new System.Windows.Forms.CheckBox();
+            this.invertCheckBox = new System.Windows.Forms.CheckBox();
             this.scale = new System.Windows.Forms.NumericUpDown();
             this.maxHeight = new System.Windows.Forms.NumericUpDown();
             this.minHeight = new System.Windows.Forms.NumericUpDown();
             this.heightView = new System.Windows.Forms.PictureBox();
             this.updateTimer = new System.Windows.Forms.Timer(this.components);
-            this.invertCheckBox = new System.Windows.Forms.CheckBox();
-            this.findRangeCheckBox = new System.Windows.Forms.CheckBox();
             splitContainer1 = new System.Windows.Forms.SplitContainer();
             label3 = new System.Windows.Forms.Label();
             label2 = new System.Windows.Forms.Label();
@@ -80,6 +81,30 @@
             splitContainer1.Size = new System.Drawing.Size(896, 573);
             splitContainer1.SplitterDistance = 74;
             splitContainer1.TabIndex = 0;
+            // 
+            // findRangeCheckBox
+            // 
+            this.findRangeCheckBox.AutoSize = true;
+            this.findRangeCheckBox.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.findRangeCheckBox.Checked = true;
+            this.findRangeCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.findRangeCheckBox.Location = new System.Drawing.Point(289, 39);
+            this.findRangeCheckBox.Name = "findRangeCheckBox";
+            this.findRangeCheckBox.Size = new System.Drawing.Size(76, 17);
+            this.findRangeCheckBox.TabIndex = 7;
+            this.findRangeCheckBox.Text = "Find range";
+            this.findRangeCheckBox.UseVisualStyleBackColor = true;
+            // 
+            // invertCheckBox
+            // 
+            this.invertCheckBox.AutoSize = true;
+            this.invertCheckBox.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.invertCheckBox.Location = new System.Drawing.Point(230, 39);
+            this.invertCheckBox.Name = "invertCheckBox";
+            this.invertCheckBox.Size = new System.Drawing.Size(53, 17);
+            this.invertCheckBox.TabIndex = 6;
+            this.invertCheckBox.Text = "Invert";
+            this.invertCheckBox.UseVisualStyleBackColor = true;
             // 
             // label3
             // 
@@ -172,36 +197,13 @@
             this.updateTimer.Interval = 33;
             this.updateTimer.Tick += new System.EventHandler(this.updateTimer_Tick);
             // 
-            // invertCheckBox
-            // 
-            this.invertCheckBox.AutoSize = true;
-            this.invertCheckBox.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.invertCheckBox.Location = new System.Drawing.Point(230, 39);
-            this.invertCheckBox.Name = "invertCheckBox";
-            this.invertCheckBox.Size = new System.Drawing.Size(53, 17);
-            this.invertCheckBox.TabIndex = 6;
-            this.invertCheckBox.Text = "Invert";
-            this.invertCheckBox.UseVisualStyleBackColor = true;
-            // 
-            // findRangeCheckBox
-            // 
-            this.findRangeCheckBox.AutoSize = true;
-            this.findRangeCheckBox.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.findRangeCheckBox.Checked = true;
-            this.findRangeCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.findRangeCheckBox.Location = new System.Drawing.Point(289, 39);
-            this.findRangeCheckBox.Name = "findRangeCheckBox";
-            this.findRangeCheckBox.Size = new System.Drawing.Size(76, 17);
-            this.findRangeCheckBox.TabIndex = 7;
-            this.findRangeCheckBox.Text = "Find range";
-            this.findRangeCheckBox.UseVisualStyleBackColor = true;
-            // 
             // HeightViewForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(896, 573);
             this.Controls.Add(splitContainer1);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "HeightViewForm";
             this.Text = "Height view";
             splitContainer1.Panel1.ResumeLayout(false);
