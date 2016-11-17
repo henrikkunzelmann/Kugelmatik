@@ -110,7 +110,7 @@
             this.Controls.Add(tabControl1);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "ConfigForm";
-            this.Text = "Config";
+            this.Text = "Options";
             tabControl1.ResumeLayout(false);
             this.clientTabPage.ResumeLayout(false);
             this.clusterTabPage.ResumeLayout(false);
