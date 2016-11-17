@@ -185,6 +185,12 @@ void sendInfo(int32_t revision, boolean wantConfig2) {
 		packet->write((uint8_t*)&config, sizeof(Config));
 	}
 
+	uint8_t mcpStatus = 0;
+	for (uint8_t i = 0; i < MCP_COUNT; i++)
+		if (mcps[i].isOK)
+			mcpStatus |= (1 << i);
+	packet->write(mcpStatus);
+
 	sendPacket();
 }
 

@@ -195,7 +195,7 @@ void updateSteppers(boolean alwaysUseHalfStep)
 		}
 
 		boolean wasOK = mcp->isOK;
-		mcp->isOK = (mcp->MCP->writeGPIOS(gpioValue));
+		mcp->isOK = (mcp->MCP->writeGPIOS(gpioValue) == 0);
 
 #if !IGNORE_MCP_FAULTS
 		if (wasOK && !mcp->isOK)

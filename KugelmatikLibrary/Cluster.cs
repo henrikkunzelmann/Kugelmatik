@@ -850,7 +850,11 @@ namespace KugelmatikLibrary
                             config = ClusterConfig.Read(reader);
                         }
 
-                        Info = new ClusterInfo(buildVersion, currentBusyCommand, highestRevision, config, lastError, freeRam);
+                        byte mcpStatus = 0;
+                        if (buildVersion >= 17)
+                            mcpStatus = reader.ReadByte();
+
+                        Info = new ClusterInfo(buildVersion, currentBusyCommand, highestRevision, config, lastError, freeRam, mcpStatus);
                         RemovePacketToAcknowlegde(revision);
                         break;
                     default:

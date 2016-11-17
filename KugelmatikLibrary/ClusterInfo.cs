@@ -39,7 +39,12 @@ namespace KugelmatikLibrary
         /// </summary>
         public int FreeRam { get; private set; }
 
-        public ClusterInfo(byte buildVersion, BusyCommand currentBusyCommand, int highestRevision, ClusterConfig config, ErrorCode lastError, int freeRam)
+        /// <summary>
+        /// Bitfeld, welches angibt welche MCP ansprechbar sind.
+        /// </summary>
+        public byte MCPStatus { get; private set; }
+
+        public ClusterInfo(byte buildVersion, BusyCommand currentBusyCommand, int highestRevision, ClusterConfig config, ErrorCode lastError, int freeRam, byte mcpStatus)
         {
             this.BuildVersion = buildVersion;
             this.CurrentBusyCommand = currentBusyCommand;
@@ -47,6 +52,7 @@ namespace KugelmatikLibrary
             this.Config = config;
             this.LastError = lastError;
             this.FreeRam = freeRam;
+            this.MCPStatus = mcpStatus;
         }
 
         public static bool operator ==(ClusterInfo a, ClusterInfo b)
@@ -74,12 +80,14 @@ namespace KugelmatikLibrary
         {
             if (other == null)
                 return false;
+
             return BuildVersion == other.BuildVersion
                 && CurrentBusyCommand == other.CurrentBusyCommand
                 && HighestRevision == other.HighestRevision
                 && Config.Equals(other.Config)
                 && LastError == other.LastError
-                && FreeRam == other.FreeRam;
+                && FreeRam == other.FreeRam
+                && MCPStatus == other.MCPStatus;
         }
 
         public override int GetHashCode()
@@ -93,6 +101,7 @@ namespace KugelmatikLibrary
                 hash = hash * 7 + Config.GetHashCode();
                 hash = hash * 7 + LastError.GetHashCode();
                 hash = hash * 7 + FreeRam.GetHashCode();
+                hash = hash * 7 + MCPStatus.GetHashCode();
                 return hash;
             }
         }
