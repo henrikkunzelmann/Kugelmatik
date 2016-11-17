@@ -62,11 +62,11 @@ namespace KugelmatikLibrary
         public static ClusterConfig GetDefault()
         {
             ClusterConfig config = new ClusterConfig();
-            config.StepMode = StepMode.Full;
+            config.StepMode = StepMode.Half;
             config.BrakeMode = BrakeMode.Smart;
-            config.TickTime = 1900;
-            config.HomeTime = 3000;
-            config.FixTime = 3000;
+            config.TickTime = 3500;
+            config.HomeTime = 3500;
+            config.FixTime = 3500;
             
             config.MaxSteps = 8000;
             config.HomeSteps = 8000;

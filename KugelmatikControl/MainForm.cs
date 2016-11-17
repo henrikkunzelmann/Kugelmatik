@@ -201,7 +201,16 @@ namespace KugelmatikControl
             if (choreography == null || !choreography.IsRunning || choreography.IsDisposed)
                 choreographyStatusLabel.Text = Properties.Resources.ChoreographyStatusNone;
             else
-                choreographyStatusLabel.Text = string.Format(Properties.Resources.ChoreographyStatus, choreography.Choreography.GetType().Name, choreography.FPS, choreography.TargetFPS);
+            {
+                string name;
+                ChoreographyDirect direct = choreography.Choreography as ChoreographyDirect;
+                if (direct != null)
+                    name = direct.Function.GetType().Name;
+                else
+                    name = choreography.Choreography.GetType().Name;
+
+                choreographyStatusLabel.Text = string.Format(Properties.Resources.ChoreographyStatus, name, choreography.FPS, choreography.TargetFPS);
+            }
         }
 
         /// <summary>
