@@ -834,6 +834,10 @@ namespace KugelmatikLibrary
                                 lastError = (ErrorCode)error;
                         }
 
+                        ErrorCode lastSavedError = Info == null ? ErrorCode.None : info.LastError;
+                        if (lastSavedError != lastError && lastError != ErrorCode.None)
+                            Log.Error("[{0}, {1}] Error changed from {2} to {3}", X, Y, lastSavedError, lastError);
+
                         int freeRam = -1;
                         if (buildVersion >= 14)
                             freeRam = reader.ReadInt16();
