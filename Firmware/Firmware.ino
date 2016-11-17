@@ -65,10 +65,8 @@ void loop()
 
 	while (true)
 	{
-		// Packet abfragen
-		ether.packetLoop(ether.packetReceive());
-
 		wdt_reset();
+		loopNetwork();
 
 		// schauen ob wir die Stepper updaten müssen
 		unsigned long time = micros();

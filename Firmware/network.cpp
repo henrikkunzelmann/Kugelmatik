@@ -73,6 +73,20 @@ void initNetwork()
 	ether.udpServerListenOnPort(&onPacketReceive, PROTOCOL_PORT);
 }
 
+boolean loopNetwork() {
+	wdt_reset();
+
+	// Paket abfragen
+	ether.packetLoop(ether.packetReceive());
+
+	// wenn Netzwerk Verbindung getrennt wurde
+	if (!ether.isLinkUp()) {
+		stopMove(); // stoppen
+		return false;
+	}
+	return true;
+}
+
 void sendPacket()
 {
 	if (packet->getError())
@@ -223,6 +237,7 @@ void handlePacket(uint8_t packetType, int32_t revision)
 		byte x, y;
 		if (!readPosition(packet, &x, &y))
 			return;
+
 		uint16_t height = packet->readUint16();
 		byte waitTime = packet->readUint8();
 
@@ -309,7 +324,7 @@ void handlePacket(uint8_t packetType, int32_t revision)
 
 		byte area = (maxX - minX + 1) * (maxY - minY + 1); // +1, da max die letzte Kugel nicht beinhaltet
 
-														   // beide for-Schleifen müssen mit dem Client übereinstimmen sonst stimmen die Positionen nicht		
+		// beide for-Schleifen müssen mit dem Client übereinstimmen sonst stimmen die Positionen nicht		
 		for (byte x = minX; x <= maxX; x++) {
 			for (byte y = minY; y <= maxY; y++) {
 				uint16_t height = packet->readUint16();
@@ -512,7 +527,6 @@ void handlePacket(uint8_t packetType, int32_t revision)
 
 		setDataRevision = revision;
 
-
 		Serial.println(F("PacketSetData received"));
 
 		for (byte x = 0; x < CLUSTER_WIDTH; x++) {
@@ -584,11 +598,10 @@ void runBusy(uint8_t type, int steps, uint16_t delay)
 		updateSteppers(true);
 		usdelay(delay); 
 
-		wdt_reset();
-
-		// Pakete empfangen
-		ether.packetLoop(ether.packetReceive());
+		if (!loopNetwork())
+			break;
 	}
+
 	currentBusyCommand = BUSY_NONE;
 	stopBusyCommand = false;
 	turnGreenLedOff();

@@ -165,7 +165,7 @@ void updateSteppers(boolean alwaysUseHalfStep)
 					stepper->CurrentSteps -= stepSize;
 					stepperIndex -= stepSize;
 				}
-				else											// nach unten fahren
+				else											 // nach unten fahren
 				{
 					stepper->CurrentSteps += stepSize;
 					stepperIndex += stepSize;
@@ -201,5 +201,7 @@ void updateSteppers(boolean alwaysUseHalfStep)
 		if (wasOK && !mcp->isOK)
 			internalError(ERROR_MCP_FAULT_1 + i);
 #endif
+
+		wdt_reset();
 	}
 }
