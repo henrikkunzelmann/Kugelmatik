@@ -182,11 +182,12 @@ void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, c
 	if (len < HEADER_SIZE || data[0] != 'K' || data[1] != 'K' || data[2] != 'S')
 		return;
 
+	// Fehler aus dem PacketBuffer löschen
+	if (packet->getError())
+		Serial.println(F("packet->getError() == true"));
+
 	// data ist unser Etherner Buffer (verschoben um die UDP Header Länge)
 	// wir nutzen den selben Buffer zum Lesen und zum Schreiben
-	if (packet->getError()) // Fehler löschen
-		internalError();
-
 	packet->setBuffer((uint8_t*)data, ETHERNET_BUFFER_SIZE - 28); // 28 Bytes für IP + UDP Header abziehen
 	packet->setSize(len);
 	packet->seek(3); 
