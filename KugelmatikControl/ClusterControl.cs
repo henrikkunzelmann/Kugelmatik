@@ -126,7 +126,7 @@ namespace KugelmatikControl
             else if (info != null && info.CurrentBusyCommand != BusyCommand.None)
                 groupBox.ForeColor = Color.DarkBlue;
             else if (info != null && info.LastError != ErrorCode.None)
-                groupBox.ForeColor = Color.Brown;
+                groupBox.ForeColor = Color.DarkMagenta;
             else if (ping >= 150)
                 groupBox.ForeColor = Color.DarkOrange;
             else
