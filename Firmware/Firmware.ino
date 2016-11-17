@@ -41,13 +41,13 @@ void setup()
 	Serial.print(F("Kugelmatik Firmware booting up, version: "));
 	Serial.println(BUILD_VERSION);
 
-	config = getDefaultConfig();
-
 	setupLeds();
-
 	turnGreenLedOn();
+
+	setDefaultConfig();
 	initNetwork();
 	initAllMCPs();
+
 	turnGreenLedOff();
 
 #if ENABLE_WATCH_DOG
@@ -73,7 +73,7 @@ void loop()
 		if (time < procStart) // overflow von micros() handeln
 			break;
 
-		if (time - procStart >= config->tickTime)
+		if (time - procStart >= config.tickTime)
 			break;
 	}
 }

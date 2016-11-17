@@ -95,7 +95,7 @@ void setStepper(int32_t revision, byte x, byte y, uint16_t height, byte waitTime
 		return protocolError(ERROR_X_INVALID);
 	if (y < 0 || y >= CLUSTER_HEIGHT)
 		return protocolError(ERROR_Y_INVALID);
-	if (height > config->maxSteps)
+	if (height > config.maxSteps)
 		return protocolError(ERROR_INVALID_HEIGHT);
 
 	setStepper(getStepper(x, y), revision, height, waitTime);
@@ -103,7 +103,7 @@ void setStepper(int32_t revision, byte x, byte y, uint16_t height, byte waitTime
 
 void setAllSteps(int32_t revision, uint16_t height, byte waitTime)
 {
-	if (height > config->maxSteps)
+	if (height > config.maxSteps)
 		return protocolError(ERROR_INVALID_HEIGHT);
 	for (int i = 0; i < CLUSTER_SIZE; i++) 
 		setStepper(getStepper(i), revision, height, waitTime);
@@ -139,10 +139,10 @@ void updateSteppers(boolean alwaysUseHalfStep)
 			int32_t diff = abs(stepper->CurrentSteps - stepper->GotoSteps);
 			if (diff != 0)
 			{
-				if (config->stepMode == StepBoth) 
+				if (config.stepMode == StepBoth) 
 					stepSize = min(2, diff);		// schauen ob Full oder Half Step gemacht werden soll
-				else if (diff >= config->stepMode)	
-					stepSize = config->stepMode;	// Half oder Full Step machen
+				else if (diff >= config.stepMode)	
+					stepSize = config.stepMode;	// Half oder Full Step machen
 			}
 
 			if (alwaysUseHalfStep)
@@ -183,14 +183,14 @@ void updateSteppers(boolean alwaysUseHalfStep)
 				stepper->TickCount = stepper->WaitTime;
 				stepper->BrakeTicks = 0;
 			}
-			else if (config->brakeMode == BrakeSmart)
+			else if (config.brakeMode == BrakeSmart)
 			{
-				if (stepper->BrakeTicks < config->brakeTicks) {
+				if (stepper->BrakeTicks < config.brakeTicks) {
 					gpioValue |= stepsStepper[stepper->CurrentStepIndex] << (4 * j);
 					stepper->BrakeTicks++;
 				}
 			}
-			else if (config->brakeMode == BrakeAlways) // Bremse benutzen?
+			else if (config.brakeMode == BrakeAlways) // Bremse benutzen?
 				gpioValue |= stepsStepper[stepper->CurrentStepIndex] << (4 * j);
 		}
 

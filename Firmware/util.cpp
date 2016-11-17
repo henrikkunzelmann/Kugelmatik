@@ -36,7 +36,7 @@ void internalError()
 
 void internalError(uint8_t error)
 {
-	Serial.print(F("internalError(error = "));
+	Serial.print(F("Error(error = "));
 	Serial.print(error);
 	Serial.println(")");
 

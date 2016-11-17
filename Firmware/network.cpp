@@ -173,16 +173,16 @@ void sendInfo(int32_t revision, boolean wantConfig2) {
 	packet->write(currentBusyCommand);
 	packet->write(highestRevision);
 	if (!wantConfig2) {
-		packet->write((uint8_t)config->stepMode);
-		packet->write(config->tickTime);
-		packet->write(config->brakeMode != BrakeNone);
+		packet->write((uint8_t)config.stepMode);
+		packet->write(config.tickTime);
+		packet->write(config.brakeMode != BrakeNone);
 	}
 	packet->write(lastError);
 	packet->write((int16_t)freeRam());
 
 	if (wantConfig2) {
 		packet->write((uint16_t)sizeof(Config));
-		packet->write((uint8_t*)config, sizeof(Config));
+		packet->write((uint8_t*)&config, sizeof(Config));
 	}
 
 	sendPacket();
@@ -382,13 +382,13 @@ void handlePacket(uint8_t packetType, int32_t revision)
 			StepperData* stepper = getStepper(i);
 
 			if (checkRevision(stepper->LastRevision, revision)) {
-				forceStepper(stepper, revision, -config->homeSteps);
+				forceStepper(stepper, revision, -config.homeSteps);
 				stepperSet = true;
 			}
 		}
 
 		if (stepperSet) {
-			runBusy(BUSY_HOME, config->homeSteps, config->homeTime);
+			runBusy(BUSY_HOME, config.homeSteps, config.homeTime);
 
 
 			// alle Stepper zurücksetzen
@@ -429,8 +429,8 @@ void handlePacket(uint8_t packetType, int32_t revision)
 		{
 			stopMove();
 
-			forceStepper(stepper, revision, config->fixSteps);
-			runBusy(BUSY_FIX, config->fixSteps, config->fixTime);
+			forceStepper(stepper, revision, config.fixSteps);
+			runBusy(BUSY_FIX, config.fixSteps, config.fixTime);
 			resetStepper(stepper);
 		}
 		break;
@@ -454,8 +454,8 @@ void handlePacket(uint8_t packetType, int32_t revision)
 		{
 			stopMove();
 
-			forceStepper(stepper, revision, -config->homeSteps);
-			runBusy(BUSY_HOME_STEPPER, config->homeSteps, config->homeTime);
+			forceStepper(stepper, revision, -config.homeSteps);
+			runBusy(BUSY_HOME_STEPPER, config.homeSteps, config.homeTime);
 			resetStepper(stepper);
 		}
 		break;
@@ -486,7 +486,7 @@ void handlePacket(uint8_t packetType, int32_t revision)
 			return protocolError(ERROR_INVALID_CONFIG_VALUE);
 
 		int32_t cTickTime = packet->readInt32();
-		if (cTickTime < 50 || cTickTime > 15000)
+		if (cTickTime < 1000 || cTickTime > 5000)
 			return protocolError(ERROR_INVALID_CONFIG_VALUE);
 
 		boolean cUseBreak = packet->readBoolean();
@@ -494,9 +494,12 @@ void handlePacket(uint8_t packetType, int32_t revision)
 		if (packet->getError())
 			return;
 
-		config->stepMode = (StepMode)cStepMode;
-		config->tickTime = cTickTime;
-		config->brakeMode = cUseBreak ? BrakeSmart : BrakeNone;
+		config.stepMode = (StepMode)cStepMode;
+		config.tickTime = cTickTime;
+		config.brakeMode = cUseBreak ? BrakeSmart : BrakeNone;
+
+		if (!checkConfig(&config))
+			return protocolError(ERROR_INVALID_CONFIG_VALUE);
 
 		sendInfo(revision, false);
 		break;
@@ -534,7 +537,7 @@ void handlePacket(uint8_t packetType, int32_t revision)
 				StepperData* stepper = getStepper(x, y);
 
 				uint16_t height = packet->readUint16();
-				if (height > config->maxSteps)
+				if (height > config.maxSteps)
 					return protocolError(ERROR_INVALID_HEIGHT);
 
 				if (packet->getError())
@@ -558,17 +561,16 @@ void handlePacket(uint8_t packetType, int32_t revision)
 		if (size != sizeof(Config))
 			return protocolError(ERROR_INVALID_CONFIG_VALUE);
 
-		Config* newConfig = getDefaultConfig();
-		packet->read((uint8_t*)newConfig, sizeof(Config));
+		Config newConfig;
+		packet->read((uint8_t*)&newConfig, sizeof(Config));
 
-		if (packet->getError()) {
-			delete newConfig;
+		if (packet->getError()) 
 			return;
-		}
 
-		delete config;
-		config = newConfig;
+		if (!checkConfig(&newConfig))
+			return protocolError(ERROR_INVALID_CONFIG_VALUE);
 
+		memcpy(&config, &newConfig, sizeof(Config));
 		Serial.println(F("Config2 set by network!"));
 
 		sendInfo(revision, true);

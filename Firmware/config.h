@@ -32,7 +32,10 @@ struct Config {
 };
 
 // gibt die Standard Config zurück
-Config* getDefaultConfig();
+void setDefaultConfig();
 
-extern Config* config;
+// prüft Config auf invalide Werte
+boolean checkConfig(Config* config);
+
+extern Config config;
 #endif
