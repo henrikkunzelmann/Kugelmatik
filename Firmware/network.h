@@ -20,6 +20,7 @@ boolean checkRevision(int32_t lastRevision, int32_t revision);
 
 
 void initNetwork();
+boolean loopNetwork();
 
 char getHexChar(int x);
 
