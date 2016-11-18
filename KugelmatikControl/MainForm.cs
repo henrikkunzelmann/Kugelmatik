@@ -55,53 +55,61 @@ namespace KugelmatikControl
 
         private void LoadKugelmatik()
         {
-            CloseAllWindows();
-
-            if (choreography != null)
+            try
             {
-                if (choreography.IsRunning)
-                    choreography.Stop();
-                choreography.Dispose();
-                choreography = null;
-            }
-            if (Kugelmatik != null)
-                Kugelmatik.Dispose();
+                CloseAllWindows();
 
-            Log.Info("Loading kugelmatik...");
-
-            // Config kopieren oder laden
-            Config config;
-            ClusterConfig clusterConfig;
-
-            if (Kugelmatik != null)
-            {
-                config = Kugelmatik.Config;
-                clusterConfig = Kugelmatik.ClusterConfig;
-            }
-            else
-            {
-                config = LoadOrDefault(ConfigFile, Config.GetDefault());
-                clusterConfig = LoadOrDefault(ClusterConfigFile, ClusterConfig.GetDefault());
-            }
-
-            Kugelmatik = new Kugelmatik(config, clusterConfig);
-
-            // UI erstellen
-            clustersPanel.Controls.Clear();
-            clusterControls = new ClusterControl[Kugelmatik.Config.KugelmatikWidth * Kugelmatik.Config.KugelmatikHeight];
-
-            const int padding = 5;
-            for (int y = 0; y < Kugelmatik.Config.KugelmatikHeight; y++)
-                for (int x = 0; x < Kugelmatik.Config.KugelmatikWidth; x++)
+                if (choreography != null)
                 {
-                    ClusterControl cluster = new ClusterControl(Kugelmatik.GetClusterByPosition(x, Kugelmatik.Config.KugelmatikHeight - 1 - y));
-                    cluster.Location = new Point(x * (cluster.Width + padding), y * (cluster.Height + padding));
-                    cluster.Click += Cluster_Click;
-                    clustersPanel.Controls.Add(cluster);
-                    clusterControls[y * Kugelmatik.Config.KugelmatikWidth + x] = cluster;
+                    if (choreography.IsRunning)
+                        choreography.Stop();
+                    choreography.Dispose();
+                    choreography = null;
+                }
+                if (Kugelmatik != null)
+                    Kugelmatik.Dispose();
+
+                Log.Info("Loading kugelmatik...");
+
+                // Config kopieren oder laden
+                Config config;
+                ClusterConfig clusterConfig;
+
+                if (Kugelmatik != null)
+                {
+                    config = Kugelmatik.Config;
+                    clusterConfig = Kugelmatik.ClusterConfig;
+                }
+                else
+                {
+                    config = LoadOrDefault(ConfigFile, Config.GetDefault());
+                    clusterConfig = LoadOrDefault(ClusterConfigFile, ClusterConfig.GetDefault());
                 }
 
-            UpdateChoreographyStatus();
+                Kugelmatik = new Kugelmatik(config, clusterConfig);
+
+                // UI erstellen
+                clustersPanel.Controls.Clear();
+                clusterControls = new ClusterControl[Kugelmatik.Config.KugelmatikWidth * Kugelmatik.Config.KugelmatikHeight];
+
+                const int padding = 5;
+                for (int y = 0; y < Kugelmatik.Config.KugelmatikHeight; y++)
+                    for (int x = 0; x < Kugelmatik.Config.KugelmatikWidth; x++)
+                    {
+                        ClusterControl cluster = new ClusterControl(Kugelmatik.GetClusterByPosition(x, Kugelmatik.Config.KugelmatikHeight - 1 - y));
+                        cluster.Location = new Point(x * (cluster.Width + padding), y * (cluster.Height + padding));
+                        cluster.Click += Cluster_Click;
+                        clustersPanel.Controls.Add(cluster);
+                        clusterControls[y * Kugelmatik.Config.KugelmatikWidth + x] = cluster;
+                    }
+
+                UpdateChoreographyStatus();
+
+            }
+            catch(Exception e)
+            {
+                MessageBox.Show(e.ToString(), "Could not load kugelmatik", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         private static T LoadOrDefault<T>(string file, T defaultValue)
@@ -127,6 +135,9 @@ namespace KugelmatikControl
 
         private void updateTimer_Tick(object sender, EventArgs e)
         {
+            if (Kugelmatik == null)
+                return;
+
             // Ping senden
             Kugelmatik.SendPing();
 
