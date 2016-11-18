@@ -21,27 +21,27 @@ namespace KugelmatikLibrary
         public BrakeMode BrakeMode;
 
         [DescriptionAttribute("Zeit (in Mikrosekunden) zwischen zwei Schritten")]
-        [Range(200, 10000)]
+        [Range(500, 5000)]
         public uint TickTime;
 
         [Category("Kugelmatik")]
         [DescriptionAttribute("Zeit (in Mikrosekunden) zwischen zwei Schritten (beim Home-Befehl)")]
-        [Range(200, 10000)]
+        [Range(500, 5000)]
         public uint HomeTime;
 
         [Category("Kugelmatik")]
         [DescriptionAttribute("Zeit (in Mikrosekunden) zwischen zwei Schritten (beim Fix-Befehl)")]
-        [Range(200, 10000)]
+        [Range(500, 5000)]
         public uint FixTime;
 
         [Category("Kugelmatik")]
         [DescriptionAttribute("Anzahl der Schritte die eine Kugel maximal nach unten darf")]
-        [Range(1, 8000)]
+        [Range(1, 15000)]
         public short MaxSteps;
 
         [Category("Kugelmatik")]
         [DescriptionAttribute("Anzahl der Schritte für den Home-Befehl")]
-        [Range(1, 8000)]
+        [Range(1, 10000)]
         public short HomeSteps;
 
         [Category("Kugelmatik")]

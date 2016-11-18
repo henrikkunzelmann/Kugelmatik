@@ -27,13 +27,13 @@ boolean checkConfig(Config* config) {
 	correct &= config->stepMode >= StepHalf && config->stepMode <= StepBoth;
 	correct &= config->brakeMode >= BrakeNone && config->brakeMode <= BrakeSmart;
 
-	correct &= config->tickTime >= 1000 && config->tickTime <= 5000;
-	correct &= config->homeTime >= 1000 && config->homeTime <= 5000;
-	correct &= config->fixTime >= 1000 && config->fixTime <= 5000;
+	correct &= config->tickTime >= 500 && config->tickTime <= 5000;
+	correct &= config->homeTime >= 500 && config->homeTime <= 5000;
+	correct &= config->fixTime >= 500 && config->fixTime <= 5000;
 
-	correct &= config->maxSteps > 0 && config->maxSteps <= 10000;
-	correct &= config->homeSteps > 0 && config->homeSteps <= 8000;
-	correct &= config->fixSteps > 0 && config->fixSteps <= 8000;
+	correct &= config->maxSteps > 0 && config->maxSteps <= 15000;
+	correct &= config->homeSteps > 0 && config->homeSteps <= 10000;
+	correct &= config->fixSteps > 0 && config->fixSteps <= 10000;
 
 	return correct;
 }
