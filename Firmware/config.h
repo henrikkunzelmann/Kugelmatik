@@ -29,6 +29,8 @@ struct Config {
 	int16_t fixSteps; // Anzahl an Schritten die die Firmware macht um eine Kugel nach unten zu fahren (ignoriert dabei maxSteps)
 
 	uint16_t brakeTicks;
+
+	uint16_t minStepDelta; // Unterschied zwischen derzeitiger Höhe und Zielhöhe ab wann die Kugel bewegt werden soll
 };
 
 // gibt die Standard Config zurück

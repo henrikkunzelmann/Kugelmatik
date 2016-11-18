@@ -54,6 +54,11 @@ namespace KugelmatikLibrary
         [Range(0, ushort.MaxValue)]
         public ushort BrakeTicks;
 
+        [Category("Kugelmatik")]
+        [DescriptionAttribute("Unterschied zwischen derzeitiger Höhe und Zielhöhe ab wann die Kugel bewegt werden soll")]
+        [Range(0, ushort.MaxValue)]
+        public ushort MinStepDelta;
+
         public static ushort Size
         {
             get { return (ushort)Marshal.SizeOf(typeof(ClusterConfig)); }
@@ -73,6 +78,8 @@ namespace KugelmatikLibrary
             config.FixSteps = 8000;
             
             config.BrakeTicks = 10000;
+
+            config.MinStepDelta = 10;
             return config;
         }
 

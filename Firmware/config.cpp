@@ -16,6 +16,8 @@ void setDefaultConfig() {
 	
 	config.brakeTicks = 10000;
 
+	config.minStepDelta = 10;
+
 	if (!checkConfig(&config))
 		internalError(ERROR_INTERNAL_DEFAULT_CONFIG_FAULT);
 }

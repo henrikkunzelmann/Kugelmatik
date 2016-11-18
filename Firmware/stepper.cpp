@@ -140,6 +140,9 @@ void updateSteppers(boolean alwaysUseHalfStep)
 
 			byte stepSize = 0;
 			int32_t diff = abs(stepper->CurrentSteps - stepper->GotoSteps);
+			if (diff < config.minStepDelta)
+				continue;
+
 			if (diff != 0)
 			{
 				if (config.stepMode == StepBoth) 
