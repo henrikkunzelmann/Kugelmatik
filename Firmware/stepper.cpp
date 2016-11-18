@@ -33,6 +33,9 @@ void initMCP(byte index)
 #if !IGNORE_MCP_FAULTS
 	if (!data->isOK)
 	{
+		Serial.print(F("MCP Fault with mcp number "));
+		Serial.println(index);
+
 		internalError(ERROR_MCP_FAULT_1 + index);
 
 		turnRedLedOn();
@@ -198,8 +201,12 @@ void updateSteppers(boolean alwaysUseHalfStep)
 		mcp->isOK = (mcp->MCP->writeGPIOS(gpioValue) == 0);
 
 #if !IGNORE_MCP_FAULTS
-		if (wasOK && !mcp->isOK)
+		if (wasOK && !mcp->isOK) {
+			Serial.print(F("MCP Fault with mcp number "));
+			Serial.println(i);
+
 			internalError(ERROR_MCP_FAULT_1 + i);
+		}
 #endif
 
 		wdt_reset();
