@@ -34,6 +34,7 @@ struct MCPData
 	StepperData Steppers[MCP_STEPPER_COUNT]; // Schrittmotoren pro MCP
 	MCP23017* MCP;
 	boolean isOK;
+	uint16_t lastGPIOValue;
 };
 
 // Anweisung die der Schrittmotor machen soll

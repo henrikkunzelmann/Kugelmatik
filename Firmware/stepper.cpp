@@ -29,6 +29,7 @@ void initMCP(byte index)
 	data->MCP->setPinDirOUT(0xFFFF);
 
 	data->isOK = (data->MCP->writeGPIOS(0) == 0);
+	data->lastGPIOValue = 0;
 
 #if !IGNORE_MCP_FAULTS
 	if (!data->isOK)
@@ -201,17 +202,23 @@ void updateSteppers(boolean alwaysUseHalfStep)
 				gpioValue |= stepsStepper[stepper->CurrentStepIndex] << (4 * j);
 		}
 
-		boolean wasOK = mcp->isOK;
-		mcp->isOK = (mcp->MCP->writeGPIOS(gpioValue) == 0);
+
+		if (mcp->lastGPIOValue != gpioValue) {
+			boolean wasOK = mcp->isOK;
+			mcp->isOK = (mcp->MCP->writeGPIOS(gpioValue) == 0);
+
+			if (mcp->isOK)
+				mcp->lastGPIOValue = gpioValue;
 
 #if !IGNORE_MCP_FAULTS
-		if (wasOK && !mcp->isOK) {
-			Serial.print(F("MCP Fault with mcp number "));
-			Serial.println(i);
+			if (wasOK && !mcp->isOK) {
+				Serial.print(F("MCP Fault with mcp number "));
+				Serial.println(i);
 
-			internalError(ERROR_MCP_FAULT_1 + i);
-		}
+				internalError(ERROR_MCP_FAULT_1 + i);
+			}
 #endif
+		}
 
 		wdt_reset();
 	}
