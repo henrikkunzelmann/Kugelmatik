@@ -11,8 +11,10 @@ namespace KugelmatikLibrary
         private static object locker = new object();
         private static StringBuilder buffer = new StringBuilder();
 
-        public static bool WriteToConsole { get; set; } = true;
-        public static bool WriteToDebug { get; set; } = true;
+        public static LogStorage Storage { get; set; } = new LogStorage();
+
+        public static bool WriteToConsole { get; set; }
+        public static bool WriteToDebug { get; set; }
 
         private static bool allowBuffer = true;
         /// <summary>
@@ -38,7 +40,7 @@ namespace KugelmatikLibrary
         /// <summary>
         /// Erlaubt ob der Buffer automatisch geleert wird.
         /// </summary>
-        public static bool AutomaticFlush { get;set; }
+        public static bool AutomaticFlush { get; set; }
 
         private static int bufferCapacity = 5000;
         /// <summary>
@@ -65,9 +67,9 @@ namespace KugelmatikLibrary
         /// Das Level ab dem Nachrichten im Log angezeigt werden.
         /// Standard: LogLevel.Verbose
         /// </summary>
-        public static LogLevel LevelMinimum { get; set; }
+        public static LogLevel LevelMinimum { get; set; } = LogLevel.Verbose;
 
-        public static event Action<string> OnFlushBuffer;
+        public static event EventHandler<LogFlushEventArgs> OnFlushBuffer;
 
         /// <summary>
         /// Sorgt dafür das der Buffer in die Konsole oder Debug-Output geschrieben wird.
@@ -81,12 +83,13 @@ namespace KugelmatikLibrary
         {
             InternalFlushBuffer(true);
         }
-        
+
         private static void InternalFlushBuffer(bool isAutomatic)
         {
             if (!AutomaticFlush && isAutomatic)
                 return;
-             lock (locker)
+
+            lock (locker)
             {
                 string bufferString = buffer.ToString();
                 if (WriteToConsole)
@@ -94,8 +97,7 @@ namespace KugelmatikLibrary
                 if (WriteToDebug)
                     System.Diagnostics.Debug.Write(bufferString);
 
-                if (OnFlushBuffer != null)
-                    OnFlushBuffer(bufferString);
+                OnFlushBuffer?.Invoke(null, new LogFlushEventArgs(bufferString));
                 buffer.Clear();
             }
         }
@@ -117,8 +119,11 @@ namespace KugelmatikLibrary
                     string[] messageLines = message.Split(new char[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
                     foreach (string str in messageLines)
                     {
-                        string formattedMessage = string.Format("[{0}] {1} {2}\r\n", DateTime.Now.ToLongTimeString(), ("(" + level.ToString() + ")").PadRight(10), str);
+                        string formattedMessage = string.Format("[{0}] {1} {2}", DateTime.Now.ToLongTimeString(), ("(" + level.ToString() + ")").PadRight(10), str);
                         buffer.Append(formattedMessage);
+                        buffer.AppendLine();
+
+                        Storage.AddLine(formattedMessage);
                     }
 
                     if (!allowBuffer || buffer.Length >= bufferCapacity)
@@ -189,6 +194,15 @@ namespace KugelmatikLibrary
                 throw new ArgumentNullException("message");
 
             Write(LogLevel.Warning, message);
+        }
+
+        public static void Error(Exception e)
+        {
+            if (e == null)
+                throw new ArgumentNullException("e");
+
+            Error(e.Message);
+            Error(e.StackTrace);
         }
 
         /// <summary>
@@ -284,7 +298,20 @@ namespace KugelmatikLibrary
             var fields = obj.GetType().GetFields();
             Log.Write(level, "All fields for {0} [n: {1}]:", obj.GetType().FullName, fields.Length);
             foreach (var field in fields)
-                Log.Write(level, "\t{0} = {1}", field.Name, field.GetValue(obj));
+                Log.Write(level, "...{0} = {1}", field.Name, field.GetValue(obj));
+        }
+
+        /// <summary>
+        /// Schreibt alle Eigenschaft des Objekts obj in den Log.
+        /// </summary>
+        /// <param name="level">Das LogLevel welches benutzt werden soll.</param>
+        /// <param name="obj">Das Objekt mit den Eigenschaften die in den Log geschrieben werden sollen.</param>
+        public static void WriteProperties(LogLevel level, object obj)
+        {
+            var properties = obj.GetType().GetProperties();
+            Log.Write(level, "All properties for {0} [n: {1}]:", obj.GetType().FullName, properties.Length);
+            foreach (var property in properties)
+                Log.Write(level, "...{0} = {1}", property.Name, property.GetValue(obj));
         }
     }
 }
