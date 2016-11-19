@@ -33,11 +33,12 @@ namespace KugelmatikLibrary.Script
                 }
                 catch (CompileException e)
                 {
+                    Log.Error(e);
                     throw new CompileException(i + 1, e.Message);
                 }
                 catch (Exception e)
                 {
-                    Log.Error(e.ToString());
+                    Log.Error(e);
                     throw new CompileException(i + 1, CompileException.InternalError);
                 }
             }

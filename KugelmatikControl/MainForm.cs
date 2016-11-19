@@ -526,12 +526,12 @@ namespace KugelmatikControl
                 catch(CompileException ex)
                 {
                     MessageBox.Show(string.Format("Compile error in line {0}: {1}", ex.Line, ex.Message), "Compile error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    Log.Error(ex.ToString());
+                    Log.Error(ex);
                 }
                 catch(Exception ex)
                 {
                     MessageBox.Show("Internal error: \r\n" + ex.ToString(), "Internal error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    Log.Error(ex.ToString());
+                    Log.Error(ex);
                 }
             }
         }

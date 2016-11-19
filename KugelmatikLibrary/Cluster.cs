@@ -717,7 +717,7 @@ namespace KugelmatikLibrary
             }
             catch (Exception e)
             {
-                Log.Error(e.ToString());
+                Log.Error(e);
                 if (Debugger.IsAttached)
                     Debugger.Break();
             }

@@ -96,7 +96,7 @@ namespace KugelmatikControl
             }
             catch(Exception ex)
             {
-                Log.Error(ex.ToString());
+                Log.Error(ex);
                 if (Debugger.IsAttached)
                     Debugger.Break();
             }
