@@ -117,7 +117,7 @@
             // 
             this.splitContainer2.Panel2.Controls.Add(this.splitContainer3);
             this.splitContainer2.Size = new System.Drawing.Size(633, 319);
-            this.splitContainer2.SplitterDistance = 173;
+            this.splitContainer2.SplitterDistance = 248;
             this.splitContainer2.TabIndex = 1;
             // 
             // clusterInfoGrid
@@ -127,7 +127,7 @@
             this.clusterInfoGrid.HelpVisible = false;
             this.clusterInfoGrid.Location = new System.Drawing.Point(0, 0);
             this.clusterInfoGrid.Name = "clusterInfoGrid";
-            this.clusterInfoGrid.Size = new System.Drawing.Size(173, 319);
+            this.clusterInfoGrid.Size = new System.Drawing.Size(248, 319);
             this.clusterInfoGrid.TabIndex = 0;
             // 
             // splitContainer3
@@ -148,7 +148,7 @@
             this.splitContainer3.Panel2.Controls.Add(this.clusterHeightTrackBar);
             this.splitContainer3.Panel2.Controls.Add(this.clusterHeight);
             this.splitContainer3.Panel2.Controls.Add(this.label1);
-            this.splitContainer3.Size = new System.Drawing.Size(456, 319);
+            this.splitContainer3.Size = new System.Drawing.Size(381, 319);
             this.splitContainer3.SplitterDistance = 253;
             this.splitContainer3.TabIndex = 1;
             // 
@@ -159,7 +159,7 @@
             this.steppersPanel.Location = new System.Drawing.Point(0, 0);
             this.steppersPanel.Margin = new System.Windows.Forms.Padding(10);
             this.steppersPanel.Name = "steppersPanel";
-            this.steppersPanel.Size = new System.Drawing.Size(456, 253);
+            this.steppersPanel.Size = new System.Drawing.Size(381, 253);
             this.steppersPanel.TabIndex = 0;
             // 
             // clusterHeightTrackBar

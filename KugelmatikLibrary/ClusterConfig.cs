@@ -117,5 +117,10 @@ namespace KugelmatikLibrary
 
             writer.Write(buffer, 0, buffer.Length);
         }
+
+        public override string ToString()
+        {
+            return string.Format("{0}, t: {1}, b: {2}", StepMode, TickTime, BrakeMode);
+        }
     }
 }
