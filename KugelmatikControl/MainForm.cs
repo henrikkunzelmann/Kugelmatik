@@ -166,7 +166,7 @@ namespace KugelmatikControl
                 if (tickCount % 5 == 0)
                     Kugelmatik.ResendPendingPackets();
 
-                if (tickCount % 3 == 0)
+                if (tickCount % 20 == 0)
                     Kugelmatik.SendInfo();
 
                 if (viewOnlyToolStripMenuItem.Checked && tickCount % 2 == 0)
