@@ -62,16 +62,6 @@ char getHexChar(int x)
 	return '0' + x;
 }
 
-void usdelay(uint16_t us) {
-	while (us--) {
-		// 4 times * 4 cycles gives 16 cyles = 1 us with 16 MHz clocking
-		byte i = 4;
-		// this while loop executes with exact 4 cycles:
-		while (i--)
-			_NOP();
-	}
-}
-
 #define TIMER_COUNT 3
 unsigned long time[3];
 

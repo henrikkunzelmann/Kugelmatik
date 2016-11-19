@@ -55,13 +55,18 @@ namespace KugelmatikLibrary
         public int NetworkTime { get; private set; }
 
         /// <summary>
+        /// Zeit die das Cluster maximal benötigt um ein Paket zu verarbeiten.
+        /// </summary>
+        public int MaxNetworkTime { get; private set; }
+
+        /// <summary>
         /// Zeit die das Cluster benötigt um die Stepper zu aktualisieren.
         /// </summary>
         public int StepperTime { get; private set; }
 
         public ClusterInfo(byte buildVersion, BusyCommand currentBusyCommand, int highestRevision, 
             ClusterConfig config, ErrorCode lastError, int freeRam, 
-            byte mcpStatus, int loopTime, int networkTime, int stepperTimer)
+            byte mcpStatus, int loopTime, int networkTime, int maxNetworkTime, int stepperTimer)
         {
             this.BuildVersion = buildVersion;
             this.CurrentBusyCommand = currentBusyCommand;
@@ -72,6 +77,7 @@ namespace KugelmatikLibrary
             this.MCPStatus = mcpStatus;
             this.LoopTime = loopTime;
             this.NetworkTime = networkTime;
+            this.MaxNetworkTime = maxNetworkTime;
             this.StepperTime = stepperTimer;
         }
 

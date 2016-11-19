@@ -1,8 +1,9 @@
 #include "network.h"
 
-int32_t loopTime;
-int32_t networkTime;
-int32_t stepperTime;
+int32_t loopTime = 0;
+int32_t networkTime = 0;
+int32_t maxNetworkTime = 0;
+int32_t stepperTime = 0;
 
 const static uint8_t ethernetMac[] = { 0x74, 0x69, 0x69, 0x2D, 0x30, LAN_ID }; // Mac-Adresse des Boards
 uint8_t Ethernet::buffer[ETHERNET_BUFFER_SIZE];	
@@ -76,14 +77,14 @@ boolean loopNetwork() {
 	// Paket abfragen
 	ether.packetLoop(ether.packetReceive());
 
-	// wenn Netzwerk Verbindung getrennt wurde
-	if (!ether.isLinkUp()) {
+	boolean linkUp = ether.isLinkUp();
+	if (!linkUp) 	// wenn Netzwerk Verbindung getrennt wurde
 		stopMove(); // stoppen
-		networkTime = endTime(TIMER_NETWORK);
-		return false;
-	}
+
 	networkTime = endTime(TIMER_NETWORK);
-	return true;
+	if (networkTime > maxNetworkTime || maxNetworkTime > networkTime * 4) // maxNetworkTime Windup vermeiden
+		maxNetworkTime = networkTime;
+	return linkUp;
 }
 
 void sendPacket()
@@ -192,6 +193,7 @@ void sendInfo(int32_t revision, boolean wantConfig2) {
 
 	packet->write(loopTime);
 	packet->write(networkTime);
+	packet->write(maxNetworkTime);
 	packet->write(stepperTime);
 
 	sendPacket();
@@ -590,7 +592,7 @@ void handlePacket(uint8_t packetType, int32_t revision)
 	}
 }
 
-void runBusy(uint8_t type, int steps, uint16_t delay)
+void runBusy(uint8_t type, int32_t steps, uint32_t delay)
 {
 	Serial.print(F("runBusy(type = "));
 	Serial.print(type);
@@ -598,18 +600,14 @@ void runBusy(uint8_t type, int steps, uint16_t delay)
 
 	currentBusyCommand = type;
 	turnRedLedOn();
-	for (int i = 0; i <= delay; i++)
-	{
+	for (int i = 0; i <= steps; i++) {
 		if (stopBusyCommand)
 			break;
 
 		if (i % 100 == 0)
 			toogleGreenLed();
 
-		updateSteppers(true);
-		usdelay(delay); 
-
-		if (!loopNetwork())
+		if (!runTick(delay, true))
 			break;
 	}
 

@@ -8,6 +8,8 @@
 
 #include "util.h"
 #include "constants.h"
+#include "stepper.h"
+#include "tick.h"
 #include "config.h"
 #include "PacketBuffer.h"
 
@@ -18,6 +20,7 @@
 
 extern int32_t loopTime;
 extern int32_t networkTime;
+extern int32_t maxNetworkTime;
 extern int32_t stepperTime;
 
 boolean checkRevision(int32_t lastRevision, int32_t revision);
@@ -36,6 +39,6 @@ void sendInfo(int32_t revision, boolean wantConfig2);
 void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, const char* data, uint16_t len);
 void handlePacket(uint8_t packetType, int32_t revision);
 
-void runBusy(uint8_t type, int steps, uint16_t delay);
+void runBusy(uint8_t type, int32_t steps, uint32_t delay);
 
 #endif

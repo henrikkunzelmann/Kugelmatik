@@ -30,6 +30,7 @@
 #include "config.h"
 #include "stepper.h"
 #include "network.h"
+#include "tick.h"
 #include "PacketBuffer.h"
 #include "BinaryHelper.h"
 
@@ -60,23 +61,6 @@ void setup()
 void loop()
 {
 	startTime(TIMER_LOOP);
-
-	unsigned long procStart = micros();
-	updateSteppers(false);
-
-	while (true)
-	{
-		wdt_reset();
-		loopNetwork();
-
-		// schauen ob wir die Stepper updaten müssen
-		unsigned long time = micros();
-		if (time < procStart) // overflow von micros() handeln
-			break;
-
-		if (time - procStart >= config.tickTime)
-			break;
-	}
-
+	runTick(config.tickTime, false);
 	loopTime = endTime(TIMER_LOOP);
 }
