@@ -855,6 +855,7 @@ namespace KugelmatikLibrary
                         int networkTime = 0;
                         int maxNetworkTime = 0;
                         int stepperTime = 0;
+                        int upTime = 0;
 
                         if (buildVersion >= 17)
                         {
@@ -863,11 +864,13 @@ namespace KugelmatikLibrary
                             networkTime = reader.ReadInt32();
                             maxNetworkTime = reader.ReadInt32();
                             stepperTime = reader.ReadInt32();
+                            upTime = reader.ReadInt32();
                         }
 
                         Info = new ClusterInfo(buildVersion, currentBusyCommand, highestRevision, 
                             config, lastError, freeRam, mcpStatus, 
-                            loopTime, networkTime, maxNetworkTime, stepperTime);
+                            loopTime, networkTime, maxNetworkTime, stepperTime,
+                            upTime);
                         RemovePacketToAcknowlegde(revision);
                         break;
                     default:

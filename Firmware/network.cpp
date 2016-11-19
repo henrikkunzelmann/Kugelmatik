@@ -195,6 +195,7 @@ void sendInfo(int32_t revision, boolean wantConfig2) {
 	packet->write(networkTime);
 	packet->write(maxNetworkTime);
 	packet->write(stepperTime);
+	packet->write((int32_t)(millis() / 1000));
 
 	sendPacket();
 }

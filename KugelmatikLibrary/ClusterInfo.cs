@@ -64,9 +64,15 @@ namespace KugelmatikLibrary
         /// </summary>
         public int StepperTime { get; private set; }
 
+        /// <summary>
+        /// Zeit in Sekunden wie lange schon das Cluster lief
+        /// </summary>
+        public int Uptime { get; private set; }
+
         public ClusterInfo(byte buildVersion, BusyCommand currentBusyCommand, int highestRevision, 
             ClusterConfig config, ErrorCode lastError, int freeRam, 
-            byte mcpStatus, int loopTime, int networkTime, int maxNetworkTime, int stepperTimer)
+            byte mcpStatus, int loopTime, int networkTime, int maxNetworkTime, int stepperTimer,
+            int upTime)
         {
             this.BuildVersion = buildVersion;
             this.CurrentBusyCommand = currentBusyCommand;
@@ -79,6 +85,7 @@ namespace KugelmatikLibrary
             this.NetworkTime = networkTime;
             this.MaxNetworkTime = maxNetworkTime;
             this.StepperTime = stepperTimer;
+            this.Uptime = upTime;
         }
 
         public static bool operator ==(ClusterInfo a, ClusterInfo b)
