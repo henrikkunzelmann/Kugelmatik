@@ -1,8 +1,6 @@
 #include "tick.h"
 
 boolean runTick(uint32_t tickTime, boolean useHalfStep) {
-	toogleGreenLed();
-
 	unsigned long start = micros();
 	updateSteppers(useHalfStep);
 
