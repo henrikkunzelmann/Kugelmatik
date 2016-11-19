@@ -81,8 +81,8 @@ namespace KugelmatikLibrary
         [Category("Time")]
         public int Uptime { get; private set; }
 
-        public ClusterInfo(byte buildVersion, BusyCommand currentBusyCommand, int highestRevision, 
-            ClusterConfig config, ErrorCode lastError, int freeRam, 
+        public ClusterInfo(byte buildVersion, BusyCommand currentBusyCommand, int highestRevision,
+            ClusterConfig config, ErrorCode lastError, int freeRam,
             byte mcpStatus, int loopTime, int networkTime, int maxNetworkTime, int stepperTimer,
             int upTime)
         {
@@ -98,57 +98,6 @@ namespace KugelmatikLibrary
             this.MaxNetworkTime = maxNetworkTime;
             this.StepperTime = stepperTimer;
             this.Uptime = upTime;
-        }
-
-        public static bool operator ==(ClusterInfo a, ClusterInfo b)
-        {
-            if (object.ReferenceEquals(a, b))
-                return true;
-            if (object.ReferenceEquals(a, null))
-                return false;
-            return a.Equals(b);
-        }
-
-        public static bool operator !=(ClusterInfo a, ClusterInfo b)
-        {
-            return !(a == b);
-        }
-
-        public override bool Equals(object obj)
-        {
-            if (obj is ClusterInfo)
-                return Equals(obj as ClusterInfo);
-            return false;
-        }
-
-        public bool Equals(ClusterInfo other)
-        {
-            if (other == null)
-                return false;
-
-            return BuildVersion == other.BuildVersion
-                && CurrentBusyCommand == other.CurrentBusyCommand
-                && HighestRevision == other.HighestRevision
-                && Config.Equals(other.Config)
-                && LastError == other.LastError
-                && FreeRam == other.FreeRam
-                && MCPStatus == other.MCPStatus;
-        }
-
-        public override int GetHashCode()
-        {
-            unchecked
-            {
-                int hash = 13;
-                hash = hash * 7 + BuildVersion.GetHashCode();
-                hash = hash * 7 + CurrentBusyCommand.GetHashCode();
-                hash = hash * 7 + HighestRevision.GetHashCode();
-                hash = hash * 7 + Config.GetHashCode();
-                hash = hash * 7 + LastError.GetHashCode();
-                hash = hash * 7 + FreeRam.GetHashCode();
-                hash = hash * 7 + MCPStatus.GetHashCode();
-                return hash;
-            }
-        }
+        } 
     }
 }
