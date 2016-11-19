@@ -71,8 +71,11 @@
             this.scriptFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.stopButton = new System.Windows.Forms.Button();
             this.clustersPanel = new KugelmatikControl.NoScrollingPanel();
+            this.loadError = new System.Windows.Forms.Label();
+            this.reloadKugelmatik = new System.Windows.Forms.Button();
             this.menuStrip1.SuspendLayout();
             this.statusStrip.SuspendLayout();
+            this.clustersPanel.SuspendLayout();
             this.SuspendLayout();
             // 
             // menuStrip1
@@ -386,11 +389,32 @@
             // clustersPanel
             // 
             this.clustersPanel.AutoScroll = true;
+            this.clustersPanel.Controls.Add(this.reloadKugelmatik);
+            this.clustersPanel.Controls.Add(this.loadError);
             this.clustersPanel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.clustersPanel.Location = new System.Drawing.Point(0, 24);
             this.clustersPanel.Name = "clustersPanel";
             this.clustersPanel.Size = new System.Drawing.Size(621, 463);
             this.clustersPanel.TabIndex = 1;
+            // 
+            // loadError
+            // 
+            this.loadError.AutoSize = true;
+            this.loadError.Location = new System.Drawing.Point(12, 14);
+            this.loadError.Name = "loadError";
+            this.loadError.Size = new System.Drawing.Size(129, 13);
+            this.loadError.TabIndex = 0;
+            this.loadError.Text = "Could not load kugelmatik";
+            // 
+            // reloadKugelmatik
+            // 
+            this.reloadKugelmatik.Location = new System.Drawing.Point(15, 30);
+            this.reloadKugelmatik.Name = "reloadKugelmatik";
+            this.reloadKugelmatik.Size = new System.Drawing.Size(75, 23);
+            this.reloadKugelmatik.TabIndex = 1;
+            this.reloadKugelmatik.Text = "Reload kugelmatik";
+            this.reloadKugelmatik.UseVisualStyleBackColor = true;
+            this.reloadKugelmatik.Click += new System.EventHandler(this.reloadClustersToolStripMenuItem_Click);
             // 
             // MainForm
             // 
@@ -409,6 +433,8 @@
             this.menuStrip1.PerformLayout();
             this.statusStrip.ResumeLayout(false);
             this.statusStrip.PerformLayout();
+            this.clustersPanel.ResumeLayout(false);
+            this.clustersPanel.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -457,6 +483,8 @@
         private System.Windows.Forms.OpenFileDialog scriptFileDialog;
         private System.Windows.Forms.Button stopButton;
         private System.Windows.Forms.ToolStripMenuItem autoStopToolStripMenuItem;
+        private System.Windows.Forms.Button reloadKugelmatik;
+        private System.Windows.Forms.Label loadError;
     }
 }
 

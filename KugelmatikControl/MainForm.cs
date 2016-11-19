@@ -57,6 +57,9 @@ namespace KugelmatikControl
         {
             try
             {
+                loadError.Visible = false;
+                reloadKugelmatik.Visible = false;
+
                 CloseAllWindows();
 
                 if (choreography != null)
@@ -102,14 +105,20 @@ namespace KugelmatikControl
                         clustersPanel.Controls.Add(cluster);
                         clusterControls[y * Kugelmatik.Config.KugelmatikWidth + x] = cluster;
                     }
-
-                UpdateChoreographyStatus();
-
             }
             catch(Exception e)
             {
+                Log.Error(e);
                 MessageBox.Show(e.ToString(), "Could not load kugelmatik", MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+                loadError.Visible = true;
+                reloadKugelmatik.Visible = true;
+
+                clusterControls = new ClusterControl[0];
             }
+
+            UpdateNetworkStatus();
+            UpdateChoreographyStatus();
         }
 
         private static T LoadOrDefault<T>(string file, T defaultValue)
@@ -135,47 +144,54 @@ namespace KugelmatikControl
 
         private void updateTimer_Tick(object sender, EventArgs e)
         {
-            if (Kugelmatik == null)
-                return;
-
-            // Ping senden
-            Kugelmatik.SendPing();
-
-            // Daten senden
-            if (!viewOnlyToolStripMenuItem.Checked)
+            try
             {
-                // alle 8 Ticks werden die Daten vollständig gesendet
-                // damit werden out-of-sync Fehler behoben wenn ein Paket vom Cluster nicht verarbeitet wurde
-                if (tickCount % 8 == 0)
-                    Kugelmatik.SendData(false, true);
-                else
-                    Kugelmatik.SendData();
+                if (Kugelmatik == null)
+                    return;
+
+                // Ping senden
+                Kugelmatik.SendPing();
+
+                // Daten senden
+                if (!viewOnlyToolStripMenuItem.Checked)
+                {
+                    // alle 8 Ticks werden die Daten vollständig gesendet
+                    // damit werden out-of-sync Fehler behoben wenn ein Paket vom Cluster nicht verarbeitet wurde
+                    if (tickCount % 8 == 0)
+                        Kugelmatik.SendData(false, true);
+                    else
+                        Kugelmatik.SendData();
+                }
+
+                if (tickCount % 5 == 0)
+                    Kugelmatik.ResendPendingPackets();
+
+                if (tickCount % 3 == 0)
+                    Kugelmatik.SendInfo();
+
+                if (viewOnlyToolStripMenuItem.Checked && tickCount % 2 == 0)
+                    Kugelmatik.SendGetData();
+
+                // wenn eine Choreograpie läuft, dann werden alle Stepper per Tick geupdatet, da AutomaticUpdate auf false ist
+                if (choreography != null && choreography.IsRunning)
+                {
+                    for (int i = 0; i < clusterControls.Length; i++)
+                        clusterControls[i]?.UpdateSteppers();
+
+                    clusterForm?.ClusterControl?.UpdateSteppers();
+
+                    CheckChoreographyAutoStop();
+                }
+
+                UpdateChoreographyStatus();
+                UpdateNetworkStatus();
+
+                tickCount++;
             }
-
-            if (tickCount % 5 == 0)
-                Kugelmatik.ResendPendingPackets();
-
-            if (tickCount % 3 == 0)
-                Kugelmatik.SendInfo();
-
-            if (viewOnlyToolStripMenuItem.Checked && tickCount % 2 == 0)
-                Kugelmatik.SendGetData();
-
-            // wenn eine Choreograpie läuft, dann werden alle Stepper per Tick geupdatet, da AutomaticUpdate auf false ist
-            if (choreography != null && choreography.IsRunning)
+            catch(Exception ex)
             {
-                for (int i = 0; i < clusterControls.Length; i++)
-                    clusterControls[i]?.UpdateSteppers();
-
-                clusterForm?.ClusterControl?.UpdateSteppers();
-
-                CheckChoreographyAutoStop();
+                Log.Error(ex);
             }
-
-            UpdateChoreographyStatus();
-            UpdateNetworkStatus();
-
-            tickCount++;
         }
 
         public void ShowCluster(Cluster cluster)
@@ -194,6 +210,12 @@ namespace KugelmatikControl
 
         private void UpdateNetworkStatus()
         {
+            if (Kugelmatik == null)
+            {
+                networkStatusLabel.Text = "Error while loading kugelmatik";
+                return;
+            }
+
             // Ping berechnen
             var clusters = Kugelmatik.EnumerateClusters();
             var pings = clusters.Select(c => c.Ping);
@@ -267,6 +289,9 @@ namespace KugelmatikControl
 
         private void StartChoreography(Choreography c)
         {
+            if (Kugelmatik == null)
+                return;
+
             if (!Kugelmatik.AnyClusterOnline)
             {
                 MessageBox.Show("Can not start choreography because all clusters are offline", "Choreography not started", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -377,23 +402,28 @@ namespace KugelmatikControl
 
         private void homeToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            if (Kugelmatik == null)
+                return;
+
             if (CheckChoreography())
                 Kugelmatik.SendHome();
         }
 
         private void optionsToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            ShowForm(configForm, () => configForm = new ConfigForm(Kugelmatik));
+            if (Kugelmatik != null)
+                ShowForm(configForm, () => configForm = new ConfigForm(Kugelmatik));
         }
 
         private void getDataToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Kugelmatik.SendGetData();
+            if (Kugelmatik != null)
+                Kugelmatik.SendGetData();
         }
 
         private void moveAllTo0ToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (CheckChoreography())
+            if (Kugelmatik != null && CheckChoreography())
             {
                 Kugelmatik.SetAllClusters(0);
                 Kugelmatik.SendData(false, true);
@@ -402,7 +432,7 @@ namespace KugelmatikControl
 
         private void stopToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (CheckChoreography(true))
+            if (Kugelmatik != null && CheckChoreography(true))
                 Kugelmatik.SendStop();
         }
 
@@ -418,7 +448,8 @@ namespace KugelmatikControl
 
         private void infoToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Kugelmatik.SendInfo();
+            if (Kugelmatik != null)
+                Kugelmatik.SendInfo();
         }
 
         private void logToolStripMenuItem_Click(object sender, EventArgs e)
@@ -428,27 +459,33 @@ namespace KugelmatikControl
 
         private void configToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Kugelmatik.SendConfig(Kugelmatik.ClusterConfig);
+            if (Kugelmatik != null)
+                Kugelmatik.SendConfig(Kugelmatik.ClusterConfig);
         }
 
         private void dataToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Kugelmatik.SendData();
+            if (Kugelmatik != null)
+                Kugelmatik.SendData();
         }
 
         private void pingPongToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (CheckChoreography())
+            if (Kugelmatik != null && CheckChoreography())
                 ShowForm(pingPongForm, () => pingPongForm = new PingPongForm(Kugelmatik));
         }
 
         private void heightViewToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            ShowForm(heightViewForm, () => heightViewForm = new HeightViewForm(Kugelmatik));
+            if (Kugelmatik != null)
+                ShowForm(heightViewForm, () => heightViewForm = new HeightViewForm(Kugelmatik));
         }
 
         private void resetRevisionToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            if (Kugelmatik == null)
+                return;
+
             foreach (Cluster cluster in Kugelmatik.EnumerateClusters())
                 cluster.SendPacket(new KugelmatikLibrary.Protocol.PacketResetRevision(), false);
         }
@@ -501,7 +538,7 @@ namespace KugelmatikControl
 
         private void stopButton_Click(object sender, EventArgs e)
         {
-            if (CheckChoreography(true))
+            if (Kugelmatik != null && CheckChoreography(true))
                 Kugelmatik.SendStop();
         }
 
