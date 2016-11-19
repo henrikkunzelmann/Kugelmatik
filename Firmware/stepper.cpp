@@ -203,7 +203,7 @@ void updateSteppers(boolean alwaysUseHalfStep)
 		}
 
 
-		if (mcp->lastGPIOValue != gpioValue) {
+		if (!mcp->isOK || mcp->lastGPIOValue != gpioValue) {
 			boolean wasOK = mcp->isOK;
 			mcp->isOK = (mcp->MCP->writeGPIOS(gpioValue) == 0);
 
