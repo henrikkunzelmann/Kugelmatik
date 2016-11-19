@@ -64,7 +64,10 @@
     <Compile Include="Kugelmatik.cs" />
     <Compile Include="KugelmatikAddressProvider.cs" />
     <Compile Include="Log.cs" />
+    <Compile Include="LogFlushEventArgs.cs" />
     <Compile Include="LogLevel.cs" />
+    <Compile Include="LogStorage.cs" />
+    <Compile Include="LogView.cs" />
     <Compile Include="MathHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Protocol\IPacket.cs" />
