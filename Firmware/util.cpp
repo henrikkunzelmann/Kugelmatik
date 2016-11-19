@@ -54,6 +54,14 @@ void protocolError(uint8_t error)
 	blinkRedLedShort(true);
 }
 
+char getHexChar(int x)
+{
+	x &= 0xF;
+	if (x >= 10)
+		return 'A' + (x - 10);
+	return '0' + x;
+}
+
 void usdelay(uint16_t us) {
 	while (us--) {
 		// 4 times * 4 cycles gives 16 cyles = 1 us with 16 MHz clocking
@@ -62,6 +70,28 @@ void usdelay(uint16_t us) {
 		while (i--)
 			_NOP();
 	}
+}
+
+#define TIMER_COUNT 3
+unsigned long time[3];
+
+void startTime(uint8_t index) {
+	if (index >= TIMER_COUNT)
+		return internalError(ERROR_INTERNAL_INVALID_TIMER);
+
+	time[index] = micros();
+}
+
+int32_t endTime(uint8_t index) {
+	if (index >= TIMER_COUNT) {
+		internalError(ERROR_INTERNAL_INVALID_TIMER);
+		return 0;
+	}
+
+	unsigned long end = micros();
+	if (end > time[index])
+		return end - time[index];
+	return 0;
 }
 
 int freeRam() {

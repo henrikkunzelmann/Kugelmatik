@@ -1,5 +1,9 @@
 #include "network.h"
 
+int32_t loopTime;
+int32_t networkTime;
+int32_t stepperTime;
+
 const static uint8_t ethernetMac[] = { 0x74, 0x69, 0x69, 0x2D, 0x30, LAN_ID }; // Mac-Adresse des Boards
 uint8_t Ethernet::buffer[ETHERNET_BUFFER_SIZE];	
 
@@ -17,14 +21,6 @@ boolean checkRevision(int32_t lastRevision, int32_t revision)
 	if (lastRevision >= 0 && revision < 0) // Overflow handeln
 		return true;
 	return revision > lastRevision;
-}
-
-char getHexChar(int x)
-{
-	x &= 0xF;
-	if (x >= 10)
-		return 'A' + (x - 10);
-	return '0' + x;
 }
 
 void initNetwork()
@@ -74,6 +70,7 @@ void initNetwork()
 }
 
 boolean loopNetwork() {
+	startTime(TIMER_NETWORK);
 	wdt_reset();
 
 	// Paket abfragen
@@ -82,8 +79,10 @@ boolean loopNetwork() {
 	// wenn Netzwerk Verbindung getrennt wurde
 	if (!ether.isLinkUp()) {
 		stopMove(); // stoppen
+		networkTime = endTime(TIMER_NETWORK);
 		return false;
 	}
+	networkTime = endTime(TIMER_NETWORK);
 	return true;
 }
 
@@ -190,6 +189,10 @@ void sendInfo(int32_t revision, boolean wantConfig2) {
 		if (mcps[i].isOK)
 			mcpStatus |= (1 << i);
 	packet->write(mcpStatus);
+
+	packet->write(loopTime);
+	packet->write(networkTime);
+	packet->write(stepperTime);
 
 	sendPacket();
 }

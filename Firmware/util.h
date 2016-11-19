@@ -17,7 +17,12 @@ void internalError();
 void internalError(uint8_t error);
 void protocolError(uint8_t error);
 
+char getHexChar(int x);
+
 void usdelay(uint16_t us);
+
+void startTime(uint8_t index);
+int32_t endTime(uint8_t index);
 
 // gibt den freien SRAM zurück, siehe http://playground.arduino.cc/Code/AvailableMemory
 int freeRam();

@@ -128,6 +128,7 @@ void stopMove() {
 
 void updateSteppers(boolean alwaysUseHalfStep)
 {
+	startTime(TIMER_STEPPER);
 	for (byte i = 0; i < MCP_COUNT; i++)
 	{
 		uint16_t gpioValue = 0;
@@ -214,4 +215,5 @@ void updateSteppers(boolean alwaysUseHalfStep)
 
 		wdt_reset();
 	}
+	stepperTime = endTime(TIMER_STEPPER);
 }

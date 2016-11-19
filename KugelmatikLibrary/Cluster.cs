@@ -851,10 +851,21 @@ namespace KugelmatikLibrary
                         }
 
                         byte mcpStatus = 0;
-                        if (buildVersion >= 17)
-                            mcpStatus = reader.ReadByte();
+                        int loopTime = 0;
+                        int networkTime = 0;
+                        int stepperTime = 0;
 
-                        Info = new ClusterInfo(buildVersion, currentBusyCommand, highestRevision, config, lastError, freeRam, mcpStatus);
+                        if (buildVersion >= 17)
+                        {
+                            mcpStatus = reader.ReadByte();
+                            loopTime = reader.ReadInt32();
+                            networkTime = reader.ReadInt32();
+                            stepperTime = reader.ReadInt32();
+                        }
+
+                        Info = new ClusterInfo(buildVersion, currentBusyCommand, highestRevision, 
+                            config, lastError, freeRam, mcpStatus, 
+                            loopTime, networkTime, stepperTime);
                         RemovePacketToAcknowlegde(revision);
                         break;
                     default:

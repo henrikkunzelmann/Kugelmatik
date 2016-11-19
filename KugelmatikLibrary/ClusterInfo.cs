@@ -44,7 +44,24 @@ namespace KugelmatikLibrary
         /// </summary>
         public byte MCPStatus { get; private set; }
 
-        public ClusterInfo(byte buildVersion, BusyCommand currentBusyCommand, int highestRevision, ClusterConfig config, ErrorCode lastError, int freeRam, byte mcpStatus)
+        /// <summary>
+        /// Zeit die das Cluster benötigt um einen Tick auszuführen.
+        /// </summary>
+        public int LoopTime { get; private set; }
+
+        /// <summary>
+        /// Zeit die das Cluster benötigt um ein Paket zu verarbeiten.
+        /// </summary>
+        public int NetworkTime { get; private set; }
+
+        /// <summary>
+        /// Zeit die das Cluster benötigt um die Stepper zu aktualisieren.
+        /// </summary>
+        public int StepperTime { get; private set; }
+
+        public ClusterInfo(byte buildVersion, BusyCommand currentBusyCommand, int highestRevision, 
+            ClusterConfig config, ErrorCode lastError, int freeRam, 
+            byte mcpStatus, int loopTime, int networkTime, int stepperTimer)
         {
             this.BuildVersion = buildVersion;
             this.CurrentBusyCommand = currentBusyCommand;
@@ -53,6 +70,9 @@ namespace KugelmatikLibrary
             this.LastError = lastError;
             this.FreeRam = freeRam;
             this.MCPStatus = mcpStatus;
+            this.LoopTime = loopTime;
+            this.NetworkTime = networkTime;
+            this.StepperTime = stepperTimer;
         }
 
         public static bool operator ==(ClusterInfo a, ClusterInfo b)

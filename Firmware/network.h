@@ -16,13 +16,14 @@
 #define ETHERNET_BUFFER_SIZE 300	// Größe des Ethernet Buffers in Bytes	
 #define HEADER_SIZE 9				// Größe des Paket-Headers in Bytes
 
-boolean checkRevision(int32_t lastRevision, int32_t revision);
+extern int32_t loopTime;
+extern int32_t networkTime;
+extern int32_t stepperTime;
 
+boolean checkRevision(int32_t lastRevision, int32_t revision);
 
 void initNetwork();
 boolean loopNetwork();
-
-char getHexChar(int x);
 
 void sendPacket();
 void writeHeader(bool guarenteed, byte packetType, int32_t revision);

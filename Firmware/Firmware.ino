@@ -59,8 +59,9 @@ void setup()
 
 void loop()
 {
-	unsigned long procStart = micros();
+	startTime(TIMER_LOOP);
 
+	unsigned long procStart = micros();
 	updateSteppers(false);
 
 	while (true)
@@ -76,4 +77,6 @@ void loop()
 		if (time - procStart >= config.tickTime)
 			break;
 	}
+
+	loopTime = endTime(TIMER_LOOP);
 }
