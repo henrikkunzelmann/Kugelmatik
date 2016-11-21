@@ -4,6 +4,7 @@ using KugelmatikLibrary.Script;
 using System;
 using System.Data;
 using System.Drawing;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
@@ -60,19 +61,11 @@ namespace KugelmatikControl
                 loadError.Visible = false;
                 reloadKugelmatik.Visible = false;
 
-                CloseAllWindows();
-
-                if (choreography != null)
-                {
-                    if (choreography.IsRunning)
-                        choreography.Stop();
-                    choreography.Dispose();
-                    choreography = null;
-                }
-                if (Kugelmatik != null)
-                    Kugelmatik.Dispose();
+                UnloadKugelmatik();
 
                 Log.Info("Loading kugelmatik...");
+
+                CheckOtherInstances();
 
                 // Config kopieren oder laden
                 Config config;
@@ -121,6 +114,35 @@ namespace KugelmatikControl
             UpdateChoreographyStatus();
         }
 
+        
+
+        private void CheckOtherInstances()
+        {
+            DialogResult result;
+            do
+            {
+                Process self = Process.GetCurrentProcess();
+                Process[] processes = Process.GetProcessesByName(self.ProcessName);
+                if (processes.Length <= 1)
+                    return;
+
+                string text = "Following instances found:";
+                text += Environment.NewLine;
+                text += string.Join(Environment.NewLine,
+                    processes.Where(p => p.Id != self.Id).Select(p => string.Format("{0} (PID {1})", p.ProcessName, p.Id)));
+
+                result = MessageBox.Show(text, "Multiple Kugelmatik instances running",
+                    MessageBoxButtons.AbortRetryIgnore, MessageBoxIcon.Error);
+
+                if (result == DialogResult.Ignore)
+                    return;
+
+                if (result == DialogResult.Abort)
+                    throw new InvalidOperationException("A Kugelmatik instance is already running");
+            }
+            while (result == DialogResult.Retry);
+        }
+
         private static T LoadOrDefault<T>(string file, T defaultValue)
         {
             if (File.Exists(file))
@@ -130,13 +152,18 @@ namespace KugelmatikControl
             return defaultValue;
         }
 
-        protected override void OnClosed(EventArgs e)
+        private void UnloadKugelmatik()
         {
+            CloseAllWindows();
             StopChoreographyInternal();
 
             if (Kugelmatik != null)
                 Kugelmatik.Dispose();
+        }
 
+        protected override void OnClosed(EventArgs e)
+        {
+            UnloadKugelmatik();
             base.OnClosed(e);
         }
 
