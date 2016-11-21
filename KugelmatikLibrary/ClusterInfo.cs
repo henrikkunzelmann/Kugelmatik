@@ -132,7 +132,12 @@ namespace KugelmatikLibrary
                 && Config.Equals(other.Config)
                 && LastError == other.LastError
                 && FreeRam == other.FreeRam
-                && MCPStatus == other.MCPStatus;
+                && MCPStatus == other.MCPStatus
+                && LoopTime == other.LoopTime
+                && NetworkTime == other.NetworkTime
+                && MaxNetworkTime == other.MaxNetworkTime
+                && StepperTime == other.StepperTime
+                && Uptime == other.Uptime;
         }
 
         public override int GetHashCode()
@@ -147,6 +152,11 @@ namespace KugelmatikLibrary
                 hash = hash * 7 + LastError.GetHashCode();
                 hash = hash * 7 + FreeRam.GetHashCode();
                 hash = hash * 7 + MCPStatus.GetHashCode();
+                hash = hash * 7 + LoopTime.GetHashCode();
+                hash = hash * 7 + NetworkTime.GetHashCode();
+                hash = hash * 7 + MaxNetworkTime.GetHashCode();
+                hash = hash * 7 + StepperTime.GetHashCode();
+                hash = hash * 7 + Uptime.GetHashCode();
                 return hash;
             }
         }
