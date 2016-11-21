@@ -43,7 +43,7 @@ namespace KugelmatikLibrary
         private CancellationTokenSource cancellationToken;
         private Task task;
 
-        public ChoreographyManager(Kugelmatik kugelmatik, int targetFPS, IChoreography choreography)
+        public ChoreographyManager(Kugelmatik kugelmatik, int targetFPS, IChoreographyFunction choreography)
             : this(kugelmatik, targetFPS, new ChoreographyDirect(choreography))
         {
             

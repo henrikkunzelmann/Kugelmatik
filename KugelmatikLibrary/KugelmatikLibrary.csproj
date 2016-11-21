@@ -45,6 +45,9 @@
   <ItemGroup>
     <Compile Include="BrakeMode.cs" />
     <Compile Include="BusyCommand.cs" />
+    <Compile Include="Choreographies\Direction.cs" />
+    <Compile Include="Choreographies\Plane.cs" />
+    <Compile Include="Choreographies\LinearMove.cs" />
     <Compile Include="Choreography.cs" />
     <Compile Include="ChoreographyDirect.cs" />
     <Compile Include="ChoreographyManager.cs" />
@@ -58,7 +61,7 @@
     <Compile Include="FileAddressProvider.cs" />
     <Compile Include="FixedAddressProvider.cs" />
     <Compile Include="FunctionChoreography.cs" />
-    <Compile Include="DistanceChoreography.cs" />
+    <Compile Include="Choreographies\DistanceChoreography.cs" />
     <Compile Include="IAddressProvider.cs" />
     <Compile Include="IChoreography.cs" />
     <Compile Include="Kugelmatik.cs" />
@@ -96,7 +99,7 @@
     <Compile Include="Protocol\PacketTypeHelper.cs" />
     <Compile Include="Protocol\StepperPosition.cs" />
     <Compile Include="Range.cs" />
-    <Compile Include="Ripple.cs" />
+    <Compile Include="Choreographies\Ripple.cs" />
     <Compile Include="Script\CompileException.cs" />
     <Compile Include="Script\Instruction.cs" />
     <Compile Include="Script\InstructionParser.cs" />
@@ -108,7 +111,7 @@
     <Compile Include="Script\TargetAll.cs" />
     <Compile Include="Script\TargetCluster.cs" />
     <Compile Include="Script\TargetStepper.cs" />
-    <Compile Include="SineWave.cs" />
+    <Compile Include="Choreographies\SineWave.cs" />
     <Compile Include="StepMode.cs" />
     <Compile Include="Stepper.cs" />
   </ItemGroup>

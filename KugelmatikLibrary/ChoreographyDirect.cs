@@ -4,9 +4,9 @@ namespace KugelmatikLibrary
 {
     public class ChoreographyDirect : Choreography
     {
-        public IChoreography Function { get; private set; }
+        public IChoreographyFunction Function { get; private set; }
 
-        public ChoreographyDirect(IChoreography function)
+        public ChoreographyDirect(IChoreographyFunction function)
         {
             this.Function = function;
         }

@@ -2,7 +2,7 @@
 
 namespace KugelmatikLibrary
 {
-    public class FunctionChoreography : IChoreography
+    public class FunctionChoreography : IChoreographyFunction
     {
         private Func<Cluster, TimeSpan, int, int, ushort> function;
 

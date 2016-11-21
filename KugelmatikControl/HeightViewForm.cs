@@ -54,7 +54,11 @@ namespace KugelmatikControl
                     max = Kugelmatik.EnumerateSteppers().Select(s => s.Height).Max();
 
                     minHeight.Value = min;
-                    maxHeight.Value = Math.Max(min + 1, max);
+
+                    if (min == maxHeight.Maximum)
+                        maxHeight.Value = min;
+                    else
+                        maxHeight.Value = Math.Max(min + 1, max);
                 }
 
                 float minHeightValue = (float)min;
@@ -74,7 +78,7 @@ namespace KugelmatikControl
                     {
                         Stepper stepper = Kugelmatik.GetStepperByPosition(x, y);
 
-                        int color = (int)(255 * (stepper.Height - minHeightValue) / maxHeightValue);
+                        int color = (int)Math.Round(255 * (stepper.Height - minHeightValue) / maxHeightValue);
                         if (color < 0)
                             color = 0;
                         if (color > byte.MaxValue)
@@ -92,7 +96,7 @@ namespace KugelmatikControl
                 // Frame-Zeit anzeigen
                 Font font = new Font("Consolas", 12.0f);
                 e.Graphics.ResetTransform();
-                e.Graphics.DrawString(stopwatch.ElapsedMilliseconds + "ms", font, Brushes.Black, new PointF(8, 8));
+                e.Graphics.DrawString(stopwatch.Elapsed.TotalMilliseconds.ToString("0.00ms"), font, Brushes.Black, new PointF(8, 8));
             }
             catch(Exception ex)
             {

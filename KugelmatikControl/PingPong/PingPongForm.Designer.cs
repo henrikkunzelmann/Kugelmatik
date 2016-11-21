@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(PingPongForm));
             this.gameTimer = new System.Windows.Forms.Timer(this.components);
             this.resetButton = new System.Windows.Forms.Button();
             this.scoreText = new System.Windows.Forms.Label();
@@ -101,9 +102,10 @@
             this.Controls.Add(this.playerTopTextBox);
             this.Controls.Add(this.scoreText);
             this.Controls.Add(this.resetButton);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.KeyPreview = true;
             this.Name = "PingPongForm";
-            this.Text = "PingPong";
+            this.Text = "Kugelmatik PingPong";
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.PingPongForm_KeyDown);
             this.KeyUp += new System.Windows.Forms.KeyEventHandler(this.PingPongForm_KeyUp);
             this.ResumeLayout(false);

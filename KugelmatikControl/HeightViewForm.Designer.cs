@@ -86,8 +86,6 @@
             // 
             this.findRangeCheckBox.AutoSize = true;
             this.findRangeCheckBox.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.findRangeCheckBox.Checked = true;
-            this.findRangeCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
             this.findRangeCheckBox.Location = new System.Drawing.Point(289, 39);
             this.findRangeCheckBox.Name = "findRangeCheckBox";
             this.findRangeCheckBox.Size = new System.Drawing.Size(76, 17);

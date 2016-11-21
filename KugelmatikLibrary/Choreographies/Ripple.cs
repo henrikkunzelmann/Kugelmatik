@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace KugelmatikLibrary
+namespace KugelmatikLibrary.Choreographies
 {
-    public class Ripple : IChoreography
+    public class Ripple : IChoreographyFunction
     {
         public ushort GetHeight(Cluster cluster, TimeSpan time, int x, int y)
         {
@@ -12,8 +12,7 @@ namespace KugelmatikLibrary
             float dt = (float)time.TotalSeconds * 0.1f;
 
             double val = Math.Sin(0.3 * x + dt) * Math.Cos(0.3 * y + dt);
-            val += 1;
-            val /= 2;
+            val = MathHelper.ConvertToZeroToOne(val);
 
             return (ushort)(val * cluster.Kugelmatik.ClusterConfig.MaxSteps);
         }

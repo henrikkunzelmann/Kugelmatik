@@ -8,6 +8,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
+using KugelmatikLibrary.Choreographies;
 
 namespace KugelmatikControl
 {
@@ -309,7 +310,7 @@ namespace KugelmatikControl
             return form;
         }
 
-        private void StartChoreography(IChoreography c)
+        private void StartChoreography(IChoreographyFunction c)
         {
             StartChoreography(new ChoreographyDirect(c));
         }
@@ -346,7 +347,7 @@ namespace KugelmatikControl
                     return false;
                 }  
 
-                result = MessageBox.Show("Can not start choreography because all clusters are offline. Auto stop is not checked.", "Choreography not started", MessageBoxButtons.AbortRetryIgnore, MessageBoxIcon.Error);
+                result = MessageBox.Show("Can not start choreography because all clusters are offline. Auto stop is not checked. Ignore will start the choreography anyway.", "Choreography not started", MessageBoxButtons.AbortRetryIgnore, MessageBoxIcon.Error);
 
                 if (result == DialogResult.Ignore)
                     return true;
@@ -461,7 +462,7 @@ namespace KugelmatikControl
         private void optionsToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (Kugelmatik != null)
-                ShowForm(configForm, () => configForm = new ConfigForm(Kugelmatik));
+                ShowForm(configForm, () => configForm = new ConfigForm(this, Kugelmatik));
         }
 
         private void getDataToolStripMenuItem_Click(object sender, EventArgs e)
@@ -483,11 +484,6 @@ namespace KugelmatikControl
         {
             if (Kugelmatik != null && CheckChoreography(true))
                 Kugelmatik.SendStop();
-        }
-
-        private void sineWaveToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            StartChoreography(new SineWave(SineWave.Direction.Y, 0.001f, 0.20f));
         }
 
         private void restartToolStripMenuItem_Click(object sender, EventArgs e)
@@ -539,16 +535,6 @@ namespace KugelmatikControl
                 cluster.SendPacket(new KugelmatikLibrary.Protocol.PacketResetRevision(), false);
         }
 
-        private void distanceToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            StartChoreography(new DistanceChoreography());
-        }
-
-        private void rippleToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            StartChoreography(new Ripple());
-        }
-
         private void stopChoreographyToolStripMenuItem_Click(object sender, EventArgs e)
         {
             StopChoreography();
@@ -591,9 +577,34 @@ namespace KugelmatikControl
                 Kugelmatik.SendStop();
         }
 
+        private void sineWaveToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            StartChoreography(new SineWave(Direction.Y, 0.05f));
+        }
+
         private void autoStopToolStripMenuItem_Click(object sender, EventArgs e)
         {
             CheckChoreographyAutoStop();
+        }
+
+        private void distanceToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            StartChoreography(new DistanceChoreography(TimeSpan.FromMinutes(1)));
+        }
+
+        private void rippleToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            StartChoreography(new Ripple());
+        }
+
+        private void linearToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            StartChoreography(new LinearMove(TimeSpan.FromMinutes(1)));
+        }
+
+        private void planeToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            StartChoreography(new Plane(TimeSpan.FromSeconds(20)));
         }
     }
 }

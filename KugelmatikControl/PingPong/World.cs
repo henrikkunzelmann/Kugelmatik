@@ -105,9 +105,9 @@ namespace KugelmatikControl.PingPong
                 ball.X = 0;
                 ballSpeed.X = -ballSpeed.X;
             }
-            if (ball.X > Width)
+            if (ball.X >= Width)
             {
-                ball.X = Width;
+                ball.X = Width - 1;
                 ballSpeed.X = -ballSpeed.X;
             }
 
@@ -125,7 +125,7 @@ namespace KugelmatikControl.PingPong
                 ResetBall();
             }
 
-            if (ball.Y >= Height - PaddleHeight && ball.Y <= Height)
+            if (ball.Y >= Height - PaddleHeight - 1 && ball.Y <= Height)
             {
                 if (ball.X >= PlayerBottom.Position && ball.X < PlayerBottom.Position + PaddleWidth)
                 {

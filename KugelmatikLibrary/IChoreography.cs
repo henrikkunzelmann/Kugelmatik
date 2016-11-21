@@ -2,7 +2,7 @@
 
 namespace KugelmatikLibrary
 {
-    public interface IChoreography
+    public interface IChoreographyFunction
     {
         ushort GetHeight(Cluster cluster, TimeSpan time, int x, int y);
     }

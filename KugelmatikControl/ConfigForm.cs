@@ -6,10 +6,12 @@ namespace KugelmatikControl
 {
     public partial class ConfigForm : Form
     {
+        private MainForm mainForm;
         private Kugelmatik kugelmatik;
 
-        public ConfigForm(Kugelmatik kugelmatik)
+        public ConfigForm(MainForm mainForm, Kugelmatik kugelmatik)
         {
+            this.mainForm = mainForm;
             this.kugelmatik = kugelmatik;
 
             InitializeComponent();
@@ -23,11 +25,14 @@ namespace KugelmatikControl
             Config config = (Config)propertyGrid.SelectedObject;
             ClusterConfig clusterConfig = (ClusterConfig)clusterPropertyGrid.SelectedObject;
 
-            kugelmatik.Config = config;
-            kugelmatik.ClusterConfig = clusterConfig;
-
             ConfigHelper.SaveToFile(MainForm.ConfigFile, config);
             ConfigHelper.SaveToFile(MainForm.ClusterConfigFile, clusterConfig);
+
+            if (mainForm.CheckChoreography(true))
+            {
+                kugelmatik.Config = config;
+                kugelmatik.ClusterConfig = clusterConfig;
+            }
         }
 
         protected override void OnClosed(EventArgs e)

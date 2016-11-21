@@ -70,9 +70,11 @@
             this.choreographyStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.scriptFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.stopButton = new System.Windows.Forms.Button();
+            this.linearToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.clustersPanel = new KugelmatikControl.NoScrollingPanel();
-            this.loadError = new System.Windows.Forms.Label();
             this.reloadKugelmatik = new System.Windows.Forms.Button();
+            this.loadError = new System.Windows.Forms.Label();
+            this.planeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.statusStrip.SuspendLayout();
             this.clustersPanel.SuspendLayout();
@@ -261,49 +263,51 @@
             this.sineWaveToolStripMenuItem,
             this.distanceToolStripMenuItem,
             this.rippleToolStripMenuItem,
+            this.linearToolStripMenuItem,
+            this.planeToolStripMenuItem,
             this.toolStripSeparator5,
             this.scriptToolStripMenuItem});
             this.startToolStripMenuItem.Name = "startToolStripMenuItem";
-            this.startToolStripMenuItem.Size = new System.Drawing.Size(129, 22);
+            this.startToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.startToolStripMenuItem.Text = "Start";
             // 
             // sineWaveToolStripMenuItem
             // 
             this.sineWaveToolStripMenuItem.Name = "sineWaveToolStripMenuItem";
-            this.sineWaveToolStripMenuItem.Size = new System.Drawing.Size(125, 22);
+            this.sineWaveToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.sineWaveToolStripMenuItem.Text = "SineWave";
             this.sineWaveToolStripMenuItem.Click += new System.EventHandler(this.sineWaveToolStripMenuItem_Click);
             // 
             // distanceToolStripMenuItem
             // 
             this.distanceToolStripMenuItem.Name = "distanceToolStripMenuItem";
-            this.distanceToolStripMenuItem.Size = new System.Drawing.Size(125, 22);
+            this.distanceToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.distanceToolStripMenuItem.Text = "Distance";
             this.distanceToolStripMenuItem.Click += new System.EventHandler(this.distanceToolStripMenuItem_Click);
             // 
             // rippleToolStripMenuItem
             // 
             this.rippleToolStripMenuItem.Name = "rippleToolStripMenuItem";
-            this.rippleToolStripMenuItem.Size = new System.Drawing.Size(125, 22);
+            this.rippleToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.rippleToolStripMenuItem.Text = "Ripple";
             this.rippleToolStripMenuItem.Click += new System.EventHandler(this.rippleToolStripMenuItem_Click);
             // 
             // toolStripSeparator5
             // 
             this.toolStripSeparator5.Name = "toolStripSeparator5";
-            this.toolStripSeparator5.Size = new System.Drawing.Size(122, 6);
+            this.toolStripSeparator5.Size = new System.Drawing.Size(149, 6);
             // 
             // scriptToolStripMenuItem
             // 
             this.scriptToolStripMenuItem.Name = "scriptToolStripMenuItem";
-            this.scriptToolStripMenuItem.Size = new System.Drawing.Size(125, 22);
+            this.scriptToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.scriptToolStripMenuItem.Text = "Script";
             this.scriptToolStripMenuItem.Click += new System.EventHandler(this.scriptToolStripMenuItem_Click);
             // 
             // stopChoreographyToolStripMenuItem
             // 
             this.stopChoreographyToolStripMenuItem.Name = "stopChoreographyToolStripMenuItem";
-            this.stopChoreographyToolStripMenuItem.Size = new System.Drawing.Size(129, 22);
+            this.stopChoreographyToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.stopChoreographyToolStripMenuItem.Text = "Stop";
             this.stopChoreographyToolStripMenuItem.Click += new System.EventHandler(this.stopChoreographyToolStripMenuItem_Click);
             // 
@@ -313,19 +317,19 @@
             this.autoStopToolStripMenuItem.CheckOnClick = true;
             this.autoStopToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
             this.autoStopToolStripMenuItem.Name = "autoStopToolStripMenuItem";
-            this.autoStopToolStripMenuItem.Size = new System.Drawing.Size(129, 22);
+            this.autoStopToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.autoStopToolStripMenuItem.Text = "Auto stop";
             this.autoStopToolStripMenuItem.Click += new System.EventHandler(this.autoStopToolStripMenuItem_Click);
             // 
             // toolStripSeparator3
             // 
             this.toolStripSeparator3.Name = "toolStripSeparator3";
-            this.toolStripSeparator3.Size = new System.Drawing.Size(126, 6);
+            this.toolStripSeparator3.Size = new System.Drawing.Size(149, 6);
             // 
             // pingPongToolStripMenuItem
             // 
             this.pingPongToolStripMenuItem.Name = "pingPongToolStripMenuItem";
-            this.pingPongToolStripMenuItem.Size = new System.Drawing.Size(129, 22);
+            this.pingPongToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.pingPongToolStripMenuItem.Text = "Ping pong";
             this.pingPongToolStripMenuItem.Click += new System.EventHandler(this.pingPongToolStripMenuItem_Click);
             // 
@@ -386,6 +390,13 @@
             this.stopButton.UseVisualStyleBackColor = false;
             this.stopButton.Click += new System.EventHandler(this.stopButton_Click);
             // 
+            // linearToolStripMenuItem
+            // 
+            this.linearToolStripMenuItem.Name = "linearToolStripMenuItem";
+            this.linearToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.linearToolStripMenuItem.Text = "Linear";
+            this.linearToolStripMenuItem.Click += new System.EventHandler(this.linearToolStripMenuItem_Click);
+            // 
             // clustersPanel
             // 
             this.clustersPanel.AutoScroll = true;
@@ -397,15 +408,6 @@
             this.clustersPanel.Size = new System.Drawing.Size(621, 463);
             this.clustersPanel.TabIndex = 1;
             // 
-            // loadError
-            // 
-            this.loadError.AutoSize = true;
-            this.loadError.Location = new System.Drawing.Point(12, 14);
-            this.loadError.Name = "loadError";
-            this.loadError.Size = new System.Drawing.Size(129, 13);
-            this.loadError.TabIndex = 0;
-            this.loadError.Text = "Could not load kugelmatik";
-            // 
             // reloadKugelmatik
             // 
             this.reloadKugelmatik.Location = new System.Drawing.Point(15, 30);
@@ -415,6 +417,22 @@
             this.reloadKugelmatik.Text = "Reload kugelmatik";
             this.reloadKugelmatik.UseVisualStyleBackColor = true;
             this.reloadKugelmatik.Click += new System.EventHandler(this.reloadClustersToolStripMenuItem_Click);
+            // 
+            // loadError
+            // 
+            this.loadError.AutoSize = true;
+            this.loadError.Location = new System.Drawing.Point(12, 14);
+            this.loadError.Name = "loadError";
+            this.loadError.Size = new System.Drawing.Size(129, 13);
+            this.loadError.TabIndex = 0;
+            this.loadError.Text = "Could not load kugelmatik";
+            // 
+            // planeToolStripMenuItem
+            // 
+            this.planeToolStripMenuItem.Name = "planeToolStripMenuItem";
+            this.planeToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.planeToolStripMenuItem.Text = "Plane";
+            this.planeToolStripMenuItem.Click += new System.EventHandler(this.planeToolStripMenuItem_Click);
             // 
             // MainForm
             // 
@@ -485,6 +503,8 @@
         private System.Windows.Forms.ToolStripMenuItem autoStopToolStripMenuItem;
         private System.Windows.Forms.Button reloadKugelmatik;
         private System.Windows.Forms.Label loadError;
+        private System.Windows.Forms.ToolStripMenuItem linearToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem planeToolStripMenuItem;
     }
 }
 
