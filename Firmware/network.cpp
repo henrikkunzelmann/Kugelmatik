@@ -616,4 +616,8 @@ void runBusy(uint8_t type, int32_t steps, uint32_t delay)
 	stopBusyCommand = false;
 	turnGreenLedOff();
 	turnRedLedOff();
+
+	// Timer zurück setzen, damit LoopTime und NetworkTime nicht kurzeitig in die Höhe springt
+	startTime(TIMER_LOOP);
+	startTime(TIMER_NETWORK); 
 }
