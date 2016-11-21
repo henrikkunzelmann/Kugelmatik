@@ -79,7 +79,7 @@ namespace KugelmatikControl.Properties {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die {0}, {1} (Ping: {2}, IP: {3}) ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die {0}, {1} ({2}, {3}) ähnelt.
         /// </summary>
         internal static string ClusterInfo {
             get {

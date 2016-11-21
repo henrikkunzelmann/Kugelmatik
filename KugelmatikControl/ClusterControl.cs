@@ -66,10 +66,7 @@ namespace KugelmatikControl
                 clusterBox.BeginInvoke(new EventHandler(UpdateClusterBox), sender, e);
             else
             {
-                clusterBox.Text = string.Format(Properties.Resources.ClusterInfo,
-                    Cluster.X + 1, Cluster.Y + 1,
-                    Cluster.IsOnline ? (Cluster.Ping + "ms") : "n/a",
-                    Cluster.Address == null ? "none" : Cluster.Address.ToString());
+                clusterBox.Text = FormatClusterText(Cluster);
 
                 if (Cluster.Info == null)
                     infoText.Text = string.Format(Properties.Resources.ClusterInfoLong, "n/a", "");
@@ -85,6 +82,14 @@ namespace KugelmatikControl
 
                 SetClusterBoxColor(clusterBox, Cluster);
             }
+        }
+
+        public static string FormatClusterText(Cluster cluster)
+        {
+            return string.Format(Properties.Resources.ClusterInfo,
+                    cluster.X + 1, cluster.Y + 1,
+                    cluster.IsOnline ? (cluster.Ping + "ms") : "offline",
+                    cluster.Address == null ? "none" : cluster.Address.ToString());
         }
 
         private void UpdateGrid()

@@ -169,10 +169,7 @@ namespace KugelmatikControl
                 // komische PropertyGrid Exception ignorieren
             }
 
-            clusterBox.Text = string.Format(Properties.Resources.ClusterInfo,
-                CurrentCluster.X + 1, CurrentCluster.Y + 1,
-                ping == -1 ? "offline" : (ping + "ms"),
-                CurrentCluster.Address == null ? "none" : CurrentCluster.Address.ToString());
+            clusterBox.Text = ClusterControl.FormatClusterText(CurrentCluster);
 
             ClusterControl.SetClusterBoxColor(clusterBox, ping, info);
         }

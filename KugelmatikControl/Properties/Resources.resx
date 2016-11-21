@@ -124,7 +124,7 @@
     <value>Choreography: none</value>
   </data>
   <data name="ClusterInfo" xml:space="preserve">
-    <value>{0}, {1} (Ping: {2}, IP: {3})</value>
+    <value>{0}, {1} ({2}, {3})</value>
   </data>
   <data name="ClusterInfoLong" xml:space="preserve">
     <value>Version: {0} {1}</value>
