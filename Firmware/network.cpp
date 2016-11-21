@@ -334,8 +334,6 @@ void handlePacket(uint8_t packetType, int32_t revision)
 		if (minX > maxX || minY > maxY)
 			return protocolError(ERROR_INVALID_VALUE);
 
-		byte area = (maxX - minX + 1) * (maxY - minY + 1); // +1, da max die letzte Kugel nicht beinhaltet
-
 		// beide for-Schleifen müssen mit dem Client übereinstimmen sonst stimmen die Positionen nicht		
 		for (byte x = minX; x <= maxX; x++) {
 			for (byte y = minY; y <= maxY; y++) {
