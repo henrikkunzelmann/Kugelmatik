@@ -292,13 +292,9 @@ namespace KugelmatikControl
             if (Kugelmatik == null)
                 return;
 
-            if (!Kugelmatik.AnyClusterOnline)
-            {
-                MessageBox.Show("Can not start choreography because all clusters are offline", "Choreography not started", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            if (!ShowOfflineError())
                 return;
-            }
-
-
+          
             // wenn schon eine Choreography läuft, dann stoppen
             StopChoreographyInternal();
 
@@ -307,6 +303,29 @@ namespace KugelmatikControl
 
             UpdateChoreographyStatus();
             SetAutomaticUpdate(false);
+        }
+
+        private bool ShowOfflineError()
+        {
+            DialogResult result;
+            do
+            {
+                if (Kugelmatik.AnyClusterOnline)
+                    return true;
+
+                if (autoStopToolStripMenuItem.Checked)
+                {
+                    MessageBox.Show("Can not start choreography because all clusters are offline and auto stop is checked.", "Choreography not started", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return false;
+                }  
+
+                result = MessageBox.Show("Can not start choreography because all clusters are offline. Auto stop is not checked.", "Choreography not started", MessageBoxButtons.AbortRetryIgnore, MessageBoxIcon.Error);
+
+                if (result == DialogResult.Ignore)
+                    return true;
+            }
+            while (result == DialogResult.Retry);
+            return false;
         }
 
         private void StopChoreography()
@@ -332,15 +351,18 @@ namespace KugelmatikControl
         {
             if (!Kugelmatik.AnyClusterOnline)
             {
-                MessageBox.Show("Can not run command because all clusters are offline", "Command did not run", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                ShowClusterOfflineError(true);
                 return false;
             }
             return true;
         }
 
-        public void ShowClusterOfflineError()
+        public void ShowClusterOfflineError(bool multiple)
         {
-            MessageBox.Show("Can not run command because cluster is offline", "Command did not run", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            if (multiple)
+                MessageBox.Show("Can not run command because all clusters are offline.", "Command did not run", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            else
+                MessageBox.Show("Can not run command because cluster is offline.", "Command did not run", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
 
         public bool CheckChoreography()
@@ -381,7 +403,7 @@ namespace KugelmatikControl
             if (!Kugelmatik.AnyClusterOnline)
             {
                 StopChoreography();
-                MessageBox.Show("Choreography stopped because all clusters are offline", "Choreography stopped", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Choreography stopped because all clusters are offline.", "Choreography stopped", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
 

@@ -198,7 +198,7 @@ namespace KugelmatikControl
         {
             if (!CurrentCluster.IsOnline)
             {
-                Form.ShowClusterOfflineError();
+                Form.ShowClusterOfflineError(false);
                 return false;
             }
             return true;
