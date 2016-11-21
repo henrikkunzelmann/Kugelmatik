@@ -35,7 +35,7 @@ namespace KugelmatikLibrary
             sinWave /= 2; // normalisieren
 
             // in Schritte umwandeln
-            return (ushort)(sinWave * cluster.Kugelmatik.ClusterConfig.MaxSteps);
+            return (ushort)Math.Round(sinWave * cluster.Kugelmatik.ClusterConfig.MaxSteps);
         }
 
         public enum Direction
