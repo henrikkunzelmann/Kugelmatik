@@ -62,6 +62,7 @@ namespace KugelmatikControl
 
         private void UpdateClusterBox(object sender, EventArgs e)
         {
+            SuspendLayout();
             if (clusterBox.InvokeRequired)
                 clusterBox.BeginInvoke(new EventHandler(UpdateClusterBox), sender, e);
             else
@@ -69,19 +70,21 @@ namespace KugelmatikControl
                 clusterBox.Text = FormatClusterText(Cluster);
 
                 if (Cluster.Info == null)
-                    infoText.Text = string.Format(Properties.Resources.ClusterInfoLong, "n/a", "");
+                    infoText.Visible = false;
                 else
                 {
                     string errorText = "";
                     if (Cluster.Info.LastError != ErrorCode.None)
                         errorText = string.Format("(error: {0})", Cluster.Info.LastError);
 
+                    infoText.Visible = true;
                     infoText.Text = string.Format(Properties.Resources.ClusterInfoLong,
                         Cluster.Info.BuildVersion.ToString(), errorText);
                 }
 
                 SetClusterBoxColor(clusterBox, Cluster);
             }
+            ResumeLayout();
         }
 
         public static string FormatClusterText(Cluster cluster)
