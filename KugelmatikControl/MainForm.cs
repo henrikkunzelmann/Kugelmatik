@@ -243,6 +243,12 @@ namespace KugelmatikControl
                 networkStatusLabel.Text = "Error while loading kugelmatik";
                 return;
             }
+            
+            if (!Kugelmatik.AnyClusterOnline)
+            {
+                networkStatusLabel.Text = "All clusters are offline";
+                return;
+            }
 
             // Ping berechnen
             var clusters = Kugelmatik.EnumerateClusters();
