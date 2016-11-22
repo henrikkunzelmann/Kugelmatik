@@ -577,19 +577,19 @@ namespace KugelmatikControl
                 Kugelmatik.SendStop();
         }
 
-        private void sineWaveToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            StartChoreography(new SineWave(Direction.Y, 0.05f));
-        }
-
         private void autoStopToolStripMenuItem_Click(object sender, EventArgs e)
         {
             CheckChoreographyAutoStop();
         }
 
+        private void sineWaveToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            StartChoreography(new SineWave(Direction.Y, 0.01f));
+        }
+
         private void distanceToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            StartChoreography(new DistanceChoreography(TimeSpan.FromMinutes(1)));
+            StartChoreography(new DistanceChoreography(TimeSpan.FromMinutes(2)));
         }
 
         private void rippleToolStripMenuItem_Click(object sender, EventArgs e)
@@ -604,7 +604,28 @@ namespace KugelmatikControl
 
         private void planeToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            StartChoreography(new Plane(TimeSpan.FromSeconds(20)));
+            StartChoreography(new Plane(TimeSpan.FromMinutes(2), 0.7f));
+        }
+
+        private void splitPlaneToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            StartChoreography(new SplitPlane(TimeSpan.FromMinutes(2), 0.7f));
+        }
+
+        private void showToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ShowEntry[] entries = new ShowEntry[]
+            {
+                new ShowEntry(TimeSpan.FromMinutes(3), new SineWave(Direction.X, 0.01f)),
+                new ShowEntry(TimeSpan.FromMinutes(3), new SineWave(Direction.Y, 0.01f)),
+
+                new ShowEntry(TimeSpan.FromMinutes(4), new Plane(TimeSpan.FromMinutes(2), 0.7f)),
+                new ShowEntry(TimeSpan.FromMinutes(4), new SplitPlane(TimeSpan.FromMinutes(2), 0.7f)),
+                new ShowEntry(TimeSpan.FromMinutes(4), new Plane(TimeSpan.FromMinutes(2), 0.7f)),
+            };
+
+            Show show = new Show(entries, TimeSpan.FromMinutes(1));
+            StartChoreography(show);
         }
     }
 }

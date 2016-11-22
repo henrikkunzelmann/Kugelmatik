@@ -46,8 +46,11 @@
     <Compile Include="BrakeMode.cs" />
     <Compile Include="BusyCommand.cs" />
     <Compile Include="Choreographies\Direction.cs" />
+    <Compile Include="Choreographies\SplitPlane.cs" />
     <Compile Include="Choreographies\Plane.cs" />
     <Compile Include="Choreographies\LinearMove.cs" />
+    <Compile Include="Choreographies\Show.cs" />
+    <Compile Include="Choreographies\ShowEntry.cs" />
     <Compile Include="Choreography.cs" />
     <Compile Include="ChoreographyDirect.cs" />
     <Compile Include="ChoreographyManager.cs" />

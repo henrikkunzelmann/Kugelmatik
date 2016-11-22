@@ -16,6 +16,11 @@ namespace KugelmatikLibrary
             return value;
         }
 
+        public static float Lerp(float a, float b, float pos)
+        {
+            return a * (1 - pos) + b * pos;
+        }
+
         public static float Clamp(float value, float min, float max)
         {
             if (value < min)
@@ -83,7 +88,7 @@ namespace KugelmatikLibrary
             if (t >= 0.5f)
                 t = 1 - t;
 
-            return (float)t;
+            return (float)t * 2;
         }
     }
 }
