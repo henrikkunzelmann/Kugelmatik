@@ -19,7 +19,6 @@ namespace KugelmatikLibrary.Choreographies
 
         public ushort GetHeight(Cluster cluster, TimeSpan time, int x, int y)
         {
-            float cx = x / (float)cluster.Kugelmatik.StepperCountX;
             float cy = y / (float)cluster.Kugelmatik.StepperCountY;
 
             float maxSteps = cluster.Kugelmatik.ClusterConfig.MaxSteps;
@@ -30,7 +29,13 @@ namespace KugelmatikLibrary.Choreographies
             t = (float)MathHelper.ConvertToOneToOne(t);
 
             float dir = 1;
-            if (cx < 0.1 || cx > 0.9 || cy < 0.1 || cy > 0.9)
+
+            int borderX1 = cluster.Kugelmatik.Config.KugelmatikWidth;
+            int borderY1 = cluster.Kugelmatik.Config.KugelmatikHeight;
+            int borderX2 = cluster.Kugelmatik.StepperCountX - borderX1;
+            int borderY2 = cluster.Kugelmatik.StepperCountY - borderY1;
+
+            if (x < borderX1 || x >= borderX2 || y < borderY1 || y >= borderY2)
                 dir = -1;
 
             double steps = 0.5f * maxSteps + range * t * Math.Sign(dcy) * Inclination * dir;

@@ -610,12 +610,12 @@ namespace KugelmatikControl
 
         private void planeToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            StartChoreography(new Plane(TimeSpan.FromMinutes(2), 0.7f));
+            StartChoreography(new Plane(TimeSpan.FromMinutes(2), 0.9f));
         }
 
         private void splitPlaneToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            StartChoreography(new SplitPlane(TimeSpan.FromMinutes(2), 0.7f));
+            StartChoreography(new SplitPlane(TimeSpan.FromMinutes(2), 0.9f));
         }
 
         private void showToolStripMenuItem_Click(object sender, EventArgs e)
@@ -625,9 +625,9 @@ namespace KugelmatikControl
                 new ShowEntry(TimeSpan.FromMinutes(3), new SineWave(Direction.X, 0.01f)),
                 new ShowEntry(TimeSpan.FromMinutes(3), new SineWave(Direction.Y, 0.01f)),
 
-                new ShowEntry(TimeSpan.FromMinutes(4), new Plane(TimeSpan.FromMinutes(2), 0.7f)),
-                new ShowEntry(TimeSpan.FromMinutes(4), new SplitPlane(TimeSpan.FromMinutes(2), 0.7f)),
-                new ShowEntry(TimeSpan.FromMinutes(4), new Plane(TimeSpan.FromMinutes(2), 0.7f)),
+                new ShowEntry(TimeSpan.FromMinutes(4), new Plane(TimeSpan.FromMinutes(2), 0.9f)),
+                new ShowEntry(TimeSpan.FromMinutes(4), new SplitPlane(TimeSpan.FromMinutes(2), 0.9f)),
+                new ShowEntry(TimeSpan.FromMinutes(4), new Plane(TimeSpan.FromMinutes(2), 0.9f)),
             };
 
             Show show = new Show(entries, TimeSpan.FromMinutes(1));
