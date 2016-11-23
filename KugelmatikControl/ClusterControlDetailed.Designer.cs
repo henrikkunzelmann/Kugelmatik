@@ -98,7 +98,7 @@
             splitContainer1.Panel2.Controls.Add(this.getDataButton);
             splitContainer1.Panel2.Controls.Add(this.homeButton);
             splitContainer1.Panel2.Controls.Add(this.stepperBox);
-            splitContainer1.Size = new System.Drawing.Size(633, 416);
+            splitContainer1.Size = new System.Drawing.Size(690, 416);
             splitContainer1.SplitterDistance = 319;
             splitContainer1.TabIndex = 3;
             // 
@@ -116,7 +116,7 @@
             // splitContainer2.Panel2
             // 
             this.splitContainer2.Panel2.Controls.Add(this.splitContainer3);
-            this.splitContainer2.Size = new System.Drawing.Size(633, 319);
+            this.splitContainer2.Size = new System.Drawing.Size(690, 319);
             this.splitContainer2.SplitterDistance = 248;
             this.splitContainer2.TabIndex = 1;
             // 
@@ -148,7 +148,7 @@
             this.splitContainer3.Panel2.Controls.Add(this.clusterHeightTrackBar);
             this.splitContainer3.Panel2.Controls.Add(this.clusterHeight);
             this.splitContainer3.Panel2.Controls.Add(this.label1);
-            this.splitContainer3.Size = new System.Drawing.Size(381, 319);
+            this.splitContainer3.Size = new System.Drawing.Size(438, 319);
             this.splitContainer3.SplitterDistance = 253;
             this.splitContainer3.TabIndex = 1;
             // 
@@ -159,7 +159,7 @@
             this.steppersPanel.Location = new System.Drawing.Point(0, 0);
             this.steppersPanel.Margin = new System.Windows.Forms.Padding(10);
             this.steppersPanel.Name = "steppersPanel";
-            this.steppersPanel.Size = new System.Drawing.Size(381, 253);
+            this.steppersPanel.Size = new System.Drawing.Size(438, 253);
             this.steppersPanel.TabIndex = 0;
             // 
             // clusterHeightTrackBar
@@ -192,10 +192,10 @@
             // setDataButton
             // 
             this.setDataButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.setDataButton.Location = new System.Drawing.Point(165, 66);
+            this.setDataButton.Location = new System.Drawing.Point(168, 67);
             this.setDataButton.Name = "setDataButton";
             this.setDataButton.Size = new System.Drawing.Size(78, 23);
-            this.setDataButton.TabIndex = 7;
+            this.setDataButton.TabIndex = 6;
             this.setDataButton.Text = "Set data";
             this.setDataButton.UseVisualStyleBackColor = true;
             this.setDataButton.Click += new System.EventHandler(this.setDataButton_Click);
@@ -203,10 +203,10 @@
             // blinkButton
             // 
             this.blinkButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.blinkButton.Location = new System.Drawing.Point(165, 41);
+            this.blinkButton.Location = new System.Drawing.Point(84, 66);
             this.blinkButton.Name = "blinkButton";
             this.blinkButton.Size = new System.Drawing.Size(78, 23);
-            this.blinkButton.TabIndex = 6;
+            this.blinkButton.TabIndex = 4;
             this.blinkButton.Text = "Blink";
             this.blinkButton.UseVisualStyleBackColor = true;
             this.blinkButton.Click += new System.EventHandler(this.blinkButton_Click);
@@ -214,10 +214,10 @@
             // configButton
             // 
             this.configButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.configButton.Location = new System.Drawing.Point(165, 14);
+            this.configButton.Location = new System.Drawing.Point(84, 14);
             this.configButton.Name = "configButton";
             this.configButton.Size = new System.Drawing.Size(78, 23);
-            this.configButton.TabIndex = 5;
+            this.configButton.TabIndex = 2;
             this.configButton.Text = "Config";
             this.configButton.UseVisualStyleBackColor = true;
             this.configButton.Click += new System.EventHandler(this.configButton_Click);
@@ -227,10 +227,10 @@
             this.stopButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.stopButton.BackColor = System.Drawing.Color.DarkRed;
             this.stopButton.ForeColor = System.Drawing.Color.White;
-            this.stopButton.Location = new System.Drawing.Point(84, 66);
+            this.stopButton.Location = new System.Drawing.Point(274, 66);
             this.stopButton.Name = "stopButton";
             this.stopButton.Size = new System.Drawing.Size(75, 23);
-            this.stopButton.TabIndex = 4;
+            this.stopButton.TabIndex = 7;
             this.stopButton.Text = "Stop";
             this.stopButton.UseVisualStyleBackColor = false;
             this.stopButton.Click += new System.EventHandler(this.stopButton_Click);
@@ -240,7 +240,7 @@
             this.infoButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.infoButton.Location = new System.Drawing.Point(84, 41);
             this.infoButton.Name = "infoButton";
-            this.infoButton.Size = new System.Drawing.Size(75, 23);
+            this.infoButton.Size = new System.Drawing.Size(78, 23);
             this.infoButton.TabIndex = 3;
             this.infoButton.Text = "Info";
             this.infoButton.UseVisualStyleBackColor = true;
@@ -260,10 +260,10 @@
             // getDataButton
             // 
             this.getDataButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.getDataButton.Location = new System.Drawing.Point(84, 14);
+            this.getDataButton.Location = new System.Drawing.Point(168, 41);
             this.getDataButton.Name = "getDataButton";
-            this.getDataButton.Size = new System.Drawing.Size(75, 23);
-            this.getDataButton.TabIndex = 2;
+            this.getDataButton.Size = new System.Drawing.Size(78, 23);
+            this.getDataButton.TabIndex = 5;
             this.getDataButton.Text = "Get data";
             this.getDataButton.UseVisualStyleBackColor = true;
             this.getDataButton.Click += new System.EventHandler(this.getDataButton_Click);
@@ -286,7 +286,7 @@
             this.stepperBox.Controls.Add(this.setClusterButton);
             this.stepperBox.Controls.Add(this.fixStepperButton);
             this.stepperBox.Controls.Add(this.homeStepperButton);
-            this.stepperBox.Location = new System.Drawing.Point(298, 9);
+            this.stepperBox.Location = new System.Drawing.Point(355, 9);
             this.stepperBox.Name = "stepperBox";
             this.stepperBox.Size = new System.Drawing.Size(332, 75);
             this.stepperBox.TabIndex = 2;
@@ -340,7 +340,7 @@
             this.clusterBox.Font = new System.Drawing.Font("Consolas", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.clusterBox.Location = new System.Drawing.Point(0, 0);
             this.clusterBox.Name = "clusterBox";
-            this.clusterBox.Size = new System.Drawing.Size(639, 438);
+            this.clusterBox.Size = new System.Drawing.Size(696, 438);
             this.clusterBox.TabIndex = 2;
             this.clusterBox.TabStop = false;
             this.clusterBox.Text = "Cluster";
@@ -373,7 +373,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.clusterBox);
             this.Name = "ClusterControlDetailed";
-            this.Size = new System.Drawing.Size(639, 438);
+            this.Size = new System.Drawing.Size(696, 438);
             splitContainer1.Panel1.ResumeLayout(false);
             splitContainer1.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(splitContainer1)).EndInit();
