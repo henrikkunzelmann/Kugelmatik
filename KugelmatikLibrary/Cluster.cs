@@ -846,8 +846,12 @@ namespace KugelmatikLibrary
                         {
                             ushort configSize = reader.ReadUInt16();
                             if (configSize != ClusterConfig.Size)
-                                throw new InvalidDataException("Packet config size does not match config structure size");
-                            config = ClusterConfig.Read(reader);
+                            {
+                                config = new ClusterConfig();
+                                Log.Error("[{0}, {1}] Packet config size does not match config structure size (firmware: {2}, size: {3} != {4})", X, Y, buildVersion, configSize, ClusterConfig.Size);
+                            }
+                            else
+                                config = ClusterConfig.Read(reader);
                         }
 
                         byte mcpStatus = 0;
