@@ -86,9 +86,14 @@ void setStepper(StepperData* stepper, int32_t revision, uint16_t height, byte wa
 	if (checkRevision(stepper->LastRevision, revision))
 	{
 		stepper->LastRevision = revision;
-		stepper->GotoSteps = height;
-		stepper->TickCount = 0;
-		stepper->WaitTime = waitTime;
+
+		uint16_t diff = abs(stepper->CurrentSteps - height);
+		if (diff >= config.minStepDelta)
+		{
+			stepper->GotoSteps = height;
+			stepper->TickCount = 0;
+			stepper->WaitTime = waitTime;
+		}
 	}
 }
 
@@ -142,8 +147,6 @@ void updateSteppers(boolean alwaysUseHalfStep)
 
 			byte stepSize = 0;
 			int32_t diff = abs(stepper->CurrentSteps - stepper->GotoSteps);
-			if (diff < config.minStepDelta)
-				continue;
 
 			if (diff != 0)
 			{
