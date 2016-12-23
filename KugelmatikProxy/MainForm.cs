@@ -24,13 +24,14 @@ namespace KugelmatikProxy
             Log.BufferCapacity = 1;
         }
 
-        private void Log_OnFlushBuffer(string obj)
+        private void Log_OnFlushBuffer(object sender, LogFlushEventArgs e)
         {
             if (logTextBox.InvokeRequired)
-                logTextBox.BeginInvoke(new Action<string>(Log_OnFlushBuffer), obj);
+                logTextBox.BeginInvoke(new EventHandler<LogFlushEventArgs>(Log_OnFlushBuffer), e);
             else
-                logTextBox.AppendText(obj);
+                logTextBox.AppendText(e.Buffer);
         }
+
 
         protected override void OnClosing(CancelEventArgs e)
         {
