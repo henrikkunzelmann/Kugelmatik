@@ -274,7 +274,7 @@ namespace KugelmatikLibrary
 
         public void Dispose()
         {
-            Dispose(false);
+            Dispose(true);
             GC.SuppressFinalize(this);
         }
 
@@ -283,14 +283,14 @@ namespace KugelmatikLibrary
             if (IsDisposed)
                 return;
 
+            IsDisposed = true;
+
             if (disposing)
             {
                 socket?.Close();
                 packetBuffer?.Dispose();
                 packetWriter?.Dispose();
             }
-
-            IsDisposed = true;
         }
 
         public IEnumerable<Stepper> EnumerateSteppers()
@@ -683,6 +683,9 @@ namespace KugelmatikLibrary
 
         private void SendPacket(IAsyncResult result)
         {
+            if (IsDisposed)
+                return;
+
             try
             {
                 socket.EndSend(result);
@@ -723,7 +726,8 @@ namespace KugelmatikLibrary
             }
             finally
             {
-                socket.BeginReceive(ReceivePacket, null);
+                if (!IsDisposed)
+                    socket.BeginReceive(ReceivePacket, null);
             }
         }
 
