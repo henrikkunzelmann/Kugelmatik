@@ -762,7 +762,14 @@ namespace KugelmatikLibrary
                         lastPing = Environment.TickCount;
 
                         long time = reader.ReadInt64(); // time ist der Wert von stopwatch zum Zeitpunkt des Absenden des Pakets
-                        Ping = (int)(stopwatch.ElapsedMilliseconds - time);
+
+                        if (stopwatch.ElapsedMilliseconds < time)
+                        {
+                            Ping = 0;
+                            Log.Verbose("[{0}, {1}] Invalid ping value sent: {2}", X, Y, time);
+                        }
+                        else
+                            Ping = (int)(stopwatch.ElapsedMilliseconds - time);
 
                         RemovePacketToAcknowlegde(revision);
 
