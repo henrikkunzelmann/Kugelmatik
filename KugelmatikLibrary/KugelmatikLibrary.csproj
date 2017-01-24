@@ -56,7 +56,9 @@
     <Compile Include="ChoreographyManager.cs" />
     <Compile Include="Cluster.cs" />
     <Compile Include="ClusterConfig.cs" />
+    <Compile Include="ClusterEntry.cs" />
     <Compile Include="ClusterInfo.cs" />
+    <Compile Include="ClusterSearch.cs" />
     <Compile Include="Config.cs" />
     <Compile Include="ConfigHelper.cs" />
     <Compile Include="ConfigTypeConverter.cs" />
