@@ -1,23 +1,15 @@
 #include "BinaryHelper.h"
-#include "string.h"
 
-#ifdef  __IEEE_LITTLE_ENDIAN
-	#define NEED_SWAPPING 1
-#else
-	#define NEED_SWAPPING 0
-#endif
-
-void BinaryHelper::changeByteOrder(byte* buffer, int start, int length) {
+void BinaryHelper::changeByteOrder(uint8_t* buffer, int32_t offset, size_t length) {
 #if NEED_SWAPPING
-	int end = start + length;
-	int swapsLeft = length / 2;
+	int32_t end = offset + length;
+	int32_t swapsLeft = length / 2;
 
-	byte temp;
 	while (swapsLeft > 0) {
-		byte* a = buffer + (start + swapsLeft - 1);
-		byte* b = buffer + (end - swapsLeft);
+		uint8_t* a = buffer + (offset + swapsLeft - 1);
+		uint8_t* b = buffer + (end - swapsLeft);
 
-		temp = *a;
+		uint8_t temp = *a;
 		*a = *b;
 		*b = temp;
 		swapsLeft--;
@@ -25,97 +17,97 @@ void BinaryHelper::changeByteOrder(byte* buffer, int start, int length) {
 #endif
 }
 
-void BinaryHelper::writeInt16(byte* buf, int offset, int16_t val) {
-	memcpy(buf + offset, &val, sizeof(int16_t));
-	changeByteOrder(buf, offset, sizeof(int16_t));
+void BinaryHelper::writeInt16(uint8_t* buf, int32_t offset, int16_t val) {
+	memcpy(buf + offset, &val, sizeof(val));
+	changeByteOrder(buf, offset, sizeof(val));
 }
 
-int16_t BinaryHelper::readInt16(byte* buf, int offset) {
-	byte valArr[sizeof(int16_t)];
-	memcpy(valArr, buf + offset, sizeof(int16_t));
-	changeByteOrder(valArr, 0,sizeof(int16_t));
-	return *reinterpret_cast<int16_t*>(valArr);
+int16_t BinaryHelper::readInt16(uint8_t* buf, int32_t offset) {
+	int16_t value;
+	memcpy(&value, buf + offset, sizeof(value));
+	changeByteOrder((uint8_t*)&value, 0, sizeof(value));
+	return value;
 }
 
-void BinaryHelper::writeUint16(byte* buf, int offset, uint16_t val) {
-	memcpy(buf + offset, &val, sizeof(uint16_t));
-	changeByteOrder(buf, offset, sizeof(uint16_t));
+void BinaryHelper::writeUint16(uint8_t* buf, int32_t offset, uint16_t val) {
+	memcpy(buf + offset, &val, sizeof(val));
+	changeByteOrder(buf, offset, sizeof(val));
 }
 
-uint16_t BinaryHelper::readUint16(byte* buf, int offset) {
-	byte valArr[sizeof(uint16_t)];
-	memcpy(valArr, buf + offset, sizeof(uint16_t));
-	changeByteOrder(valArr, 0, sizeof(uint16_t));
-	return *reinterpret_cast<uint16_t*>(valArr);
+uint16_t BinaryHelper::readUint16(uint8_t* buf, int32_t offset) {
+	uint16_t value;
+	memcpy(&value, buf + offset, sizeof(value));
+	changeByteOrder((uint8_t*)&value, 0, sizeof(value));
+	return value;
 }
 
-void BinaryHelper::writeInt32(byte* buf, int offset, int32_t val) {
-	memcpy(buf + offset, &val, sizeof(int32_t));
-	changeByteOrder(buf, offset, sizeof(int32_t));
+void BinaryHelper::writeInt32(uint8_t* buf, int32_t offset, int32_t val) {
+	memcpy(buf + offset, &val, sizeof(val));
+	changeByteOrder(buf, offset, sizeof(val));
 }
 
-int32_t BinaryHelper::readInt32(byte* buf, int offset) {
-	byte valArr[sizeof(int32_t)];
-	memcpy(valArr, buf + offset, sizeof(int32_t));
-	changeByteOrder(valArr, 0, sizeof(int32_t));
-	return *reinterpret_cast<int32_t*>(valArr);
+int32_t BinaryHelper::readInt32(uint8_t* buf, int32_t offset) {
+	int32_t value;
+	memcpy(&value, buf + offset, sizeof(value));
+	changeByteOrder((uint8_t*)&value, 0, sizeof(value));
+	return value;
 }
 
-void BinaryHelper::writeUint32(byte* buf, int offset, uint32_t val) {
-	memcpy(buf + offset, &val, sizeof(uint32_t));
-	changeByteOrder(buf, offset, sizeof(uint32_t));
+void BinaryHelper::writeUint32(uint8_t* buf, int32_t offset, uint32_t val) {
+	memcpy(buf + offset, &val, sizeof(val));
+	changeByteOrder(buf, offset, sizeof(val));
 }
 
-uint32_t BinaryHelper::readUint32(byte* buf, int offset) {
-	byte valArr[sizeof(uint32_t)];
-	memcpy(valArr, buf + offset, sizeof(uint32_t));
-	changeByteOrder(valArr, 0, sizeof(uint32_t));
-	return *reinterpret_cast<uint32_t*>(valArr);
+uint32_t BinaryHelper::readUint32(uint8_t* buf, int32_t offset) {
+	uint32_t value;
+	memcpy(&value, buf + offset, sizeof(value));
+	changeByteOrder((uint8_t*)&value, 0, sizeof(value));
+	return value;
 }
 
-void BinaryHelper::writeInt64(byte* buf, int offset, int64_t val) {
-	memcpy(buf + offset, &val, sizeof(int64_t));
-	changeByteOrder(buf, offset, sizeof(int64_t));
-}
-
-
-int64_t BinaryHelper::readInt64(byte* buf, int offset) {
-	byte valArr[sizeof(int64_t)];
-	memcpy(valArr, buf + offset, sizeof(int64_t));
-	changeByteOrder(valArr, 0, sizeof(int64_t));
-	return *reinterpret_cast<int64_t*>(valArr);
+void BinaryHelper::writeInt64(uint8_t* buf, int32_t offset, int64_t val) {
+	memcpy(buf + offset, &val, sizeof(val));
+	changeByteOrder(buf, offset, sizeof(val));
 }
 
 
-void BinaryHelper::writeUint64(byte* buf, int offset, uint64_t val) {
-	memcpy(buf + offset, &val, sizeof(uint64_t));
-	changeByteOrder(buf, offset, sizeof(uint64_t));
+int64_t BinaryHelper::readInt64(uint8_t* buf, int32_t offset) {
+	int64_t value;
+	memcpy(&value, buf + offset, sizeof(value));
+	changeByteOrder((uint8_t*)&value, 0, sizeof(value));
+	return value;
 }
 
 
-uint64_t BinaryHelper::readUint64(byte* buf, int offset) {
-	byte valArr[sizeof(uint64_t)];
-	memcpy(valArr, buf + offset, sizeof(uint64_t));
-	changeByteOrder(valArr, 0, sizeof(uint64_t));
-	return *reinterpret_cast<uint64_t*>(valArr);
+void BinaryHelper::writeUint64(uint8_t* buf, int32_t offset, uint64_t val) {
+	memcpy(buf + offset, &val, sizeof(val));
+	changeByteOrder(buf, offset, sizeof(val));
 }
 
-void BinaryHelper::writeFloat(byte* buf, int offset, float val) {
-	memcpy(&buf[offset], &val, sizeof(float));
+
+uint64_t BinaryHelper::readUint64(uint8_t* buf, int32_t offset) {
+	uint64_t value;
+	memcpy(&value, buf + offset, sizeof(value));
+	changeByteOrder((uint8_t*)&value, 0, sizeof(value));
+	return value;
 }
 
-float BinaryHelper::readFloat(byte* buf, int offset) {
-	byte valArr[sizeof(float)];
-	memcpy(valArr, buf + offset, sizeof(float));
-	return *reinterpret_cast<float*>(valArr);
+void BinaryHelper::writeFloat(uint8_t* buf, int32_t offset, float val) {
+	memcpy(buf + offset, &val, sizeof(float));
 }
 
-void BinaryHelper::writeDouble(byte* buf, int offset, double val) {
+float BinaryHelper::readFloat(uint8_t* buf, int32_t offset) {
+	float value;
+	memcpy(&value, buf + offset, sizeof(value));
+	return value;
+}
+
+void BinaryHelper::writeDouble(uint8_t* buf, int32_t offset, double val) {
 	memcpy(buf + offset, &val, sizeof(double));
 }
 
-double BinaryHelper::readDouble(byte* buf, int offset) {
-	byte valArr[sizeof(double)];
-	memcpy(valArr, buf + offset, sizeof(double));
-	return *reinterpret_cast<double*>(valArr);
+double BinaryHelper::readDouble(uint8_t* buf, int32_t offset) {
+	double value;
+	memcpy(&value, buf + offset, sizeof(value));
+	return value;
 }

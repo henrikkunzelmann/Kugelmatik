@@ -1,11 +1,8 @@
 #include "leds.h"
 #include <avr/wdt.h>
 
-
-
-/// Funktionen für die LEDs
-boolean ledStateGreen = false; // Status der LED für LED_Green (grüne LED)
-boolean ledStateRed = false; // Status der LED für LED_Red (rote LED)
+boolean ledStateGreen = false;	// Status der LED für LED_Green (grüne LED)
+boolean ledStateRed = false;	// Status der LED für LED_Red (rote LED)
 
 void setupLeds()
 {

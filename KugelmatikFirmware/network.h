@@ -1,7 +1,7 @@
-#ifndef _NETWORK_h
-#define _NETWORK_h
+#pragma once
 
-#include "Arduino.h"
+#include <Arduino.h>
+
 #include <avr/wdt.h> 
 #include <limits.h>
 #include <EtherCard.h>
@@ -40,5 +40,3 @@ void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, c
 void handlePacket(uint8_t packetType, int32_t revision);
 
 void runBusy(uint8_t type, int32_t steps, uint32_t delay);
-
-#endif

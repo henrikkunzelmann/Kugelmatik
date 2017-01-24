@@ -26,7 +26,7 @@ void initMCP(byte index)
 	data->MCP->begin(index);
 
 	// alle Pins (0xFFFF) auf OUTPUT stellen
-	data->MCP->setPinDirOUT(0xFFFF);
+	data->MCP->setPinDirOUT(0xFFFFu);
 
 	data->isOK = (data->MCP->writeGPIOS(0) == 0);
 	data->lastGPIOValue = 0;

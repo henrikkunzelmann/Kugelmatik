@@ -1,8 +1,8 @@
-#ifndef _PACKETBUFFER_h
-#define _PACKETBUFFER_h
+#pragma once
+
+#include <Arduino.h>
 
 #include "BinaryHelper.h"
-#include "leds.h"
 #include "util.h"
 
 class PacketBuffer {
@@ -16,20 +16,24 @@ private:
 	bool error;
 	bool allowRead;
 
+	bool assertNull(void* pointer);
+
 	bool assertRead(); // überprüft ob das Lesen zulässig ist
-	bool assertPosition(uint32_t length); // überprüft die Position
-	bool assertPositionRead(uint32_t length); // überprüft assertRead und überprüft die Position
-	bool assertPositionWrite(uint32_t length); // setzt allowRead auf false und überprüft die Position
-	uint32_t addPosition(uint32_t length); // addiert einen Wert zur Position und gibt die alte Position zurück
+	bool assertPosition(size_t length); // überprüft die Position
+	bool assertPositionRead(size_t length); // überprüft assertRead und überprüft die Position
+	bool assertPositionWrite(size_t length); // setzt allowRead auf false und überprüft die Position
+	uint32_t addPosition(size_t length); // addiert einen Wert zur Position und gibt die alte Position zurück
+
+	void errorMemory();
 
 public:
-	explicit PacketBuffer(uint32_t size);
-	explicit PacketBuffer(uint8_t* data, uint32_t size);
+	explicit PacketBuffer(size_t size);
+	explicit PacketBuffer(uint8_t* data, size_t size);
 	~PacketBuffer();
 
 	bool getError();
 
-	void setBuffer(uint8_t* data, uint32_t size);
+	void setBuffer(uint8_t* data, size_t size);
 
 	uint8_t* getBuffer() const;
 	uint32_t getBufferSize() const;
@@ -60,11 +64,11 @@ public:
 	float readFloat();
 	double readDouble();
 
-	void read(uint8_t* buffer, int length);
-	void read(uint8_t* buffer, int length, int offset);
-	void read(char* buffer, int length, int offset);
+	void read(uint8_t* buffer, size_t length);
+	void read(uint8_t* buffer, size_t length, uint32_t offset);
+	void read(char* buffer, size_t length, uint32_t offset);
 
-	uint8_t* getBufferRegion(int size);
+	uint8_t* getBufferRegion(size_t size);
 
 	char* readString();
 
@@ -82,11 +86,9 @@ public:
 	void write(float value);
 	void write(double value);
 
-	void write(uint8_t* buffer, int length);
-	void write(uint8_t* buffer, int offset, int length);
+	void write(uint8_t* buffer, size_t length);
+	void write(uint8_t* buffer, size_t length, uint32_t offset);
 
 	void writeString(char* str);
 	void writeString(const char* str);
 };
-#endif
-

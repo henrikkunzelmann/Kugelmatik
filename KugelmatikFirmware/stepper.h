@@ -1,7 +1,6 @@
-#ifndef _STEPPER_h
-#define _STEPPER_h
+#pragma once
 
-#include "arduino.h"
+#include <Arduino.h>
 #include <MCP23017.h>
 
 #include "util.h"
@@ -21,12 +20,12 @@
 struct StepperData
 {
 	int32_t LastRevision;		// letzte Revision der Daten
-	int16_t CurrentSteps;		// derzeitige Schritte die der Motor gemacht hat
-	int16_t GotoSteps;			// Schritte zu der der Motor gehen soll
+	int16_t CurrentSteps;		// derzeitige Schritte die der Motor gemacht hat (= Höhe)
+	int16_t GotoSteps;			// Schritte zu der der Motor gehen soll (= zu welche Höhe die Kugel fahren soll)
 	uint8_t CurrentStepIndex;	// derzeitiger Stepper Wert Index, siehe stepsStepper
 	int16_t TickCount;			// derzeitige Tick Anzahl, wenn kleiner als 0 dann wird ein Schritt gemacht und die Variable auf WaitTime gesetzt
 	uint8_t WaitTime;			// Wert für TickCount nach jedem Schritt
-	int16_t BrakeTicks;			// Anzahl der Ticks seit letzter Bewegung
+	uint16_t BrakeTicks;		// Anzahl der Ticks seit letzter Bewegung
 };
 
 struct MCPData
@@ -55,9 +54,12 @@ void initMCP(byte index);	// initialisiert einen MCP
 StepperData* getStepper(byte x, byte y);
 StepperData* getStepper(int index);
 
+// setzt den Schrittmotor auf Standard Werte zurück (Höhe = 0)
 void resetStepper(StepperData* stepper);
+// setzt den Schrittmotor auf eine bestimmte Höhe welche nicht geprüft wird ob sie größer als MaxSteps ist
 void forceStepper(StepperData* stepper, int32_t revision, int16_t height);
 
+// setzt den Schrittmotor auf eine bestimmte Höhe und Wartezeit
 void setStepper(StepperData* stepper, int32_t revision, uint16_t height, byte waitTime);
 
 // setzt einen Schrittmotoren auf eine bestimmte Höhe
@@ -66,8 +68,8 @@ void setStepper(int32_t revision, byte x, byte y, uint16_t height, byte waitTime
 // setzt alle Schrittmotoren auf eine bestimmte Höhe
 void setAllSteps(int32_t revision, uint16_t height, byte waitTime);
 
-// stoppt alle Schrittmotoren
+// stoppt alle Schrittmotoren (setzt GotoSteps auf die aktuelle Höhe)
 void stopMove();
 
+// spricht die Schrittmotoren an und lässt sie drehen
 void updateSteppers(boolean alwaysUseHalfStep);
-#endif

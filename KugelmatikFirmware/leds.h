@@ -1,7 +1,6 @@
-#ifndef _LEDS_h
-#define _LEDS_h
+#pragma once
 
-#include "arduino.h"
+#include <Arduino.h>
 
 #define LED_GREEN 2		// Port für grüne LED (Pin 4 SUBD)
 #define LED_RED 3		// Port für rote LED (Pin 5 SUBD)
@@ -9,7 +8,8 @@
 #define TIME_FAST 150
 #define TIME_SLOW 500
 
-void setupLeds();
+// initialisiert die Pins für die LEDs
+void setupLeds(); 
 
 void turnGreenLedOn();
 void turnGreenLedOff();
@@ -23,6 +23,3 @@ void toogleGreenLed();
 void blinkRedLedShort(boolean fast);
 void blinkGreenLedShort(boolean fast);
 void blinkBothLedsShort(boolean fast);
-
-#endif
-

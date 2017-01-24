@@ -1,7 +1,8 @@
-#ifndef CONSTANTS_H_
-#define CONSTANTS_H_
+#pragma once
 
-#define BUILD_VERSION 18
+#include <Arduino.h>
+
+#define BUILD_VERSION 19
 
 #define PacketPing 1
 #define PacketAck 2
@@ -67,5 +68,3 @@
 #define TIMER_LOOP 0
 #define TIMER_NETWORK 1
 #define TIMER_STEPPER 2
-
-#endif

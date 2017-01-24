@@ -62,8 +62,7 @@ char getHexChar(int x)
 	return '0' + x;
 }
 
-#define TIMER_COUNT 3
-unsigned long time[3];
+unsigned long time[TIMER_COUNT];
 
 void startTime(uint8_t index) {
 	if (index >= TIMER_COUNT)

@@ -1,7 +1,7 @@
-#ifndef _CONFIG_h
-#define _CONFIG_h
+#pragma once
 
-#include "arduino.h"
+#include <Arduino.h>
+
 #include "stepper.h"
 
 enum StepMode : byte {
@@ -33,11 +33,10 @@ struct Config {
 	uint16_t minStepDelta; // Unterschied zwischen derzeitiger Höhe und Zielhöhe ab wann die Kugel bewegt werden soll
 };
 
-// gibt die Standard Config zurück
+extern Config config;
+
+// setzt die Standard Config
 void setDefaultConfig();
 
 // prüft Config auf invalide Werte
 boolean checkConfig(Config* config);
-
-extern Config config;
-#endif

@@ -15,6 +15,7 @@ byte currentBusyCommand = BUSY_NONE;
 boolean stopBusyCommand = false;
 
 PacketBuffer* packet;
+uint8_t dummyBuffer[1];
 
 // gibt true zurück wenn revision neuer ist als lastRevision
 boolean checkRevision(int32_t lastRevision, int32_t revision)
@@ -50,6 +51,7 @@ void initNetwork()
 	uint8_t lanID = ether.mymac[5];
 	delay(lanID * 20); // Init verzögern damit das Netzwerk nicht überlastet wird
 
+	// Hostname generieren (die 00 wird durch die lanID in hex ersetzt)
 	char hostName[] = "Kugelmatik-00";
 	hostName[11] = getHexChar(lanID >> 4);
 	hostName[12] = getHexChar(lanID);
@@ -64,7 +66,9 @@ void initNetwork()
 		return;
 	}
 
-	packet = new PacketBuffer(NULL, 0);
+	// PacketBuffer benutzt später den gleichen Buffer wie die Ethernetklasse
+	// daher wird hier nur ein dummyBuffer gesetzt
+	packet = new PacketBuffer(dummyBuffer, sizeof(dummyBuffer));
 	
 	Serial.println(F("Network boot done!"));
 	ether.udpServerListenOnPort(&onPacketReceive, PROTOCOL_PORT);
@@ -615,7 +619,7 @@ void runBusy(uint8_t type, int32_t steps, uint32_t delay)
 	turnGreenLedOff();
 	turnRedLedOff();
 
-	// Timer zurück setzen, damit LoopTime und NetworkTime nicht kurzeitig in die Höhe springt
+	// Timer zurück setzen, damit LoopTime und NetworkTime nicht kurzzeitig in die Höhe springt
 	startTime(TIMER_LOOP);
 	startTime(TIMER_NETWORK); 
 }
