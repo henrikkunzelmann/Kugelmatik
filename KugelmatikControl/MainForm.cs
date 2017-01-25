@@ -28,6 +28,7 @@ namespace KugelmatikControl
         private ClusterForm clusterForm;
         private PingPongForm pingPongForm;
         private HeightViewForm heightViewForm;
+        private SearchForm searchForm;
 
         public MainForm()
         {
@@ -47,6 +48,7 @@ namespace KugelmatikControl
             CloseWindow(clusterForm);
             CloseWindow(pingPongForm);
             CloseWindow(heightViewForm);
+            CloseWindow(searchForm);
         }
 
         private void CloseWindow(Form form)
@@ -530,6 +532,12 @@ namespace KugelmatikControl
         {
             if (Kugelmatik != null)
                 ShowForm(heightViewForm, () => heightViewForm = new HeightViewForm(Kugelmatik));
+        }
+
+        private void searchClustersToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (Kugelmatik != null)
+                ShowForm(searchForm, () => searchForm = new SearchForm(Kugelmatik.Config));
         }
 
         private void resetRevisionToolStripMenuItem_Click(object sender, EventArgs e)
