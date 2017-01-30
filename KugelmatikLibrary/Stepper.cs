@@ -31,6 +31,11 @@ namespace KugelmatikLibrary
         /// </summary>
         public byte Y { get; private set; }
 
+        /// <summary>
+        /// Gibt die Zeit an wann zu letzt die Höhe gesetzt wurde.
+        /// </summary>
+        public DateTime LastSet { get; private set; }
+
         private ushort lastHeight;
         private ushort height;
 
@@ -91,6 +96,8 @@ namespace KugelmatikLibrary
             this.Cluster = cluster;
             this.X = x;
             this.Y = y;
+
+            LastSet = DateTime.MinValue;
         }
 
         /// <summary>
@@ -111,6 +118,7 @@ namespace KugelmatikLibrary
             WaitTime = 0;
             lastHeight = 0;
             Height = 0;
+            LastSet = DateTime.Now;
         }
 
         /// <summary>
@@ -136,6 +144,7 @@ namespace KugelmatikLibrary
             {
                 this.Height = height;
                 this.WaitTime = waitTime;
+                this.LastSet = DateTime.Now;
             }
         }
 

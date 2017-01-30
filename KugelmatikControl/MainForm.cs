@@ -188,7 +188,7 @@ namespace KugelmatikControl
                     // alle 8 Ticks werden die Daten vollständig gesendet
                     // damit werden out-of-sync Fehler behoben wenn ein Paket vom Cluster nicht verarbeitet wurde
                     if (tickCount % 8 == 0)
-                        Kugelmatik.SendData(false, true);
+                        SendDataOnlyToTouchedCluster();
                     else
                         Kugelmatik.SendData();
                 }
@@ -222,6 +222,14 @@ namespace KugelmatikControl
             {
                 Log.Error(ex);
             }
+        }
+
+        private void SendDataOnlyToTouchedCluster()
+        {
+            DateTime now = DateTime.Now;
+            foreach (Cluster cluster in Kugelmatik.EnumerateClusters())
+                if (now - cluster.LastSet < TimeSpan.FromSeconds(60))
+                    cluster.SendData(false, true);
         }
 
         public void ShowCluster(Cluster cluster)

@@ -89,6 +89,17 @@ namespace KugelmatikLibrary
             }
         }
 
+        /// <summary>
+        /// Gibt zurück wann eine Höhe zuletzt beim Cluster gesetzt wurde.
+        /// </summary>
+        public DateTime LastSet
+        {
+            get
+            {
+                return steppers.Select(s => s.LastSet).Max();
+            }
+        }
+
         private int lastPing = Environment.TickCount;
         private int ping = -1;
         private Stopwatch stopwatch = new Stopwatch();
