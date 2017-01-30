@@ -19,7 +19,7 @@ namespace KugelmatikControl
         {
             InitializeComponent();
 
-            ShowClusters(new ClusterEntry[0]);
+            clusterList.Items.Add("Searching...");
             searcher = new ClusterSearch(config);
 
             Search();
@@ -47,7 +47,7 @@ namespace KugelmatikControl
                 if (entries.Length > 0)
                     clusterList.Items.AddRange(entries);
                 else
-                    clusterList.Items.Add("Searching...");
+                    clusterList.Items.Add("Searching (found none)...");
             }
         }
 
