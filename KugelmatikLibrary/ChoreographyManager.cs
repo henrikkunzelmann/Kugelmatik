@@ -116,48 +116,62 @@ namespace KugelmatikLibrary
                 throw new InvalidOperationException("Already canceled");
 
             cancellationToken.Cancel();
-            task.Wait();
+            task.Wait(TimeSpan.FromSeconds(2));
         }
 
         private void Run()
         {
-            Choreography.Tick(Kugelmatik, TimeSpan.Zero);
-            Kugelmatik.SendData(true);
-
-            // warten bis alle Pakete bestätigt wurden
-            while (Kugelmatik.AnyPacketsAcknowledgePending)
+            try
             {
-                Thread.Sleep(500);
-                Kugelmatik.ResendPendingPackets();
+                Choreography.Tick(Kugelmatik, TimeSpan.Zero);
+                Kugelmatik.SendData(true);
+
+                Stopwatch timeoutPending = new Stopwatch();
+                timeoutPending.Start();
+
+                // warten bis alle Pakete bestätigt wurden
+                while (Kugelmatik.AnyPacketsAcknowledgePending)
+                {
+                    Task.Delay(TimeSpan.FromMilliseconds(250), cancellationToken.Token).Wait();
+                    Kugelmatik.ResendPendingPackets();
+
+                    // schauen ob wir stoppen sollen oder wir zu lange auf die Pakete gewartet haben
+                    if (cancellationToken.IsCancellationRequested || timeoutPending.Elapsed > TimeSpan.FromSeconds(3))
+                        return;
+                }
+
+                Task.Delay(TimeSpan.FromSeconds(5), cancellationToken.Token).Wait(); // warten bis alle Kugeln auf Anfang sind
+
+                // Zeit messen
+                Stopwatch time = new Stopwatch(); // gesammte Zeit
+                time.Start();
+                Stopwatch frame = new Stopwatch(); // Zeit zwischen zwei Frames
+                frame.Start();
+
+                while (!cancellationToken.IsCancellationRequested)
+                {
+                    TimeSpan timeStamp = time.Elapsed;
+
+                    // Daten setzen und zu den Clustern senden
+                    Choreography.Tick(Kugelmatik, timeStamp);
+                    Kugelmatik.SendData();
+
+                    // alle 2 Sekunden Ping senden
+                    if ((int)timeStamp.TotalSeconds % 2 == 0)
+                        Kugelmatik.SendPing();
+
+                    // berechnen wie lange der Thread schlafen soll um die TargetFPS zu erreichen
+                    int sleepTime = (int)(1000f / Math.Max(1, TargetFPS)) - (int)frame.ElapsedMilliseconds;
+                    if (sleepTime > 0)
+                        Thread.Sleep(sleepTime);
+
+                    FPS = (int)Math.Ceiling(1000f / frame.ElapsedMilliseconds);
+                    frame.Restart();
+                }
             }
-
-            Thread.Sleep(5000); // warten bis alle Kugeln auf Anfang sind
-
-            // Zeit messen
-            Stopwatch time = new Stopwatch(); // gesammte Zeit
-            time.Start();
-            Stopwatch frame = new Stopwatch(); // Zeit zwischen zwei Frames
-            frame.Start();
-
-            while (!cancellationToken.IsCancellationRequested)
+            catch(Exception e)
             {
-                TimeSpan timeStamp = time.Elapsed;
-
-                // Daten setzen und zu den Clustern senden
-                Choreography.Tick(Kugelmatik, timeStamp);
-                Kugelmatik.SendData();
-
-                // alle 2 Sekunden Ping senden
-                if ((int)timeStamp.TotalSeconds % 2 == 0)
-                    Kugelmatik.SendPing();
-
-                // berechnen wie lange der Thread schlafen soll um die TargetFPS zu erreichen
-                int sleepTime = (int)(1000f / TargetFPS) - (int)frame.ElapsedMilliseconds;
-                if (sleepTime > 0) 
-                    Thread.Sleep(sleepTime);
-
-                FPS = (int)Math.Ceiling(1000f / frame.ElapsedMilliseconds);
-                frame.Restart();
+                Log.Error(e);
             }
         }
     }
