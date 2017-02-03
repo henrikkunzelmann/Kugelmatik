@@ -148,10 +148,21 @@ namespace KugelmatikControl
 
         private static T LoadOrDefault<T>(string file, T defaultValue)
         {
-            if (File.Exists(file))
-                return ConfigHelper.LoadConfigFromFile(file, defaultValue);
+            try
+            {
+                if (File.Exists(file))
+                    return ConfigHelper.LoadConfigFromFile(file, defaultValue);
 
-            ConfigHelper.SaveToFile(file, defaultValue);
+                ConfigHelper.SaveToFile(file, defaultValue);
+            }
+            catch(Exception e)
+            {
+                Log.Error("Exception while loading config from file {0}", file);
+                Log.Error(e);
+
+                MessageBox.Show("Error while loading config file! Using default config. Exception:" + Environment.NewLine + Environment.NewLine + e.ToString(), 
+                    string.Format("Could not load config file {0}!", Path.GetFileName(file)), MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
             return defaultValue;
         }
 
