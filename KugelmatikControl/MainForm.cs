@@ -444,7 +444,7 @@ namespace KugelmatikControl
             if (!autoStopToolStripMenuItem.Checked)
                 return;
 
-            if (!Kugelmatik.AnyClusterOnline)
+            if (!Kugelmatik.AnyClusterOnline && choreography != null && choreography.IsRunning)
             {
                 StopChoreography();
                 MessageBox.Show("Choreography stopped because all clusters are offline.", "Choreography stopped", MessageBoxButtons.OK, MessageBoxIcon.Warning);
