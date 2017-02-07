@@ -6,12 +6,16 @@ void initAllMCPs()
 {
 	Serial.println(F("initAllMCPs()"));
 
-	for (byte i = 0; i < MCP_COUNT; i++)
+	for (uint8_t i = 0; i < MCP_COUNT; i++)
 		initMCP(i);
 }
 
-void initMCP(byte index)
+void initMCP(uint8_t index)
 {
+	Serial.print(F("Init mcp number "));
+	Serial.println(index);
+
+
 	MCPData* data = &mcps[index];
 
 	for (byte i = 0; i < MCP_STEPPER_COUNT; i++)
@@ -65,6 +69,27 @@ StepperData* getStepper(int index)
 	return data->Steppers + stepperPosition[index];
 }
 
+boolean isSpecialHeight(uint16_t height)
+{
+	return height == 0 || height == config.maxSteps || height % 100 == 0;
+}
+
+void checkStepper(StepperData* stepper)
+{
+	if (stepper->CurrentSteps < 0 || stepper->CurrentSteps > config.maxSteps) {
+		internalError(ERROR_INTERNAL_LOOP_VALUES_WRONG);
+		stepper->CurrentSteps = 0;
+	}
+	if (stepper->GotoSteps < 0 || stepper->GotoSteps > config.maxSteps) {
+		internalError(ERROR_INTERNAL_LOOP_VALUES_WRONG);
+		stepper->GotoSteps = 0;
+	}
+	if (stepper->CurrentStepIndex >= STEPPER_STEP_COUNT) {
+		internalError(ERROR_INTERNAL_LOOP_VALUES_WRONG);
+		stepper->CurrentStepIndex = 0;
+	}
+}
+
 void resetStepper(StepperData* stepper)
 {
 	stepper->CurrentSteps = 0;
@@ -87,8 +112,8 @@ void setStepper(StepperData* stepper, int32_t revision, uint16_t height, byte wa
 	{
 		stepper->LastRevision = revision;
 
-		uint16_t diff = abs(stepper->CurrentSteps - height);
-		if (diff >= config.minStepDelta)
+		int16_t diff = abs(stepper->CurrentSteps - (int16_t)height);
+		if (isSpecialHeight(height) || diff >= config.minStepDelta)
 		{
 			stepper->GotoSteps = height;
 			stepper->TickCount = 0;
@@ -145,6 +170,8 @@ void updateSteppers(boolean alwaysUseHalfStep)
 		{
 			StepperData* stepper = &mcp->Steppers[j];
 
+			checkStepper(stepper);
+
 			byte stepSize = 0;
 			int32_t diff = abs(stepper->CurrentSteps - stepper->GotoSteps);
 
@@ -183,10 +210,10 @@ void updateSteppers(boolean alwaysUseHalfStep)
 				}
 
 				// stepperIndex in den richtigen Bereich bringen (underflow/overflow)
-				if (stepperIndex < 0)
-					stepperIndex = STEPPER_STEP_COUNT - stepSize;
-				else if (stepperIndex >= STEPPER_STEP_COUNT)
-					stepperIndex = 0;
+				while (stepperIndex < 0)
+					stepperIndex += STEPPER_STEP_COUNT;
+				while (stepperIndex >= STEPPER_STEP_COUNT)
+					stepperIndex -= STEPPER_STEP_COUNT;
 
 				gpioValue |= stepsStepper[stepperIndex] << (4 * j); // jeder Wert in stepsStepper ist 4 Bit lang
 

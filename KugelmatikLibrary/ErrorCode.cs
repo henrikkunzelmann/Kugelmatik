@@ -25,6 +25,7 @@
         McpFault7 = 19,
         McpFault8 = 20,
 
+        InternalWrongLoopValues = 252,
         InternalInvalidTimerIndex = 253,
         InternalDefaultConfigFault = 254,
         Internal = 255,

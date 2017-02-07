@@ -54,6 +54,12 @@ void initMCP(byte index);	// initialisiert einen MCP
 StepperData* getStepper(byte x, byte y);
 StepperData* getStepper(int index);
 
+// prüft ob die Höhe eine besondere Bedeutung hat und nicht minStepDelta benutzt wird
+boolean isSpecialHeight(uint16_t height);
+
+// überprüft einen Stepper auf richtige Werte
+void checkStepper(StepperData* stepper);
+
 // setzt den Schrittmotor auf Standard Werte zurück (Höhe = 0)
 void resetStepper(StepperData* stepper);
 // setzt den Schrittmotor auf eine bestimmte Höhe welche nicht geprüft wird ob sie größer als MaxSteps ist
