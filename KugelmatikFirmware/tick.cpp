@@ -5,7 +5,7 @@ boolean runTick(uint32_t tickTime, boolean useHalfStep) {
 	updateSteppers(useHalfStep);
 
 	while (true) {
-		wdt_reset();
+		wdt_yield();
 
 		if (!loopNetwork())
 			return false;

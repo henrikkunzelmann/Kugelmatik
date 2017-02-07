@@ -76,7 +76,7 @@ void initNetwork()
 
 boolean loopNetwork() {
 	startTime(TIMER_NETWORK);
-	wdt_reset();
+	wdt_yield();
 
 	// Paket abfragen
 	ether.packetLoop(ether.packetReceive());

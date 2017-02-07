@@ -2,6 +2,8 @@
 
 #include <Arduino.h>
 
+#include "watchdog.h"
+
 #define LED_GREEN 2		// Port für grüne LED (Pin 4 SUBD)
 #define LED_RED 3		// Port für rote LED (Pin 5 SUBD)
 

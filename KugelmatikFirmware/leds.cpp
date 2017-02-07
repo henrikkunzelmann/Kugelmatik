@@ -62,7 +62,7 @@ void blinkGreenLedShort(boolean fast)
 		delay(time);
 		turnGreenLedOff();
 		delay(time);
-		wdt_reset();
+		wdt_yield();
 	}
 }
 
@@ -76,7 +76,7 @@ void blinkRedLedShort(boolean fast)
 		delay(time);
 		turnRedLedOff();
 		delay(time);
-		wdt_reset();
+		wdt_yield();
 	}
 }
 
@@ -92,6 +92,6 @@ void blinkBothLedsShort(boolean fast)
 		turnRedLedOff();
 		turnGreenLedOff();
 		delay(time);
-		wdt_reset();
+		wdt_yield();
 	}
 }

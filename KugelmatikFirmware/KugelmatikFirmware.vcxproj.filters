@@ -15,6 +15,9 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <None Include="KugelmatikFirmware.ino" />
+  </ItemGroup>
+  <ItemGroup>
     <ClCompile Include="BinaryHelper.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -68,8 +71,11 @@
     <ClInclude Include="util.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="KugelmatikFirmware.ino" />
+    <ClInclude Include="__vm\.KugelmatikFirmware.vsarduino.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="watchdog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

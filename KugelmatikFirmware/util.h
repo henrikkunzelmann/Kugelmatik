@@ -1,14 +1,12 @@
 #pragma once
 
 #include <Arduino.h>
-#include <avr/wdt.h> 
 
+#include "watchdog.h"
 #include "leds.h"
 #include "constants.h"
 
 extern byte lastError;
-
-void softReset(); // setzt den Chip zurück
 
 // bringt den Chip in den Fehler-Modus und blockiert ihn 
 void error(const char* tag, const char* message, bool blinkFast);

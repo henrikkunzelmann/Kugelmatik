@@ -9,17 +9,11 @@
 //  L293DNE
 
 // Defines
-#define ENABLE_WATCH_DOG false		// gibt an ob der WatchDog aktiviert sein soll, der Chip wird resetet wenn er sich aufhängt
-
 #define ETHERCARD_TCPCLIENT 0
 #define ETHERCARD_TCPSERVER 0
 #define ETHERCARD_STASH 0
 
 // Includes
-#include <avr/pgmspace.h>
-#include <avr/wdt.h> 
-#include <avr/sleep.h>
-#include <avr/interrupt.h>
 #include <limits.h>
 #include <EtherCard.h>
 #include <I2C.h>
@@ -32,13 +26,12 @@
 #include "stepper.h"
 #include "network.h"
 #include "tick.h"
+#include "watchdog.h"
 #include "PacketBuffer.h"
 #include "BinaryHelper.h"
 
 void setup()
 {
-	wdt_disable(); // Watch Dog deaktivieren, da er noch aktiviert sein kann
-
 	Serial.begin(1200);
 	Serial.print(F("Kugelmatik Firmware booting up, version: "));
 	Serial.println(BUILD_VERSION);
@@ -52,10 +45,7 @@ void setup()
 
 	turnGreenLedOff();
 
-#if ENABLE_WATCH_DOG
-	wdt_enable(WDTO_2S);
-#endif
-
+	wdt_yield();
 	Serial.println(F("Done booting! Ready."));
 }
 

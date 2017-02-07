@@ -2,13 +2,6 @@
 
 byte lastError = ERROR_NONE;
 
-void softReset()
-{
-	Serial.println(F("softReset()"));
-	wdt_enable(WDTO_2S);	// Watch Dog aktivieren damit der Chip zurück gesetzt wird
-	while (true);			// in Endlosschleife gehen damit der Watch Dog den Chip resetet
-}
-
 // bringt den Chip in den Fehler-Modus und blockiert ihn 
 void error(const char* tag, const char* message, bool blinkFast)
 {
@@ -25,7 +18,7 @@ void error(const char* tag, const char* message, bool blinkFast)
 			delay(250);
 		else
 			delay(500);
-		wdt_reset();
+		wdt_yield();
 	}
 }
 
