@@ -1,9 +1,9 @@
 #include "util.h"
 
-byte lastError = ERROR_NONE;
+uint8_t lastError = ERROR_NONE;
 
 // bringt den Chip in den Fehler-Modus und blockiert ihn 
-void error(const char* tag, const char* message, bool blinkFast)
+void error(const char* tag, const char* message, boolean blinkFast)
 {
 	Serial.print(F("error(tag = "));
 	Serial.print(tag);
@@ -47,7 +47,7 @@ void protocolError(uint8_t error)
 	blinkRedLedShort(true);
 }
 
-char getHexChar(int x)
+char getHexChar(int32_t x)
 {
 	x &= 0xF;
 	if (x >= 10)
@@ -76,8 +76,8 @@ int32_t endTime(uint8_t index) {
 	return 0;
 }
 
-int freeRam() {
-	extern int __heap_start, *__brkval;
-	int v;
-	return (int)&v - (__brkval == 0 ? (int)&__heap_start : (int)__brkval);
+int32_t freeRam() {
+	extern int32_t __heap_start, *__brkval;
+	int32_t v;
+	return (int32_t)&v - (__brkval == 0 ? (int32_t)&__heap_start : (int32_t)__brkval);
 }

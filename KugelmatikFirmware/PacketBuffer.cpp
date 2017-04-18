@@ -38,8 +38,8 @@ PacketBuffer::~PacketBuffer()
 		free(data);
 }
 
-bool PacketBuffer::getError() {
-	bool err = error;
+boolean PacketBuffer::getError() {
+	boolean err = error;
 	this->error = false;
 	return err;
 }
@@ -52,7 +52,7 @@ uint32_t PacketBuffer::getBufferSize() const {
 	return bufferSize;
 }
 
-bool PacketBuffer::assertNull(void* pointer) {
+boolean PacketBuffer::assertNull(void* pointer) {
 	if (pointer != NULL)
 		return true;
 
@@ -61,7 +61,7 @@ bool PacketBuffer::assertNull(void* pointer) {
 	return false;
 }
 
-bool PacketBuffer::assertRead() {
+boolean PacketBuffer::assertRead() {
 	if (error)
 		return false;
 
@@ -72,7 +72,7 @@ bool PacketBuffer::assertRead() {
 	return allowRead;
 }
 
-bool PacketBuffer::assertPosition(size_t length) {
+boolean PacketBuffer::assertPosition(size_t length) {
 	if (error)
 		return false;
 
@@ -89,13 +89,13 @@ bool PacketBuffer::assertPosition(size_t length) {
 	return true;
 }
 
-bool PacketBuffer::assertPositionRead(size_t length) {
+boolean PacketBuffer::assertPositionRead(size_t length) {
 	if (!assertRead())
 		return false;
 	return assertPosition(length);
 }
 
-bool PacketBuffer::assertPositionWrite(size_t length) {
+boolean PacketBuffer::assertPositionWrite(size_t length) {
 	allowRead = false;
 	return assertPosition(length);
 }
@@ -145,7 +145,7 @@ void PacketBuffer::setSize(uint32_t size) {
 	this->size = size;
 }
 
-bool PacketBuffer::readBoolean() {
+boolean PacketBuffer::readBoolean() {
 	return readUint8() > 0;
 }
 
@@ -273,7 +273,7 @@ char* PacketBuffer::readString() {
 	return str;
 }
 
-void PacketBuffer::write(bool value) {
+void PacketBuffer::write(boolean value) {
 	if (value)
 		write(uint8_t(1));
 	else
@@ -356,7 +356,7 @@ void PacketBuffer::writeString(char* str) {
 	if (!assertNull(str))
 		return;
 
-	int size = sizeof(char) * strlen(str);
+	int32_t size = sizeof(char) * strlen(str);
 	if (!assertPositionWrite(size + sizeof(uint16_t)))
 		return;
 

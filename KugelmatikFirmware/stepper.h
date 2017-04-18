@@ -49,10 +49,10 @@ const uint8_t stepperPosition[CLUSTER_SIZE] = { 2, 3, 2, 3, 1, 1, 0, 1, 0, 0, 1,
 extern MCPData mcps[MCP_COUNT];
 
 void initAllMCPs();			// initialisiert alle MCPs
-void initMCP(byte index);	// initialisiert einen MCP
+void initMCP(uint8_t index);	// initialisiert einen MCP
 
-StepperData* getStepper(byte x, byte y);
-StepperData* getStepper(int index);
+StepperData* getStepper(uint8_t x, uint8_t y);
+StepperData* getStepper(int32_t index);
 
 // prüft ob die Höhe eine besondere Bedeutung hat und nicht minStepDelta benutzt wird
 boolean isSpecialHeight(uint16_t height);
@@ -66,13 +66,13 @@ void resetStepper(StepperData* stepper);
 void forceStepper(StepperData* stepper, int32_t revision, int16_t height);
 
 // setzt den Schrittmotor auf eine bestimmte Höhe und Wartezeit
-void setStepper(StepperData* stepper, int32_t revision, uint16_t height, byte waitTime);
+void setStepper(StepperData* stepper, int32_t revision, uint16_t height, uint8_t waitTime);
 
 // setzt einen Schrittmotoren auf eine bestimmte Höhe
-void setStepper(int32_t revision, byte x, byte y, uint16_t height, byte waitTime); 
+void setStepper(int32_t revision, uint8_t x, uint8_t y, uint16_t height, uint8_t waitTime); 
 
 // setzt alle Schrittmotoren auf eine bestimmte Höhe
-void setAllSteps(int32_t revision, uint16_t height, byte waitTime);
+void setAllSteps(int32_t revision, uint16_t height, uint8_t waitTime);
 
 // stoppt alle Schrittmotoren (setzt GotoSteps auf die aktuelle Höhe)
 void stopMove();

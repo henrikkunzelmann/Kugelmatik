@@ -11,7 +11,7 @@ uint8_t Ethernet::buffer[ETHERNET_BUFFER_SIZE];
 int32_t configRevision = 0;		// die letzte Revision des Config-Packets
 int32_t setDataRevision = 0;	// die letzte Revision des SetData-Packets
 
-byte currentBusyCommand = BUSY_NONE;
+uint8_t currentBusyCommand = BUSY_NONE;
 boolean stopBusyCommand = false;
 
 PacketBuffer* packet;
@@ -98,7 +98,7 @@ void sendPacket()
 	ether.makeUdpReply((char*)packet->getBuffer(), packet->getPosition(), PROTOCOL_PORT);
 }
 
-void writeHeader(bool guarenteed, byte packetType, int32_t revision)
+void writeHeader(boolean guarenteed, uint8_t packetType, int32_t revision)
 {
 	packet->resetPosition();
 	packet->setSize(packet->getBufferSize()); // Size überschreiben, da die Size vom Lesen gesetzt wird
@@ -111,11 +111,11 @@ void writeHeader(bool guarenteed, byte packetType, int32_t revision)
 }
 
 
-bool readPosition(PacketBuffer* packet, byte* x, byte* y)
+boolean readPosition(PacketBuffer* packet, uint8_t* x, uint8_t* y)
 {
-	byte pos = packet->readUint8();
-	byte xvalue = (pos >> 4) & 0xF;
-	byte yvalue = pos & 0xF;
+	uint8_t pos = packet->readUint8();
+	uint8_t xvalue = (pos >> 4) & 0xF;
+	uint8_t yvalue = pos & 0xF;
 
 	if (xvalue < 0 || xvalue >= CLUSTER_WIDTH)
 	{
@@ -143,8 +143,8 @@ void sendData(int32_t revision)
 {
 	writeHeader(false, PacketGetData, revision);
 
-	for (byte x = 0; x < CLUSTER_WIDTH; x++) {
-		for (byte y = 0; y < CLUSTER_HEIGHT; y++)
+	for (uint8_t x = 0; x < CLUSTER_WIDTH; x++) {
+		for (uint8_t y = 0; y < CLUSTER_HEIGHT; y++)
 		{
 			StepperData* stepper = getStepper(x, y);
 
@@ -158,7 +158,7 @@ void sendData(int32_t revision)
 
 void sendInfo(int32_t revision, boolean wantConfig2) {
 	int32_t highestRevision = INT_MIN;
-	for (int i = 0; i < CLUSTER_SIZE; i++) {
+	for (int32_t i = 0; i < CLUSTER_SIZE; i++) {
 		StepperData* stepper = getStepper(i);
 
 		if (stepper->LastRevision > highestRevision)
@@ -253,12 +253,12 @@ void handlePacket(uint8_t packetType, int32_t revision)
 		break;
 	case PacketStepper:
 	{
-		byte x, y;
+		uint8_t x, y;
 		if (!readPosition(packet, &x, &y))
 			return;
 
 		uint16_t height = packet->readUint16();
-		byte waitTime = packet->readUint8();
+		uint8_t waitTime = packet->readUint8();
 
 		if (packet->getError())
 			return;
@@ -268,13 +268,13 @@ void handlePacket(uint8_t packetType, int32_t revision)
 	}
 	case PacketSteppers:
 	{
-		byte length = packet->readUint8();
+		uint8_t length = packet->readUint8();
 		uint16_t height = packet->readUint16();
-		byte waitTime = packet->readUint8();
+		uint8_t waitTime = packet->readUint8();
 
-		for (byte i = 0; i < length; i++)
+		for (uint8_t i = 0; i < length; i++)
 		{
-			byte x, y;
+			uint8_t x, y;
 			readPosition(packet, &x, &y);
 
 			if (packet->getError())
@@ -286,16 +286,16 @@ void handlePacket(uint8_t packetType, int32_t revision)
 	}
 	case PacketSteppersArray:
 	{
-		byte length = packet->readUint8();
+		uint8_t length = packet->readUint8();
 
-		for (byte i = 0; i < length; i++)
+		for (uint8_t i = 0; i < length; i++)
 		{
-			byte x, y;
+			uint8_t x, y;
 			if (!readPosition(packet, &x, &y))
 				return;
 
 			uint16_t height = packet->readUint16();
-			byte waitTime = packet->readUint8();
+			uint8_t waitTime = packet->readUint8();
 
 			if (packet->getError())
 				return;
@@ -306,16 +306,16 @@ void handlePacket(uint8_t packetType, int32_t revision)
 	}
 	case PacketSteppersRectangle:
 	{
-		byte minX, minY;
+		uint8_t minX, minY;
 		if (!readPosition(packet, &minX, &minY))
 			return;
 
-		byte maxX, maxY;
+		uint8_t maxX, maxY;
 		if (!readPosition(packet, &maxX, &maxY))
 			return;
 
 		uint16_t height = packet->readUint16();
-		byte waitTime = packet->readUint8();
+		uint8_t waitTime = packet->readUint8();
 
 		if (minX > maxX || minY > maxY)
 			return protocolError(ERROR_INVALID_VALUE);
@@ -323,18 +323,18 @@ void handlePacket(uint8_t packetType, int32_t revision)
 		if (packet->getError())
 			return;
 
-		for (byte x = minX; x <= maxX; x++)
-			for (byte y = minY; y <= maxY; y++)
+		for (uint8_t x = minX; x <= maxX; x++)
+			for (uint8_t y = minY; y <= maxY; y++)
 				setStepper(revision, x, y, height, waitTime);
 		break;
 	}
 	case PacketSteppersRectangleArray:
 	{
-		byte minX, minY;
+		uint8_t minX, minY;
 		if (!readPosition(packet, &minX, &minY))
 			return;
 
-		byte maxX, maxY;
+		uint8_t maxX, maxY;
 		if (!readPosition(packet, &maxX, &maxY))
 			return;
 
@@ -342,10 +342,10 @@ void handlePacket(uint8_t packetType, int32_t revision)
 			return protocolError(ERROR_INVALID_VALUE);
 
 		// beide for-Schleifen müssen mit dem Client übereinstimmen sonst stimmen die Positionen nicht		
-		for (byte x = minX; x <= maxX; x++) {
-			for (byte y = minY; y <= maxY; y++) {
+		for (uint8_t x = minX; x <= maxX; x++) {
+			for (uint8_t y = minY; y <= maxY; y++) {
 				uint16_t height = packet->readUint16();
-				byte waitTime = packet->readUint8();
+				uint8_t waitTime = packet->readUint8();
 
 				if (packet->getError())
 					return;
@@ -358,7 +358,7 @@ void handlePacket(uint8_t packetType, int32_t revision)
 	case PacketAllSteppers:
 	{
 		uint16_t height = packet->readUint16();
-		byte waitTime = packet->readUint8();
+		uint8_t waitTime = packet->readUint8();
 
 		if (packet->getError())
 			return;
@@ -368,10 +368,10 @@ void handlePacket(uint8_t packetType, int32_t revision)
 	case PacketAllSteppersArray:
 	{
 		// beide for-Schleifen müssen mit dem Client übereinstimmen sonst stimmen die Positionen nicht		
-		for (byte x = 0; x < CLUSTER_WIDTH; x++) {
-			for (byte y = 0; y < CLUSTER_HEIGHT; y++) {
+		for (uint8_t x = 0; x < CLUSTER_WIDTH; x++) {
+			for (uint8_t y = 0; y < CLUSTER_HEIGHT; y++) {
 				uint16_t height = packet->readUint16();
-				byte waitTime = packet->readUint8();
+				uint8_t waitTime = packet->readUint8();
 
 				if (packet->getError())
 					return;
@@ -392,10 +392,10 @@ void handlePacket(uint8_t packetType, int32_t revision)
 
 		stopMove();
 
-		bool stepperSet = false;
+		boolean stepperSet = false;
 
 		// Stepper für Home Befehl vorbereiten
-		for (int i = 0; i < CLUSTER_SIZE; i++) {
+		for (int32_t i = 0; i < CLUSTER_SIZE; i++) {
 			StepperData* stepper = getStepper(i);
 
 			if (checkRevision(stepper->LastRevision, revision)) {
@@ -409,7 +409,7 @@ void handlePacket(uint8_t packetType, int32_t revision)
 
 
 			// alle Stepper zurücksetzen
-			for (int i = 0; i < CLUSTER_SIZE; i++) {
+			for (int32_t i = 0; i < CLUSTER_SIZE; i++) {
 				StepperData* stepper = getStepper(i);
 				if (stepper->LastRevision == revision)
 					resetStepper(stepper);
@@ -423,7 +423,7 @@ void handlePacket(uint8_t packetType, int32_t revision)
 		configRevision = 0;
 		setDataRevision = 0;
 
-		for (int i = 0; i < CLUSTER_SIZE; i++)
+		for (int32_t i = 0; i < CLUSTER_SIZE; i++)
 			getStepper(i)->LastRevision = 0;
 		break;
 	}
@@ -434,7 +434,7 @@ void handlePacket(uint8_t packetType, int32_t revision)
 		if (magic != 0xDCBA)
 			return protocolError(ERROR_INVALID_MAGIC);
 
-		byte x, y;
+		uint8_t x, y;
 		if (!readPosition(packet, &x, &y))
 			return;
 
@@ -459,7 +459,7 @@ void handlePacket(uint8_t packetType, int32_t revision)
 		if (magic != 0xABCD)
 			return protocolError(ERROR_INVALID_MAGIC);
 
-		byte x, y;
+		uint8_t x, y;
 		if (!readPosition(packet, &x, &y))
 			return;
 
@@ -484,7 +484,7 @@ void handlePacket(uint8_t packetType, int32_t revision)
 	}
 	case PacketInfo:
 	{
-		bool wantConfig2 = false;
+		boolean wantConfig2 = false;
 		if (packet->getPosition() < packet->getSize())
 			wantConfig2 = packet->readBoolean();
 
@@ -498,7 +498,7 @@ void handlePacket(uint8_t packetType, int32_t revision)
 
 		configRevision = revision;
 
-		byte cStepMode = packet->readUint8();
+		uint8_t cStepMode = packet->readUint8();
 		if (cStepMode < StepHalf || cStepMode > StepBoth)
 			return protocolError(ERROR_INVALID_CONFIG_VALUE);
 
@@ -549,8 +549,8 @@ void handlePacket(uint8_t packetType, int32_t revision)
 
 		Serial.println(F("PacketSetData received"));
 
-		for (byte x = 0; x < CLUSTER_WIDTH; x++) {
-			for (byte y = 0; y < CLUSTER_HEIGHT; y++) {
+		for (uint8_t x = 0; x < CLUSTER_WIDTH; x++) {
+			for (uint8_t y = 0; y < CLUSTER_HEIGHT; y++) {
 				StepperData* stepper = getStepper(x, y);
 
 				uint16_t height = packet->readUint16();
@@ -606,7 +606,7 @@ void runBusy(uint8_t type, int32_t steps, uint32_t delay)
 
 	currentBusyCommand = type;
 	turnRedLedOn();
-	for (int i = 0; i <= steps; i++) {
+	for (int32_t i = 0; i <= steps; i++) {
 		if (stopBusyCommand)
 			break;
 

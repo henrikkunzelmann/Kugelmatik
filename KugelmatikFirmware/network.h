@@ -29,8 +29,8 @@ void initNetwork();
 boolean loopNetwork();
 
 void sendPacket();
-void writeHeader(bool guarenteed, byte packetType, int32_t revision);
-bool readPosition(PacketBuffer* packet, byte* x, byte* y);
+void writeHeader(boolean guarenteed, uint8_t packetType, int32_t revision);
+boolean readPosition(PacketBuffer* packet, uint8_t* x, uint8_t* y);
 
 void sendAckPacket(int32_t revision);
 void sendData(int32_t revision);

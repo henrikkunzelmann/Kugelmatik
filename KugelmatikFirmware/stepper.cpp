@@ -18,7 +18,7 @@ void initMCP(uint8_t index)
 
 	MCPData* data = &mcps[index];
 
-	for (byte i = 0; i < MCP_STEPPER_COUNT; i++)
+	for (uint8_t i = 0; i < MCP_STEPPER_COUNT; i++)
 	{
 		StepperData* stepper = &data->Steppers[i];
 		memset(stepper, 0, sizeof(StepperData));
@@ -44,7 +44,7 @@ void initMCP(uint8_t index)
 		internalError(ERROR_MCP_FAULT_1 + index);
 
 		turnRedLedOn();
-		for (byte i = 0; i <= index; i++)
+		for (uint8_t i = 0; i <= index; i++)
 		{
 			turnGreenLedOn();
 			delay(TIME_SLOW);
@@ -58,12 +58,12 @@ void initMCP(uint8_t index)
 #endif
 }
 
-StepperData* getStepper(byte x, byte y)
+StepperData* getStepper(uint8_t x, uint8_t y)
 {
 	return getStepper(y * CLUSTER_WIDTH + x);
 }
 
-StepperData* getStepper(int index)
+StepperData* getStepper(int32_t index)
 {
 	MCPData* data = mcps + mcpPosition[index];
 	return data->Steppers + stepperPosition[index];
@@ -106,7 +106,7 @@ void forceStepper(StepperData* stepper, int32_t revision, int16_t height)
 	stepper->GotoSteps = height;
 }
 
-void setStepper(StepperData* stepper, int32_t revision, uint16_t height, byte waitTime)
+void setStepper(StepperData* stepper, int32_t revision, uint16_t height, uint8_t waitTime)
 {
 	if (checkRevision(stepper->LastRevision, revision))
 	{
@@ -123,7 +123,7 @@ void setStepper(StepperData* stepper, int32_t revision, uint16_t height, byte wa
 }
 
 
-void setStepper(int32_t revision, byte x, byte y, uint16_t height, byte waitTime)
+void setStepper(int32_t revision, uint8_t x, uint8_t y, uint16_t height, uint8_t waitTime)
 {
 	if (x < 0 || x >= CLUSTER_WIDTH)
 		return protocolError(ERROR_X_INVALID);
@@ -135,11 +135,11 @@ void setStepper(int32_t revision, byte x, byte y, uint16_t height, byte waitTime
 	setStepper(getStepper(x, y), revision, height, waitTime);
 }
 
-void setAllSteps(int32_t revision, uint16_t height, byte waitTime)
+void setAllSteps(int32_t revision, uint16_t height, uint8_t waitTime)
 {
 	if (height > config.maxSteps)
 		return protocolError(ERROR_INVALID_HEIGHT);
-	for (int i = 0; i < CLUSTER_SIZE; i++) 
+	for (int32_t i = 0; i < CLUSTER_SIZE; i++) 
 		setStepper(getStepper(i), revision, height, waitTime);
 }
 
@@ -147,7 +147,7 @@ void setAllSteps(int32_t revision, uint16_t height, byte waitTime)
 void stopMove() {
 	Serial.println(F("stopMove()"));
 
-	for (int i = 0; i < CLUSTER_SIZE; i++) {
+	for (int32_t i = 0; i < CLUSTER_SIZE; i++) {
 		StepperData* stepper = getStepper(i);
 
 		// stoppen
@@ -160,19 +160,19 @@ void stopMove() {
 void updateSteppers(boolean alwaysUseHalfStep)
 {
 	startTime(TIMER_STEPPER);
-	for (byte i = 0; i < MCP_COUNT; i++)
+	for (uint8_t i = 0; i < MCP_COUNT; i++)
 	{
 		uint16_t gpioValue = 0;
 
 		MCPData* mcp = &mcps[i];
 
-		for (byte j = 0; j < MCP_STEPPER_COUNT; j++)
+		for (uint8_t j = 0; j < MCP_STEPPER_COUNT; j++)
 		{
 			StepperData* stepper = &mcp->Steppers[j];
 
 			checkStepper(stepper);
 
-			byte stepSize = 0;
+			uint8_t stepSize = 0;
 			int32_t diff = abs(stepper->CurrentSteps - stepper->GotoSteps);
 
 			if (diff != 0)
@@ -186,7 +186,7 @@ void updateSteppers(boolean alwaysUseHalfStep)
 			if (alwaysUseHalfStep)
 				stepSize = min(stepSize, 1);
 
-			bool waitStep = false;
+			boolean waitStep = false;
 			if (stepper->WaitTime > 0) {
 				stepper->TickCount--;
 				waitStep = stepper->TickCount >= 0;
@@ -217,7 +217,7 @@ void updateSteppers(boolean alwaysUseHalfStep)
 
 				gpioValue |= stepsStepper[stepperIndex] << (4 * j); // jeder Wert in stepsStepper ist 4 Bit lang
 
-				stepper->CurrentStepIndex = (byte)stepperIndex;
+				stepper->CurrentStepIndex = (uint8_t)stepperIndex;
 				stepper->TickCount = stepper->WaitTime;
 				stepper->BrakeTicks = 0;
 			}

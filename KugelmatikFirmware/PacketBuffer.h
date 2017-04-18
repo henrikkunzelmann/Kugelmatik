@@ -13,15 +13,15 @@ private:
 	uint32_t position; // aktuelle Position
 	uint32_t size; // Länge des Pakets
 
-	bool error;
-	bool allowRead;
+	boolean error;
+	boolean allowRead;
 
-	bool assertNull(void* pointer);
+	boolean assertNull(void* pointer);
 
-	bool assertRead(); // überprüft ob das Lesen zulässig ist
-	bool assertPosition(size_t length); // überprüft die Position
-	bool assertPositionRead(size_t length); // überprüft assertRead und überprüft die Position
-	bool assertPositionWrite(size_t length); // setzt allowRead auf false und überprüft die Position
+	boolean assertRead(); // überprüft ob das Lesen zulässig ist
+	boolean assertPosition(size_t length); // überprüft die Position
+	boolean assertPositionRead(size_t length); // überprüft assertRead und überprüft die Position
+	boolean assertPositionWrite(size_t length); // setzt allowRead auf false und überprüft die Position
 	uint32_t addPosition(size_t length); // addiert einen Wert zur Position und gibt die alte Position zurück
 
 	void errorMemory();
@@ -31,7 +31,7 @@ public:
 	explicit PacketBuffer(uint8_t* data, size_t size);
 	~PacketBuffer();
 
-	bool getError();
+	boolean getError();
 
 	void setBuffer(uint8_t* data, size_t size);
 
@@ -51,7 +51,7 @@ public:
 	// setzt die Länge des Pakets in Bytes
 	void setSize(uint32_t size);
 
-	bool readBoolean();
+	boolean readBoolean();
 	int8_t readInt8();
 	uint8_t readUint8();
 	int16_t readInt16();
@@ -72,7 +72,7 @@ public:
 
 	char* readString();
 
-	void write(bool value);
+	void write(boolean value);
 	void write(char value);
 	void write(int8_t value);
 	void write(uint8_t value);

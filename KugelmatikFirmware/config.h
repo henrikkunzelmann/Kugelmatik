@@ -4,13 +4,13 @@
 
 #include "stepper.h"
 
-enum StepMode : byte {
+enum StepMode : uint8_t {
 	StepHalf = 1,
 	StepFull = 2,
 	StepBoth = 3
 };
 
-enum BrakeMode : byte {
+enum BrakeMode : uint8_t {
 	BrakeNone = 0,
 	BrakeAlways = 1,
 	BrakeSmart = 2
