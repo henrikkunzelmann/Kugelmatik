@@ -148,7 +148,7 @@ void sendData(int32_t revision)
 		{
 			StepperData* stepper = getStepper(x, y);
 
-			packet->write(max(0, stepper->CurrentSteps));
+			packet->write((uint16_t)max(0, stepper->CurrentSteps));
 			packet->write(stepper->WaitTime);
 		}
 	}

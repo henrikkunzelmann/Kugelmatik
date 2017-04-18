@@ -20,8 +20,8 @@
 struct StepperData
 {
 	int32_t LastRevision;		// letzte Revision der Daten
-	int16_t CurrentSteps;		// derzeitige Schritte die der Motor gemacht hat (= Höhe)
-	int16_t GotoSteps;			// Schritte zu der der Motor gehen soll (= zu welche Höhe die Kugel fahren soll)
+	int32_t CurrentSteps;		// derzeitige Schritte die der Motor gemacht hat (= Höhe)
+	int32_t GotoSteps;			// Schritte zu der der Motor gehen soll (= zu welche Höhe die Kugel fahren soll)
 	uint8_t CurrentStepIndex;	// derzeitiger Stepper Wert Index, siehe stepsStepper
 	int16_t TickCount;			// derzeitige Tick Anzahl, wenn kleiner als 0 dann wird ein Schritt gemacht und die Variable auf WaitTime gesetzt
 	uint8_t WaitTime;			// Wert für TickCount nach jedem Schritt
