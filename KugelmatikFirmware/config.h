@@ -31,7 +31,7 @@ struct Config {
 	uint16_t brakeTicks;
 
 	uint16_t minStepDelta; // Unterschied zwischen derzeitiger Höhe und Zielhöhe ab wann die Kugel bewegt werden soll
-};
+} __attribute__((__packed__));
 
 extern Config config;
 
