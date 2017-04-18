@@ -34,7 +34,7 @@ boolean readPosition(PacketBuffer* packet, uint8_t* x, uint8_t* y);
 
 void sendAckPacket(int32_t revision);
 void sendData(int32_t revision);
-void sendInfo(int32_t revision, boolean wantConfig2);
+void sendInfo(int32_t revision);
 
 void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, const char* data, uint16_t len);
 void handlePacket(uint8_t packetType, int32_t revision);

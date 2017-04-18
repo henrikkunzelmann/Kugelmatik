@@ -156,7 +156,7 @@ void sendData(int32_t revision)
 	sendPacket();
 }
 
-void sendInfo(int32_t revision, boolean wantConfig2) {
+void sendInfo(int32_t revision) {
 	int32_t highestRevision = INT_MIN;
 	for (int32_t i = 0; i < CLUSTER_SIZE; i++) {
 		StepperData* stepper = getStepper(i);
@@ -176,18 +176,11 @@ void sendInfo(int32_t revision, boolean wantConfig2) {
 	packet->write((uint8_t)BUILD_VERSION);
 	packet->write(currentBusyCommand);
 	packet->write(highestRevision);
-	if (!wantConfig2) {
-		packet->write((uint8_t)config.stepMode);
-		packet->write(config.tickTime);
-		packet->write(config.brakeMode != BrakeNone);
-	}
 	packet->write(lastError);
 	packet->write((int16_t)freeRam());
 
-	if (wantConfig2) {
-		packet->write((uint16_t)sizeof(Config));
-		packet->write((uint8_t*)&config, sizeof(Config));
-	}
+	packet->write((uint16_t)sizeof(Config));
+	packet->write((uint8_t*)&config, sizeof(Config));
 
 	uint8_t mcpStatus = 0;
 	for (uint8_t i = 0; i < MCP_COUNT; i++)
@@ -484,41 +477,7 @@ void handlePacket(uint8_t packetType, int32_t revision)
 	}
 	case PacketInfo:
 	{
-		boolean wantConfig2 = false;
-		if (packet->getPosition() < packet->getSize())
-			wantConfig2 = packet->readBoolean();
-
-		sendInfo(revision, wantConfig2);
-		break;
-	}
-	case PacketConfig:
-	{
-		if (!checkRevision(configRevision, revision))
-			break;
-
-		configRevision = revision;
-
-		uint8_t cStepMode = packet->readUint8();
-		if (cStepMode < StepHalf || cStepMode > StepBoth)
-			return protocolError(ERROR_INVALID_CONFIG_VALUE);
-
-		int32_t cTickTime = packet->readInt32();
-		if (cTickTime < 1000 || cTickTime > 5000)
-			return protocolError(ERROR_INVALID_CONFIG_VALUE);
-
-		boolean cUseBreak = packet->readBoolean();
-
-		if (packet->getError())
-			return;
-
-		config.stepMode = (StepMode)cStepMode;
-		config.tickTime = cTickTime;
-		config.brakeMode = cUseBreak ? BrakeSmart : BrakeNone;
-
-		if (!checkConfig(&config))
-			return protocolError(ERROR_INVALID_CONFIG_VALUE);
-
-		sendInfo(revision, false);
+		sendInfo(revision);
 		break;
 	}
 	case PacketBlinkGreen:
@@ -590,7 +549,7 @@ void handlePacket(uint8_t packetType, int32_t revision)
 		memcpy(&config, &newConfig, sizeof(Config));
 		Serial.println(F("Config2 set by network!"));
 
-		sendInfo(revision, true);
+		sendInfo(revision);
 		break;
 	}
 	default:

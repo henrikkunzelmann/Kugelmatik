@@ -23,7 +23,7 @@
 
 #define PacketGetData 14
 #define PacketInfo 15
-#define PacketConfig 16
+#define PacketConfig 16 // Veraltet. Ersetzt durch Config2.
 
 #define PacketBlinkGreen 17
 #define PacketBlinkRed 18

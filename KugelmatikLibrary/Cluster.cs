@@ -171,7 +171,7 @@ namespace KugelmatikLibrary
             {
                 lock (locker)
                 {
-                    if (value != info)
+                    if (!value.Equals(info))
                     {
                         info = value;
                         if (OnInfoChange != null)
@@ -589,10 +589,7 @@ namespace KugelmatikLibrary
             if (IsDisposed)
                 throw new ObjectDisposedException(GetType().Name);
 
-            if (Info != null && Info.BuildVersion >= 15)
-                SendPacket(new PacketConfig2(config), true);
-            else
-                SendPacket(new PacketConfig(config), true);
+            SendPacket(new PacketConfig2(config), true);
         }
 
         /// <summary>
@@ -819,84 +816,12 @@ namespace KugelmatikLibrary
                         RemovePacketToAcknowlegde(revision);
                         break;
                     case PacketType.Info:
-                        byte buildVersion = reader.ReadByte();
-
-                        BusyCommand currentBusyCommand = BusyCommand.None;
-                        if (buildVersion >= 11)
-                            currentBusyCommand = (BusyCommand)reader.ReadByte();
-                        else if (buildVersion >= 8)
-                            currentBusyCommand = reader.ReadByte() > 0 ? BusyCommand.Unknown : BusyCommand.None;
-
-                        int highestRevision = 0;
-                        if (buildVersion >= 9)
-                            highestRevision = reader.ReadInt32();
-
-                        ClusterConfig config = new ClusterConfig();
-                        if (buildVersion < 15)
-                        {
-                            byte stepMode = reader.ReadByte();
-                            if (!Enum.IsDefined(typeof(StepMode), stepMode))
-                                throw new InvalidDataException("Unknown step mode");
-
-                            int delayTime = reader.ReadInt32();
-
-                            bool useBreak = false;
-                            if (buildVersion >= 6)
-                                useBreak = reader.ReadByte() > 0;
-
-                            config = ClusterConfig.GetCompatibility((StepMode)stepMode, delayTime, useBreak);
-                        }
-
-                        ErrorCode lastError = ErrorCode.None;
-                        if (buildVersion >= 12) {
-                            int error = reader.ReadByte();
-                            if (!Enum.IsDefined(typeof(ErrorCode), error))
-                                lastError = ErrorCode.UnknownError;
-                            else
-                                lastError = (ErrorCode)error;
-                        }
-
                         ErrorCode lastSavedError = Info == null ? ErrorCode.None : info.LastError;
-                        if (lastSavedError != lastError && lastError != ErrorCode.None)
-                            Log.Error("[{0}, {1}] Error changed from {2} to {3}", X, Y, lastSavedError, lastError);
+                        Info = new ClusterInfo(reader);
+                        
+                        if (lastSavedError != Info.LastError && Info.LastError != ErrorCode.None)
+                            Log.Error("[{0}, {1}] Error changed from {2} to {3}", X, Y, lastSavedError, Info.LastError);
 
-                        int freeRam = -1;
-                        if (buildVersion >= 14)
-                            freeRam = reader.ReadInt16();
-
-                        if (buildVersion >= 15)
-                        {
-                            ushort configSize = reader.ReadUInt16();
-                            if (configSize != ClusterConfig.Size)
-                            {
-                                config = new ClusterConfig();
-                                Log.Error("[{0}, {1}] Packet config size does not match config structure size (firmware: {2}, size: {3} != {4})", X, Y, buildVersion, configSize, ClusterConfig.Size);
-                            }
-                            else
-                                config = ClusterConfig.Read(reader);
-                        }
-
-                        byte mcpStatus = 0;
-                        int loopTime = 0;
-                        int networkTime = 0;
-                        int maxNetworkTime = 0;
-                        int stepperTime = 0;
-                        int upTime = 0;
-
-                        if (buildVersion >= 17)
-                        {
-                            mcpStatus = reader.ReadByte();
-                            loopTime = reader.ReadInt32();
-                            networkTime = reader.ReadInt32();
-                            maxNetworkTime = reader.ReadInt32();
-                            stepperTime = reader.ReadInt32();
-                            upTime = reader.ReadInt32();
-                        }
-
-                        Info = new ClusterInfo(buildVersion, currentBusyCommand, highestRevision, 
-                            config, lastError, freeRam, mcpStatus, 
-                            loopTime, networkTime, maxNetworkTime, stepperTime,
-                            upTime);
                         RemovePacketToAcknowlegde(revision);
                         break;
                     default:

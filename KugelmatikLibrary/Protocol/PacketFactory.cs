@@ -33,7 +33,6 @@ namespace KugelmatikLibrary.Protocol
             { PacketType.HomeStepper, typeof(PacketHomeStepper) },
             { PacketType.GetData, typeof(PacketGetData) },
             { PacketType.Info, typeof(PacketInfo) },
-            { PacketType.Config, typeof(PacketConfig) },
             { PacketType.BlinkGreen, typeof(PacketBlinkGreen) },
             { PacketType.BlinkRed, typeof(PacketBlinkRed) },
             { PacketType.Stop, typeof(PacketStop) },

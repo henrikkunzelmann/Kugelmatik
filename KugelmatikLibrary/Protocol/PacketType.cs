@@ -22,7 +22,7 @@
 
         GetData = 14,
         Info = 15,
-        Config = 16,
+        Config = 16, // Veraltet. Ersetzt durch Config2.
 
         BlinkGreen = 17,
         BlinkRed = 18,

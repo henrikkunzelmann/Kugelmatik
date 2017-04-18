@@ -83,18 +83,6 @@ namespace KugelmatikLibrary
             return config;
         }
 
-        public static ClusterConfig GetCompatibility(StepMode stepMode, int delayTime, bool useBrake)
-        {
-            if (delayTime < 200 || delayTime > 10000)
-                throw new ArgumentOutOfRangeException("delayTime");
-
-            ClusterConfig config = GetDefault();
-            config.StepMode = stepMode;
-            config.TickTime = (uint)delayTime;
-            config.BrakeMode = useBrake ? BrakeMode.Always : BrakeMode.None;
-            return config;
-        }
-
         public static ClusterConfig Read(BinaryReader reader)
         {
             byte[] buffer = new byte[Size];

@@ -31,5 +31,5 @@ void startTime(uint8_t index);
 // beendet den Timer und gibt die verstrichende Zeit zurück
 int32_t endTime(uint8_t index);
 
-// gibt den freien SRAM in Bytes zurück, siehe http://playground.arduino.cc/Code/AvailableMemory
-int32_t freeRam();
+// gibt den freien SRAM in Bytes zurück
+uint64_t freeRam();

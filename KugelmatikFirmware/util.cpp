@@ -76,8 +76,9 @@ int32_t endTime(uint8_t index) {
 	return 0;
 }
 
-int32_t freeRam() {
+uint64_t freeRam() {
+	// siehe http://playground.arduino.cc/Code/AvailableMemory
 	extern int32_t __heap_start, *__brkval;
 	int32_t v;
-	return (int32_t)&v - (__brkval == 0 ? (int32_t)&__heap_start : (int32_t)__brkval);
+	return (uint64_t)((int32_t)&v - (__brkval == 0 ? (int32_t)&__heap_start : (int32_t)__brkval));
 }
