@@ -2,7 +2,6 @@
 
 #include <Arduino.h>
 
-#include <avr/wdt.h> 
 #include <limits.h>
 #include <EtherCard.h>
 
@@ -11,6 +10,7 @@
 #include "stepper.h"
 #include "tick.h"
 #include "config.h"
+#include "watchdog.h"
 #include "PacketBuffer.h"
 
 #define LAN_ID 0x11					// ID des Boards im LAN, wird benutzt um die Mac-Adresse zu generieren

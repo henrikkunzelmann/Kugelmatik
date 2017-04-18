@@ -1,5 +1,5 @@
 #include "leds.h"
-#include <avr/wdt.h>
+#include "watchdog.h"
 
 boolean ledStateGreen = false;	// Status der LED für LED_Green (grüne LED)
 boolean ledStateRed = false;	// Status der LED für LED_Red (rote LED)

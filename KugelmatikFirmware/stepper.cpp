@@ -250,7 +250,7 @@ void updateSteppers(boolean alwaysUseHalfStep)
 #endif
 		}
 
-		wdt_reset();
+		wdt_yield();
 	}
 	stepperTime = endTime(TIMER_STEPPER);
 }

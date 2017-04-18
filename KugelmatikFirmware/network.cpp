@@ -206,6 +206,9 @@ void sendInfo(int32_t revision, boolean wantConfig2) {
 
 void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, const char* data, uint16_t len)
 {
+	if (data == NULL)
+		return internalError();
+
 	// alle Kugelmatik V3 Pakete
 	// sind mindestens HEADER_SIZE Bytes lang
 	// und fangen mit "KKS" an
