@@ -59,6 +59,11 @@ namespace KugelmatikLibrary
         [Range(0, ushort.MaxValue)]
         public ushort MinStepDelta;
 
+        [Category("Kugelmatik")]
+        [DescriptionAttribute("Zeit die vergehen muss damit eine Kugel die Richtung ändern kann")]
+        [Range(0, ushort.MaxValue)]
+        public ushort TurnWaitTime;
+
         public static ushort Size
         {
             get { return (ushort)Marshal.SizeOf(typeof(ClusterConfig)); }
@@ -80,6 +85,7 @@ namespace KugelmatikLibrary
             config.BrakeTicks = 10000;
 
             config.MinStepDelta = 10;
+            config.TurnWaitTime = 20;
             return config;
         }
 

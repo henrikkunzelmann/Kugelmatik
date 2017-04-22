@@ -18,6 +18,8 @@ void setDefaultConfig() {
 
 	config.minStepDelta = 10;
 
+	config.turnWaitTime = 20;
+
 	if (!checkConfig(&config))
 		internalError(ERROR_INTERNAL_DEFAULT_CONFIG_FAULT);
 }

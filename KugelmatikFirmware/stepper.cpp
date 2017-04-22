@@ -197,18 +197,38 @@ void updateSteppers(boolean isUsedByBusyCommand)
 				waitStep = stepper->TickCount >= 0;
 			}
 
+			// Die gefahrene Richtung zurücksetzen
+			if (stepper->TurnWaitTime > 0) {
+				stepper->TurnWaitTime--;
+
+				if (stepper->TurnWaitTime == 0)
+					stepper->Direction = DirectionNone;
+			}
+
+			// bestimmen Welche Richtung wir fahren müssen
+			StepperDirection moveDirection = DirectionNone;
+			if (stepper->GotoSteps < stepper->CurrentSteps)
+				moveDirection = DirectionUp;
+			else if (stepper->GotoSteps > stepper->CurrentSteps)
+				moveDirection = DirectionDown;
+
+			// Kugel müsste sich in die andere Richtung bewegen
+			// nicht bewegen
+			if (stepper->Direction != DirectionNone && stepper->Direction != moveDirection)
+				waitStep = true;
+
 			if (stepSize > 0 && !waitStep)
 			{
 				int8_t stepperIndex = stepper->CurrentStepIndex;
 				if (stepperIndex % stepSize > 0) // schauen ob wir noch einen Zwischenschritt machen müssen
 					stepSize = 1;
 
-				if (stepper->GotoSteps < stepper->CurrentSteps)  // nach oben fahren
+				if (moveDirection == DirectionUp)  // nach oben fahren
 				{
 					stepper->CurrentSteps -= stepSize;
 					stepperIndex -= stepSize;
 				}
-				else											 // nach unten fahren
+				else							   // nach unten fahren
 				{
 					stepper->CurrentSteps += stepSize;
 					stepperIndex += stepSize;
@@ -222,9 +242,14 @@ void updateSteppers(boolean isUsedByBusyCommand)
 
 				gpioValue |= stepsStepper[stepperIndex] << (4 * j); // jeder Wert in stepsStepper ist 4 Bit lang
 
+				// Werte speichern
 				stepper->CurrentStepIndex = (uint8_t)stepperIndex;
 				stepper->TickCount = stepper->WaitTime;
 				stepper->BrakeTicks = 0;
+
+				// Richtung speichern
+				stepper->Direction = moveDirection;
+				stepper->TurnWaitTime = config.turnWaitTime;
 			}
 			else if (config.brakeMode == BrakeSmart)
 			{

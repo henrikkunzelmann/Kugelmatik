@@ -33,6 +33,7 @@
 #define PacketSetData 20
 
 #define PacketConfig2 21
+#define PacketClearError 22
 
 #define BUSY_NONE 0
 #define BUSY_HOME 1

@@ -17,6 +17,13 @@
 
 #define CLUSTER_SIZE (CLUSTER_WIDTH * CLUSTER_HEIGHT)
 
+enum StepperDirection
+{
+	DirectionNone,
+	DirectionUp,
+	DirectionDown
+};
+
 struct StepperData
 {
 	int32_t LastRevision;		// letzte Revision der Daten
@@ -26,6 +33,8 @@ struct StepperData
 	int16_t TickCount;			// derzeitige Tick Anzahl, wenn kleiner als 0 dann wird ein Schritt gemacht und die Variable auf WaitTime gesetzt
 	uint8_t WaitTime;			// Wert für TickCount nach jedem Schritt
 	uint16_t BrakeTicks;		// Anzahl der Ticks seit letzter Bewegung
+	StepperDirection Direction; // Richtung der Kugel
+	uint16_t TurnWaitTime;      // Wartezeit für eine Änderung der Bewegungsrichtung
 };
 
 struct MCPData
