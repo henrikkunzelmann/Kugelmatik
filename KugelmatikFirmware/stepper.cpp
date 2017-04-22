@@ -69,7 +69,7 @@ StepperData* getStepper(int32_t index)
 	return data->Steppers + stepperPosition[index];
 }
 
-boolean isSpecialHeight(uint16_t height)
+boolean isSpecialHeight(int32_t height)
 {
 	return height == 0 || height == config.maxSteps || height % 100 == 0;
 }
@@ -99,7 +99,7 @@ void resetStepper(StepperData* stepper)
 	stepper->BrakeTicks = 0;
 }
 
-void forceStepper(StepperData* stepper, int32_t revision, int16_t height)
+void forceStepper(StepperData* stepper, int32_t revision, int32_t height)
 {
 	resetStepper(stepper);
 	stepper->LastRevision = revision;
@@ -112,7 +112,7 @@ void setStepper(StepperData* stepper, int32_t revision, uint16_t height, uint8_t
 	{
 		stepper->LastRevision = revision;
 
-		int16_t diff = abs(stepper->CurrentSteps - (int16_t)height);
+		int32_t diff = abs(stepper->CurrentSteps - (int32_t)height);
 		if (isSpecialHeight(height) || diff >= config.minStepDelta)
 		{
 			stepper->GotoSteps = height;

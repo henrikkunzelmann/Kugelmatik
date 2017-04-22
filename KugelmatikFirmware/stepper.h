@@ -55,7 +55,7 @@ StepperData* getStepper(uint8_t x, uint8_t y);
 StepperData* getStepper(int32_t index);
 
 // prüft ob die Höhe eine besondere Bedeutung hat und nicht minStepDelta benutzt wird
-boolean isSpecialHeight(uint16_t height);
+boolean isSpecialHeight(int32_t height);
 
 // überprüft einen Stepper auf richtige Werte
 void checkStepper(StepperData* stepper);
@@ -63,7 +63,7 @@ void checkStepper(StepperData* stepper);
 // setzt den Schrittmotor auf Standard Werte zurück (Höhe = 0)
 void resetStepper(StepperData* stepper);
 // setzt den Schrittmotor auf eine bestimmte Höhe welche nicht geprüft wird ob sie größer als MaxSteps ist
-void forceStepper(StepperData* stepper, int32_t revision, int16_t height);
+void forceStepper(StepperData* stepper, int32_t revision, int32_t height);
 
 // setzt den Schrittmotor auf eine bestimmte Höhe und Wartezeit
 void setStepper(StepperData* stepper, int32_t revision, uint16_t height, uint8_t waitTime);
