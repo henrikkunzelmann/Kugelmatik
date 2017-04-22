@@ -10,6 +10,7 @@ uint8_t Ethernet::buffer[ETHERNET_BUFFER_SIZE];
 
 int32_t configRevision = 0;		// die letzte Revision des Config-Packets
 int32_t setDataRevision = 0;	// die letzte Revision des SetData-Packets
+int32_t clearErrorRevision = 0; // die letzte Revision des ClearError-Packets
 
 uint8_t currentBusyCommand = BUSY_NONE;
 boolean stopBusyCommand = false;
@@ -552,6 +553,13 @@ void handlePacket(uint8_t packetType, int32_t revision)
 		sendInfo(revision);
 		break;
 	}
+	case PacketClearError:
+		if (!checkRevision(clearErrorRevision, revision))
+			break;
+
+		clearErrorRevision = revision;
+		lastError = ERROR_NONE;
+		break;
 	default:
 		return protocolError(ERROR_UNKNOWN_PACKET);
 	}
