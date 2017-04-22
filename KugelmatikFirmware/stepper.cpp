@@ -157,7 +157,7 @@ void stopMove() {
 }
 
 
-void updateSteppers(boolean alwaysUseHalfStep)
+void updateSteppers(boolean isUsedByBusyCommand)
 {
 	startTime(TIMER_STEPPER);
 	for (uint8_t i = 0; i < MCP_COUNT; i++)
@@ -170,7 +170,11 @@ void updateSteppers(boolean alwaysUseHalfStep)
 		{
 			StepperData* stepper = &mcp->Steppers[j];
 
-			checkStepper(stepper);
+			// bei einem BusyCommand werden Stepper nicht ueberprueft
+			// da diese Befehle besondere Werte als Hoehe setzen
+			// und diese ungueltig im normalen Ablauf sind
+			if (!isUsedByBusyCommand)
+				checkStepper(stepper);
 
 			uint8_t stepSize = 0;
 			int32_t diff = abs(stepper->CurrentSteps - stepper->GotoSteps);
@@ -180,10 +184,11 @@ void updateSteppers(boolean alwaysUseHalfStep)
 				if (config.stepMode == StepBoth) 
 					stepSize = min(2, diff);		// schauen ob Full oder Half Step gemacht werden soll
 				else if (diff >= config.stepMode)	
-					stepSize = config.stepMode;	// Half oder Full Step machen
+					stepSize = config.stepMode;	    // Half oder Full Step machen
 			}
 
-			if (alwaysUseHalfStep)
+			// immer HalfStep machen
+			if (isUsedByBusyCommand)
 				stepSize = min(stepSize, 1);
 
 			boolean waitStep = false;

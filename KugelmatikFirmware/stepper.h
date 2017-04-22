@@ -78,4 +78,4 @@ void setAllSteps(int32_t revision, uint16_t height, uint8_t waitTime);
 void stopMove();
 
 // spricht die Schrittmotoren an und lässt sie drehen
-void updateSteppers(boolean alwaysUseHalfStep);
+void updateSteppers(boolean isUsedByBusyCommand);
