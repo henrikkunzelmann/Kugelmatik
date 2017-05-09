@@ -1,8 +1,8 @@
 #include "tick.h"
 
-boolean runTick(uint32_t tickTime, boolean useHalfStep) {
+boolean runTick(uint32_t tickTime, boolean isUsedByBusyCommand) {
 	unsigned long start = micros();
-	updateSteppers(useHalfStep);
+	updateSteppers(isUsedByBusyCommand);
 
 	while (true) {
 		wdt_yield();

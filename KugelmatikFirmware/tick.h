@@ -8,4 +8,4 @@
 #include "stepper.h"
 
 // lässt einen Tick laufen (spricht Stepper und Netzwerk an) und wartet bis tickTime vergangen ist
-boolean runTick(uint32_t tickTime, boolean useHalfStep);
+boolean runTick(uint32_t tickTime, boolean isUsedByBusyCommand);
