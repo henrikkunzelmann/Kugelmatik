@@ -178,7 +178,7 @@ void sendInfo(int32_t revision) {
 	packet->write(currentBusyCommand);
 	packet->write(highestRevision);
 	packet->write(lastError);
-	packet->write((int16_t)freeRam());
+	packet->write((uint64_t)freeRam());
 
 	packet->write((uint16_t)sizeof(Config));
 	packet->write((uint8_t*)&config, sizeof(Config));
