@@ -85,7 +85,7 @@ namespace KugelmatikLibrary
             config.BrakeTicks = 10000;
 
             config.MinStepDelta = 10;
-            config.TurnWaitTime = 20;
+            config.TurnWaitTime = 100;
             return config;
         }
 
