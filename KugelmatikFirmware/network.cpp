@@ -559,6 +559,7 @@ void handlePacket(uint8_t packetType, int32_t revision)
 
 		clearErrorRevision = revision;
 		lastError = ERROR_NONE;
+		sendInfo(revision);
 		break;
 	default:
 		return protocolError(ERROR_UNKNOWN_PACKET);
