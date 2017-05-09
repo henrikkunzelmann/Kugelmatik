@@ -62,11 +62,11 @@ namespace KugelmatikControl
 
         private void UpdateClusterBox(object sender, EventArgs e)
         {
-            SuspendLayout();
-            if (clusterBox.InvokeRequired)
-                clusterBox.BeginInvoke(new EventHandler(UpdateClusterBox), sender, e);
+            if (InvokeRequired)
+                BeginInvoke(new EventHandler(UpdateClusterBox), sender, e);
             else
             {
+                SuspendLayout();
                 clusterBox.Text = FormatClusterText(Cluster);
 
                 if (Cluster.Info == null)
@@ -83,8 +83,8 @@ namespace KugelmatikControl
                 }
 
                 SetClusterBoxColor(clusterBox, Cluster);
+                ResumeLayout();
             }
-            ResumeLayout();
         }
 
         public static string FormatClusterText(Cluster cluster)
