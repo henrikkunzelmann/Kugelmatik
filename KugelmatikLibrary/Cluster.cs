@@ -601,6 +601,14 @@ namespace KugelmatikLibrary
         }
 
         /// <summary>
+        /// Schickt einen ClearError-Befehl an das Cluster.
+        /// </summary>
+        public void SendClearError()
+        {
+            SendPacket(new PacketClearError(), true);
+        }
+
+        /// <summary>
         /// Schickt die Daten über ein SetData-Befehl an das Cluster.
         /// </summary>
         public void SendSetData()

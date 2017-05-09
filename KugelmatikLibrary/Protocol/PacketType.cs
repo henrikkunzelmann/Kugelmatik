@@ -30,6 +30,7 @@
         Stop = 19,
 
         SetData = 20,
-        Config2 = 21
+        Config2 = 21,
+        ClearError = 22
     }
 }

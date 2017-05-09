@@ -335,5 +335,14 @@ namespace KugelmatikControl
             if (CheckOnlineStatus())
                 CurrentCluster.SendSetData();
         }
+
+        private void clearErrorButton_Click(object sender, EventArgs e)
+        {
+            if (CheckOnlineStatus())
+            {
+                CurrentCluster.SendClearError();
+                CurrentCluster.SendInfo();
+            }
+        }
     }
 }

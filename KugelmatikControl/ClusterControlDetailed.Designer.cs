@@ -54,6 +54,7 @@
             this.blinkContextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.greenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.redToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.clearErrorButton = new System.Windows.Forms.Button();
             splitContainer1 = new System.Windows.Forms.SplitContainer();
             ((System.ComponentModel.ISupportInitialize)(splitContainer1)).BeginInit();
             splitContainer1.Panel1.SuspendLayout();
@@ -89,6 +90,7 @@
             // 
             // splitContainer1.Panel2
             // 
+            splitContainer1.Panel2.Controls.Add(this.clearErrorButton);
             splitContainer1.Panel2.Controls.Add(this.setDataButton);
             splitContainer1.Panel2.Controls.Add(this.blinkButton);
             splitContainer1.Panel2.Controls.Add(this.configButton);
@@ -125,6 +127,7 @@
             this.clusterInfoGrid.CategoryForeColor = System.Drawing.SystemColors.InactiveCaptionText;
             this.clusterInfoGrid.Dock = System.Windows.Forms.DockStyle.Fill;
             this.clusterInfoGrid.HelpVisible = false;
+            this.clusterInfoGrid.LineColor = System.Drawing.SystemColors.ControlDark;
             this.clusterInfoGrid.Location = new System.Drawing.Point(0, 0);
             this.clusterInfoGrid.Name = "clusterInfoGrid";
             this.clusterInfoGrid.Size = new System.Drawing.Size(248, 319);
@@ -367,6 +370,17 @@
             this.redToolStripMenuItem.Text = "Red";
             this.redToolStripMenuItem.Click += new System.EventHandler(this.redToolStripMenuItem_Click);
             // 
+            // clearErrorButton
+            // 
+            this.clearErrorButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.clearErrorButton.Location = new System.Drawing.Point(168, 14);
+            this.clearErrorButton.Name = "clearErrorButton";
+            this.clearErrorButton.Size = new System.Drawing.Size(78, 23);
+            this.clearErrorButton.TabIndex = 8;
+            this.clearErrorButton.Text = "Clear Err";
+            this.clearErrorButton.UseVisualStyleBackColor = true;
+            this.clearErrorButton.Click += new System.EventHandler(this.clearErrorButton_Click);
+            // 
             // ClusterControlDetailed
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -422,5 +436,6 @@
         private System.Windows.Forms.NumericUpDown clusterHeight;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Button setDataButton;
+        private System.Windows.Forms.Button clearErrorButton;
     }
 }
