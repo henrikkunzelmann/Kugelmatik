@@ -13,7 +13,7 @@
 #include "watchdog.h"
 #include "PacketBuffer.h"
 
-#define LAN_ID 0x11					// ID des Boards im LAN, wird benutzt um die Mac-Adresse zu generieren
+#define LAN_ID 0x10					// ID des Boards im LAN, wird benutzt um die Mac-Adresse zu generieren
 #define PROTOCOL_PORT 14804			// Port für das Protokoll über UDP
 #define ETHERNET_BUFFER_SIZE 300	// Größe des Ethernet Buffers in Bytes	
 #define HEADER_SIZE 9				// Größe des Paket-Headers in Bytes
