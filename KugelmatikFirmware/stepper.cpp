@@ -60,11 +60,15 @@ void initMCP(uint8_t index)
 
 StepperData* getStepper(uint8_t x, uint8_t y)
 {
+	if (x >= CLUSTER_WIDTH || y >= CLUSTER_HEIGHT)
+		internalError(ERROR_INTERNAL_WRONG_PARAMETER);
 	return getStepper(y * CLUSTER_WIDTH + x);
 }
 
 StepperData* getStepper(int32_t index)
 {
+	if (index < 0 || index >= CLUSTER_SIZE)
+		internalError(ERROR_INTERNAL_WRONG_PARAMETER);
 	MCPData* data = mcps + mcpPosition[index];
 	return data->Steppers + stepperPosition[index];
 }

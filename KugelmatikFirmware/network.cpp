@@ -31,7 +31,7 @@ void initNetwork()
 	Serial.println(F("initNetwork()"));
 	Serial.println(F("ether.begin()"));
 
-	uint8_t rev = ether.begin(ETHERNET_BUFFER_SIZE, ethernetMac, 28);
+	uint8_t rev = ether.begin(sizeof(Ethernet::buffer), ethernetMac, 28);
 	if (rev == 0)
 	{
 		error("init", "ethernet begin failed", true);
