@@ -100,6 +100,8 @@ namespace KugelmatikLibrary
                 addressProvider = new KugelmatikAddressProvider();
 
             InitClusters(addressProvider);
+
+            Log.Debug("ClusterConfig.Size: {0} bytes:", ClusterConfig.Size);
         }
 
         public Kugelmatik(Config config, ClusterConfig clusterConfig, IAddressProvider addressProvider)
@@ -113,6 +115,8 @@ namespace KugelmatikLibrary
         {
             if (addressProvider == null)
                 throw new ArgumentNullException("addressProvider");
+
+            Log.Debug("Using adress provider: {0}", addressProvider.GetType().Name);
 
             clusters = new Cluster[Config.KugelmatikWidth * Config.KugelmatikHeight];
             for (int x = 0; x < Config.KugelmatikWidth; x++)

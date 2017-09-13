@@ -21,7 +21,7 @@ namespace KugelmatikLibrary
         public BrakeMode BrakeMode;
 
         [DescriptionAttribute("Zeit (in Mikrosekunden) zwischen zwei Schritten")]
-        [Range(500, 5000)]
+        [Range(500, 8000)]
         public uint TickTime;
 
         [Category("Kugelmatik")]

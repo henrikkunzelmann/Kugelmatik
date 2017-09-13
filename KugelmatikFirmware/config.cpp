@@ -29,7 +29,7 @@ boolean checkConfig(Config* config) {
 	correct &= config->stepMode >= StepHalf && config->stepMode <= StepBoth;
 	correct &= config->brakeMode >= BrakeNone && config->brakeMode <= BrakeSmart;
 
-	correct &= config->tickTime >= 500 && config->tickTime <= 5000;
+	correct &= config->tickTime >= 500 && config->tickTime <= 8000;
 	correct &= config->homeTime >= 500 && config->homeTime <= 5000;
 	correct &= config->fixTime >= 500 && config->fixTime <= 5000;
 
