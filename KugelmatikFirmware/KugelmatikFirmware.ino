@@ -12,6 +12,8 @@
 // #define ETHERCARD_TCPCLIENT 0
 // #define ETHERCARD_TCPSERVER 0
 // #define ETHERCARD_STASH 0
+// #define SERIAL_TX_BUFFER_SIZE 8
+// #define SERIAL_RX_BUFFER_SIZE 8
 
 // Includes
 #include <limits.h>
