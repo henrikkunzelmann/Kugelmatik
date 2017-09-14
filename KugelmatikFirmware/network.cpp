@@ -20,6 +20,8 @@ boolean stopBusyCommand = false;
 uint8_t dummyBuffer[1];
 PacketBuffer packet(dummyBuffer, sizeof(dummyBuffer));
 
+Config newConfig;
+
 // gibt true zurück wenn revision neuer ist als lastRevision
 boolean checkRevision(int32_t lastRevision, int32_t revision)
 {
@@ -428,6 +430,7 @@ void handlePacket(uint8_t packetType, int32_t revision)
 	{
 		configRevision = 0;
 		setDataRevision = 0;
+		clearErrorRevision = 0;
 
 		for (int32_t i = 0; i < CLUSTER_SIZE; i++)
 			getStepper(i)->LastRevision = 0;
@@ -550,7 +553,6 @@ void handlePacket(uint8_t packetType, int32_t revision)
 		if (size != sizeof(Config))
 			return protocolError(ERROR_INVALID_CONFIG_VALUE);
 
-		Config newConfig;
 		packet.read((uint8_t*)&newConfig, sizeof(Config));
 
 		if (packet.getError()) 

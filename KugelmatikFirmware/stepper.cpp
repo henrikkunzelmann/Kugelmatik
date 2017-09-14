@@ -15,7 +15,6 @@ void initMCP(uint8_t index)
 	serialPrintF("Init mcp number ");
 	serialPrintln(index);
 
-
 	MCPData* data = &mcps[index];
 
 	for (uint8_t i = 0; i < MCP_STEPPER_COUNT; i++)
