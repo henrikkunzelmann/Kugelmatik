@@ -180,6 +180,9 @@ void sendInfo(int32_t revision) {
 	if (setDataRevision > highestRevision)
 		highestRevision = setDataRevision;
 
+	if (clearErrorRevision > highestRevision)
+		highestRevision = clearErrorRevision;
+
 	writeHeader(false, PacketInfo, revision);
 
 	packet.write((uint8_t)BUILD_VERSION);
