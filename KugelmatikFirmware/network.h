@@ -12,10 +12,11 @@
 #include "config.h"
 #include "watchdog.h"
 #include "PacketBuffer.h"
+#include "serial.h"
 
 #define LAN_ID 0x10					// ID des Boards im LAN, wird benutzt um die Mac-Adresse zu generieren
 #define PROTOCOL_PORT 14804			// Port für das Protokoll über UDP
-#define ETHERNET_BUFFER_SIZE 300	// Größe des Ethernet Buffers in Bytes	
+#define ETHERNET_BUFFER_SIZE 200	// Größe des Ethernet Buffers in Bytes	
 #define HEADER_SIZE 9				// Größe des Paket-Headers in Bytes
 
 extern int32_t loopTime;
@@ -30,7 +31,7 @@ boolean loopNetwork();
 
 void sendPacket();
 void writeHeader(boolean guarenteed, uint8_t packetType, int32_t revision);
-boolean readPosition(PacketBuffer* packet, uint8_t* x, uint8_t* y);
+boolean readPosition(uint8_t* x, uint8_t* y);
 
 void sendAckPacket(int32_t revision);
 void sendData(int32_t revision);

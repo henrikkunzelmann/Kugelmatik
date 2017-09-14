@@ -15,8 +15,10 @@ int32_t clearErrorRevision = 0; // die letzte Revision des ClearError-Packets
 uint8_t currentBusyCommand = BUSY_NONE;
 boolean stopBusyCommand = false;
 
-PacketBuffer* packet;
+// PacketBuffer benutzt später den gleichen Buffer wie die Ethernetklasse
+// daher wird hier nur ein dummyBuffer gesetzt
 uint8_t dummyBuffer[1];
+PacketBuffer packet(dummyBuffer, sizeof(dummyBuffer));
 
 // gibt true zurück wenn revision neuer ist als lastRevision
 boolean checkRevision(int32_t lastRevision, int32_t revision)
@@ -28,8 +30,8 @@ boolean checkRevision(int32_t lastRevision, int32_t revision)
 
 void initNetwork()
 {
-	Serial.println(F("initNetwork()"));
-	Serial.println(F("ether.begin()"));
+	serialPrintlnF("initNetwork()");
+	serialPrintlnF("ether.begin()");
 
 	uint8_t rev = ether.begin(sizeof(Ethernet::buffer), ethernetMac, 28);
 	if (rev == 0)
@@ -38,13 +40,15 @@ void initNetwork()
 		return; // wird niemals passieren da error() in eine Endloschleife geht
 	}
 
-	Serial.println(F("Waiting for link..."));
+	wdt_yield();
+	serialPrintlnF("Waiting for link...");
 
 	// warten bis Ethernet Kabel verbunden ist
 	while (!ether.isLinkUp())
 	{
 		toogleGreenLed();
 		delay(300);
+		wdt_yield();
 	}
 
 	turnGreenLedOn();
@@ -53,13 +57,17 @@ void initNetwork()
 	delay(lanID * 20); // Init verzögern damit das Netzwerk nicht überlastet wird
 
 	// Hostname generieren (die 00 wird durch die lanID in hex ersetzt)
-	char hostName[] = "Kugelmatik-00";
-	hostName[11] = getHexChar(lanID >> 4);
-	hostName[12] = getHexChar(lanID);
+	// #define DHCP_HOSTNAME_MAX_LEN 32
+	char hostName[32];
+	memset(hostName, 0, sizeof(hostName));
+	strncpy(hostName, "Kugelmatik-00", sizeof(hostName));
+	hostName[strlen(hostName) - 2] = getHexChar(lanID >> 4);
+	hostName[strlen(hostName) - 1] = getHexChar(lanID);
 
-	Serial.println(F("Link up..."));
-	Serial.print(F("ether.dhcpSetup(), using hostname: "));
-	Serial.println(hostName);
+	serialPrintlnF("Link up...");
+	serialPrintF("ether.dhcpSetup(), using hostname: ");
+	serialPrintln(hostName);
+	wdt_yield();
 
 	if (!ether.dhcpSetup(hostName, true)) 
 	{
@@ -67,12 +75,9 @@ void initNetwork()
 		return;
 	}
 
-	// PacketBuffer benutzt später den gleichen Buffer wie die Ethernetklasse
-	// daher wird hier nur ein dummyBuffer gesetzt
-	packet = new PacketBuffer(dummyBuffer, sizeof(dummyBuffer));
-	
-	Serial.println(F("Network boot done!"));
+	serialPrintlnF("Network boot done!");
 	ether.udpServerListenOnPort(&onPacketReceive, PROTOCOL_PORT);
+	wdt_yield();
 }
 
 boolean loopNetwork() {
@@ -94,27 +99,28 @@ boolean loopNetwork() {
 
 void sendPacket()
 {
-	if (packet->getError())
+	if (packet.getError())
 		return;
-	ether.makeUdpReply((char*)packet->getBuffer(), packet->getPosition(), PROTOCOL_PORT);
+	ether.makeUdpReply((char*)packet.getBuffer(), packet.getPosition(), PROTOCOL_PORT);
+	wdt_yield();
 }
 
 void writeHeader(boolean guarenteed, uint8_t packetType, int32_t revision)
 {
-	packet->resetPosition();
-	packet->setSize(packet->getBufferSize()); // Size überschreiben, da die Size vom Lesen gesetzt wird
-	packet->write('K');
-	packet->write('K');
-	packet->write('S');
-	packet->write(guarenteed);
-	packet->write(packetType);
-	packet->write(revision);
+	packet.resetPosition();
+	packet.setSize(packet.getBufferSize()); // Size überschreiben, da die Size vom Lesen gesetzt wird
+	packet.write('K');
+	packet.write('K');
+	packet.write('S');
+	packet.write(guarenteed);
+	packet.write(packetType);
+	packet.write(revision);
 }
 
 
-boolean readPosition(PacketBuffer* packet, uint8_t* x, uint8_t* y)
+boolean readPosition(uint8_t* x, uint8_t* y)
 {
-	uint8_t pos = packet->readUint8();
+	uint8_t pos = packet.readUint8();
 	uint8_t xvalue = (pos >> 4) & 0xF;
 	uint8_t yvalue = pos & 0xF;
 
@@ -149,8 +155,8 @@ void sendData(int32_t revision)
 		{
 			StepperData* stepper = getStepper(x, y);
 
-			packet->write((uint16_t)max(0, stepper->CurrentSteps));
-			packet->write(stepper->WaitTime);
+			packet.write((uint16_t)max(0, stepper->CurrentSteps));
+			packet.write(stepper->WaitTime);
 		}
 	}
 
@@ -174,28 +180,29 @@ void sendInfo(int32_t revision) {
 
 	writeHeader(false, PacketInfo, revision);
 
-	packet->write((uint8_t)BUILD_VERSION);
-	packet->write(currentBusyCommand);
-	packet->write(highestRevision);
-	packet->write(lastError);
-	packet->write((uint64_t)freeRam());
+	packet.write((uint8_t)BUILD_VERSION);
+	packet.write(currentBusyCommand);
+	packet.write(highestRevision);
+	packet.write(lastError);
+	packet.write((uint64_t)freeRam());
 
-	packet->write((uint16_t)sizeof(Config));
-	packet->write((uint8_t*)&config, sizeof(Config));
+	packet.write((uint16_t)sizeof(Config));
+	packet.write((uint8_t*)&config, sizeof(Config));
 
 	uint8_t mcpStatus = 0;
 	for (uint8_t i = 0; i < MCP_COUNT; i++)
 		if (mcps[i].isOK)
 			mcpStatus |= (1 << i);
-	packet->write(mcpStatus);
+	packet.write(mcpStatus);
 
-	packet->write(loopTime);
-	packet->write(networkTime);
-	packet->write(maxNetworkTime);
-	packet->write(stepperTime);
-	packet->write((int32_t)(millis() / 1000));
+	packet.write(loopTime);
+	packet.write(networkTime);
+	packet.write(maxNetworkTime);
+	packet.write(stepperTime);
+	packet.write((int32_t)(millis() / 1000));
 
 	sendPacket();
+	wdt_yield();
 }
 
 void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, const char* data, uint16_t len)
@@ -209,33 +216,38 @@ void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, c
 	if (len < HEADER_SIZE || data[0] != 'K' || data[1] != 'K' || data[2] != 'S')
 		return;
 
+	wdt_yield();
+
 	// Fehler aus dem PacketBuffer löschen
-	if (packet->getError())
-		Serial.println(F("packet->getError() == true"));
+	if (packet.getError())
+		serialPrintlnF("packet.getError() == true");
 
 	// data ist unser Etherner Buffer (verschoben um die UDP Header Länge)
 	// wir nutzen den selben Buffer zum Lesen und zum Schreiben
-	packet->setBuffer((uint8_t*)data, ETHERNET_BUFFER_SIZE - 28); // 28 Bytes für IP + UDP Header abziehen
-	packet->setSize(len);
-	packet->seek(3); 
+	packet.setBuffer((uint8_t*)data, ETHERNET_BUFFER_SIZE - 28); // 28 Bytes für IP + UDP Header abziehen
+	packet.setSize(len);
+	packet.seek(3); 
 
-	boolean isGuaranteed = packet->readBoolean();
+	boolean isGuaranteed = packet.readBoolean();
 
 	// erstes Byte nach dem Magicstring gibt den Paket-Typ an
-	uint8_t packetType = packet->readUint8();
+	uint8_t packetType = packet.readUint8();
 
 	// fortlaufende ID für die Pakete werden nach dem Magicstring und dem Paket-Typ geschickt
-	int32_t revision = packet->readInt32();
+	int32_t revision = packet.readInt32();
 
 	// wenn ein busy-Befehl läuft dann werden nur Ping, Info und Stop verarbeitet
 	if (currentBusyCommand != BUSY_NONE && packetType != PacketPing && packetType != PacketInfo && packetType != PacketStop)
 		return;
 
+	wdt_yield();
 	handlePacket(packetType, revision);
 
 	// isGuaranteed gibt an ob der Sender eine Antwort erwartet
 	if (isGuaranteed)
 		sendAckPacket(revision);
+
+	wdt_yield();
 }
 
 void handlePacket(uint8_t packetType, int32_t revision)
@@ -243,18 +255,18 @@ void handlePacket(uint8_t packetType, int32_t revision)
 	switch (packetType)
 	{
 	case PacketPing:
-		ether.makeUdpReply((char*)packet->getBuffer(), packet->getSize(), PROTOCOL_PORT); // das Ping-Packet funktioniert gleichzeitig auch als Echo-Funktion
+		ether.makeUdpReply((char*)packet.getBuffer(), packet.getSize(), PROTOCOL_PORT); // das Ping-Packet funktioniert gleichzeitig auch als Echo-Funktion
 		break;
 	case PacketStepper:
 	{
 		uint8_t x, y;
-		if (!readPosition(packet, &x, &y))
+		if (!readPosition(&x, &y))
 			return;
 
-		uint16_t height = packet->readUint16();
-		uint8_t waitTime = packet->readUint8();
+		uint16_t height = packet.readUint16();
+		uint8_t waitTime = packet.readUint8();
 
-		if (packet->getError())
+		if (packet.getError())
 			return;
 
 		setStepper(revision, x, y, height, waitTime);
@@ -262,16 +274,16 @@ void handlePacket(uint8_t packetType, int32_t revision)
 	}
 	case PacketSteppers:
 	{
-		uint8_t length = packet->readUint8();
-		uint16_t height = packet->readUint16();
-		uint8_t waitTime = packet->readUint8();
+		uint8_t length = packet.readUint8();
+		uint16_t height = packet.readUint16();
+		uint8_t waitTime = packet.readUint8();
 
 		for (uint8_t i = 0; i < length; i++)
 		{
 			uint8_t x, y;
-			readPosition(packet, &x, &y);
+			readPosition(&x, &y);
 
-			if (packet->getError())
+			if (packet.getError())
 				return;
 			setStepper(revision, x, y, height, waitTime);
 		}
@@ -280,18 +292,18 @@ void handlePacket(uint8_t packetType, int32_t revision)
 	}
 	case PacketSteppersArray:
 	{
-		uint8_t length = packet->readUint8();
+		uint8_t length = packet.readUint8();
 
 		for (uint8_t i = 0; i < length; i++)
 		{
 			uint8_t x, y;
-			if (!readPosition(packet, &x, &y))
+			if (!readPosition(&x, &y))
 				return;
 
-			uint16_t height = packet->readUint16();
-			uint8_t waitTime = packet->readUint8();
+			uint16_t height = packet.readUint16();
+			uint8_t waitTime = packet.readUint8();
 
-			if (packet->getError())
+			if (packet.getError())
 				return;
 
 			setStepper(revision, x, y, height, waitTime);
@@ -301,20 +313,20 @@ void handlePacket(uint8_t packetType, int32_t revision)
 	case PacketSteppersRectangle:
 	{
 		uint8_t minX, minY;
-		if (!readPosition(packet, &minX, &minY))
+		if (!readPosition(&minX, &minY))
 			return;
 
 		uint8_t maxX, maxY;
-		if (!readPosition(packet, &maxX, &maxY))
+		if (!readPosition(&maxX, &maxY))
 			return;
 
-		uint16_t height = packet->readUint16();
-		uint8_t waitTime = packet->readUint8();
+		uint16_t height = packet.readUint16();
+		uint8_t waitTime = packet.readUint8();
 
 		if (minX > maxX || minY > maxY)
 			return protocolError(ERROR_INVALID_VALUE);
 
-		if (packet->getError())
+		if (packet.getError())
 			return;
 
 		for (uint8_t x = minX; x <= maxX; x++)
@@ -325,11 +337,11 @@ void handlePacket(uint8_t packetType, int32_t revision)
 	case PacketSteppersRectangleArray:
 	{
 		uint8_t minX, minY;
-		if (!readPosition(packet, &minX, &minY))
+		if (!readPosition(&minX, &minY))
 			return;
 
 		uint8_t maxX, maxY;
-		if (!readPosition(packet, &maxX, &maxY))
+		if (!readPosition(&maxX, &maxY))
 			return;
 
 		if (minX > maxX || minY > maxY)
@@ -338,10 +350,10 @@ void handlePacket(uint8_t packetType, int32_t revision)
 		// beide for-Schleifen müssen mit dem Client übereinstimmen sonst stimmen die Positionen nicht		
 		for (uint8_t x = minX; x <= maxX; x++) {
 			for (uint8_t y = minY; y <= maxY; y++) {
-				uint16_t height = packet->readUint16();
-				uint8_t waitTime = packet->readUint8();
+				uint16_t height = packet.readUint16();
+				uint8_t waitTime = packet.readUint8();
 
-				if (packet->getError())
+				if (packet.getError())
 					return;
 
 				setStepper(revision, x, y, height, waitTime);
@@ -351,10 +363,10 @@ void handlePacket(uint8_t packetType, int32_t revision)
 	}
 	case PacketAllSteppers:
 	{
-		uint16_t height = packet->readUint16();
-		uint8_t waitTime = packet->readUint8();
+		uint16_t height = packet.readUint16();
+		uint8_t waitTime = packet.readUint8();
 
-		if (packet->getError())
+		if (packet.getError())
 			return;
 		setAllSteps(revision, height, waitTime);
 		break;
@@ -364,10 +376,10 @@ void handlePacket(uint8_t packetType, int32_t revision)
 		// beide for-Schleifen müssen mit dem Client übereinstimmen sonst stimmen die Positionen nicht		
 		for (uint8_t x = 0; x < CLUSTER_WIDTH; x++) {
 			for (uint8_t y = 0; y < CLUSTER_HEIGHT; y++) {
-				uint16_t height = packet->readUint16();
-				uint8_t waitTime = packet->readUint8();
+				uint16_t height = packet.readUint16();
+				uint8_t waitTime = packet.readUint8();
 
-				if (packet->getError())
+				if (packet.getError())
 					return;
 				setStepper(revision, x, y, height, waitTime);
 			}
@@ -377,9 +389,9 @@ void handlePacket(uint8_t packetType, int32_t revision)
 	case PacketHome:
 	{
 		// 0xABCD wird benutzt damit man nicht ausversehen das Home-Paket schickt (wenn man z.B. den Paket-Type verwechselt)
-		int32_t magic = packet->readInt32();
+		int32_t magic = packet.readInt32();
 
-		if (packet->getError())
+		if (packet.getError())
 			return;
 		if (magic != 0xABCD)
 			return protocolError(ERROR_INVALID_MAGIC);
@@ -424,15 +436,15 @@ void handlePacket(uint8_t packetType, int32_t revision)
 	case PacketFix:
 	{
 		// 0xDCBA wird benutzt damit man nicht ausversehen das Fix-Paket schickt (wenn man z.B. den Paket-Type verwechselt)
-		int32_t magic = packet->readInt32();
+		int32_t magic = packet.readInt32();
 		if (magic != 0xDCBA)
 			return protocolError(ERROR_INVALID_MAGIC);
 
 		uint8_t x, y;
-		if (!readPosition(packet, &x, &y))
+		if (!readPosition(&x, &y))
 			return;
 
-		if (packet->getError())
+		if (packet.getError())
 			return;
 
 		StepperData* stepper = getStepper(x, y);
@@ -449,15 +461,15 @@ void handlePacket(uint8_t packetType, int32_t revision)
 	case PacketHomeStepper:
 	{
 		// 0xDCBA wird benutzt damit man nicht ausversehen das HomeStepper-Paket schickt (wenn man z.B. den Paket-Type verwechselt)
-		int32_t magic = packet->readInt32();
+		int32_t magic = packet.readInt32();
 		if (magic != 0xABCD)
 			return protocolError(ERROR_INVALID_MAGIC);
 
 		uint8_t x, y;
-		if (!readPosition(packet, &x, &y))
+		if (!readPosition(&x, &y))
 			return;
 
-		if (packet->getError())
+		if (packet.getError())
 			return;
 
 		StepperData* stepper = getStepper(x, y);
@@ -507,17 +519,17 @@ void handlePacket(uint8_t packetType, int32_t revision)
 
 		setDataRevision = revision;
 
-		Serial.println(F("PacketSetData received"));
+		serialPrintlnF("PacketSetData received");
 
 		for (uint8_t x = 0; x < CLUSTER_WIDTH; x++) {
 			for (uint8_t y = 0; y < CLUSTER_HEIGHT; y++) {
 				StepperData* stepper = getStepper(x, y);
 
-				uint16_t height = packet->readUint16();
+				uint16_t height = packet.readUint16();
 				if (height > config.maxSteps)
 					return protocolError(ERROR_INVALID_HEIGHT);
 
-				if (packet->getError())
+				if (packet.getError())
 					return;
 
 				stepper->CurrentSteps = height;
@@ -534,21 +546,21 @@ void handlePacket(uint8_t packetType, int32_t revision)
 
 		configRevision = revision;
 
-		uint16_t size = packet->readUint16();
+		uint16_t size = packet.readUint16();
 		if (size != sizeof(Config))
 			return protocolError(ERROR_INVALID_CONFIG_VALUE);
 
 		Config newConfig;
-		packet->read((uint8_t*)&newConfig, sizeof(Config));
+		packet.read((uint8_t*)&newConfig, sizeof(Config));
 
-		if (packet->getError()) 
+		if (packet.getError()) 
 			return;
 
 		if (!checkConfig(&newConfig))
 			return protocolError(ERROR_INVALID_CONFIG_VALUE);
 
 		memcpy(&config, &newConfig, sizeof(Config));
-		Serial.println(F("Config2 set by network!"));
+		serialPrintlnF("Config2 set by network!");
 
 		sendInfo(revision);
 		break;
@@ -568,9 +580,9 @@ void handlePacket(uint8_t packetType, int32_t revision)
 
 void runBusy(uint8_t type, int32_t steps, uint32_t delay)
 {
-	Serial.print(F("runBusy(type = "));
-	Serial.print(type);
-	Serial.println(F(")"));
+	serialPrintF("runBusy(type = ");
+	serialPrint(type);
+	serialPrintlnF(")");
 
 	currentBusyCommand = type;
 	turnRedLedOn();

@@ -5,6 +5,7 @@
 #include "watchdog.h"
 #include "leds.h"
 #include "constants.h"
+#include "serial.h"
 
 extern uint8_t lastError;
 

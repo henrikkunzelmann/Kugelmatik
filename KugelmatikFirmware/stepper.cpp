@@ -4,7 +4,7 @@ MCPData mcps[MCP_COUNT];
 
 void initAllMCPs()
 {
-	Serial.println(F("initAllMCPs()"));
+	serialPrintlnF("initAllMCPs()");
 
 	for (uint8_t i = 0; i < MCP_COUNT; i++)
 		initMCP(i);
@@ -12,34 +12,34 @@ void initAllMCPs()
 
 void initMCP(uint8_t index)
 {
-	Serial.print(F("Init mcp number "));
-	Serial.println(index);
+	serialPrintF("Init mcp number ");
+	serialPrintln(index);
 
 
 	MCPData* data = &mcps[index];
 
 	for (uint8_t i = 0; i < MCP_STEPPER_COUNT; i++)
 	{
-		StepperData* stepper = &data->Steppers[i];
+		StepperData* stepper = &data->steppers[i];
 		memset(stepper, 0, sizeof(StepperData));
 	}
 
-	data->MCP = new MCP23017();
+	wdt_yield();
 
 	// MCP initialisieren
-	data->MCP->begin(index);
+	data->mcpChip.begin(index);
 
 	// alle Pins (0xFFFF) auf OUTPUT stellen
-	data->MCP->setPinDirOUT(0xFFFFu);
+	data->mcpChip.setPinDirOUT(0xFFFFu);
 
-	data->isOK = (data->MCP->writeGPIOS(0) == 0);
+	data->isOK = (data->mcpChip.writeGPIOS(0) == 0);
 	data->lastGPIOValue = 0;
 
 #if !IGNORE_MCP_FAULTS
 	if (!data->isOK)
 	{
-		Serial.print(F("MCP Fault with mcp number "));
-		Serial.println(index);
+		serialPrintF("MCP Fault with mcp number ");
+		serialPrintln(index);
 
 		internalError(ERROR_MCP_FAULT_1 + index);
 
@@ -54,8 +54,9 @@ void initMCP(uint8_t index)
 		turnRedLedOff();
 	}
 #else
-	Serial.println(F("IGNORE_MCP_FAULTS is set to true, skipping MCP boot test"));
+	serialPrintlnF("IGNORE_MCP_FAULTS is set to true, skipping MCP boot test");
 #endif
+	wdt_yield();
 }
 
 StepperData* getStepper(uint8_t x, uint8_t y)
@@ -70,7 +71,7 @@ StepperData* getStepper(int32_t index)
 	if (index < 0 || index >= CLUSTER_SIZE)
 		internalError(ERROR_INTERNAL_WRONG_PARAMETER);
 	MCPData* data = mcps + mcpPosition[index];
-	return data->Steppers + stepperPosition[index];
+	return data->steppers + stepperPosition[index];
 }
 
 boolean isSpecialHeight(int32_t height)
@@ -103,14 +104,14 @@ void resetStepper(StepperData* stepper)
 	stepper->BrakeTicks = 0;
 }
 
-void forceStepper(StepperData* stepper, int32_t revision, int32_t height)
+void forceStepper(StepperData* stepper, int32_t revision, int16_t height)
 {
 	resetStepper(stepper);
 	stepper->LastRevision = revision;
 	stepper->GotoSteps = height;
 }
 
-void setStepper(StepperData* stepper, int32_t revision, uint16_t height, uint8_t waitTime)
+void setStepper(StepperData* stepper, int32_t revision, int16_t height, uint8_t waitTime)
 {
 	if (checkRevision(stepper->LastRevision, revision))
 	{
@@ -124,10 +125,11 @@ void setStepper(StepperData* stepper, int32_t revision, uint16_t height, uint8_t
 			stepper->WaitTime = waitTime;
 		}
 	}
+	wdt_yield();
 }
 
 
-void setStepper(int32_t revision, uint8_t x, uint8_t y, uint16_t height, uint8_t waitTime)
+void setStepper(int32_t revision, uint8_t x, uint8_t y, int16_t height, uint8_t waitTime)
 {
 	if (x < 0 || x >= CLUSTER_WIDTH)
 		return protocolError(ERROR_X_INVALID);
@@ -139,7 +141,7 @@ void setStepper(int32_t revision, uint8_t x, uint8_t y, uint16_t height, uint8_t
 	setStepper(getStepper(x, y), revision, height, waitTime);
 }
 
-void setAllSteps(int32_t revision, uint16_t height, uint8_t waitTime)
+void setAllSteps(int32_t revision, int16_t height, uint8_t waitTime)
 {
 	if (height > config.maxSteps)
 		return protocolError(ERROR_INVALID_HEIGHT);
@@ -149,7 +151,7 @@ void setAllSteps(int32_t revision, uint16_t height, uint8_t waitTime)
 
 
 void stopMove() {
-	Serial.println(F("stopMove()"));
+	serialPrintlnF("stopMove()");
 
 	for (int32_t i = 0; i < CLUSTER_SIZE; i++) {
 		StepperData* stepper = getStepper(i);
@@ -172,7 +174,7 @@ void updateSteppers(boolean isUsedByBusyCommand)
 
 		for (uint8_t j = 0; j < MCP_STEPPER_COUNT; j++)
 		{
-			StepperData* stepper = &mcp->Steppers[j];
+			StepperData* stepper = &mcp->steppers[j];
 
 			// bei einem BusyCommand werden Stepper nicht ueberprueft
 			// da diese Befehle besondere Werte als Hoehe setzen
@@ -195,11 +197,9 @@ void updateSteppers(boolean isUsedByBusyCommand)
 			if (isUsedByBusyCommand)
 				stepSize = min(stepSize, 1);
 
-			boolean waitStep = false;
-			if (stepper->WaitTime > 0) {
+			boolean waitStep = stepper->TickCount > 0;
+			if (stepper->TickCount > 0)
 				stepper->TickCount--;
-				waitStep = stepper->TickCount >= 0;
-			}
 
 			// Die gefahrene Richtung zurücksetzen
 			if (stepper->TurnWaitTime > 0) {
@@ -220,6 +220,8 @@ void updateSteppers(boolean isUsedByBusyCommand)
 			// nicht bewegen
 			if (stepper->Direction != DirectionNone && stepper->Direction != moveDirection)
 				waitStep = true;
+
+			bool writeGPIO = false;
 
 			if (stepSize > 0 && !waitStep)
 			{
@@ -244,7 +246,7 @@ void updateSteppers(boolean isUsedByBusyCommand)
 				while (stepperIndex >= STEPPER_STEP_COUNT)
 					stepperIndex -= STEPPER_STEP_COUNT;
 
-				gpioValue |= stepsStepper[stepperIndex] << (4 * j); // jeder Wert in stepsStepper ist 4 Bit lang
+				writeGPIO = true;
 
 				// Werte speichern
 				stepper->CurrentStepIndex = (uint8_t)stepperIndex;
@@ -258,26 +260,30 @@ void updateSteppers(boolean isUsedByBusyCommand)
 			else if (config.brakeMode == BrakeSmart)
 			{
 				if (stepper->BrakeTicks < config.brakeTicks) {
-					gpioValue |= stepsStepper[stepper->CurrentStepIndex] << (4 * j);
+					writeGPIO = true;
 					stepper->BrakeTicks++;
 				}
 			}
 			else if (config.brakeMode == BrakeAlways) // Bremse benutzen?
-				gpioValue |= stepsStepper[stepper->CurrentStepIndex] << (4 * j);
+				writeGPIO = true;
+
+			if (writeGPIO)
+				gpioValue |= stepsStepper[stepper->CurrentStepIndex] << (4 * j); // jeder Wert in stepsStepper ist 4 Bit lang
+			wdt_yield();
 		}
 
 
 		if (!mcp->isOK || mcp->lastGPIOValue != gpioValue) {
 			boolean wasOK = mcp->isOK;
-			mcp->isOK = (mcp->MCP->writeGPIOS(gpioValue) == 0);
+			mcp->isOK = (mcp->mcpChip.writeGPIOS(gpioValue) == 0);
 
 			if (mcp->isOK)
 				mcp->lastGPIOValue = gpioValue;
 
 #if !IGNORE_MCP_FAULTS
 			if (wasOK && !mcp->isOK) {
-				Serial.print(F("MCP Fault with mcp number "));
-				Serial.println(i);
+				serialPrintF("MCP Fault with mcp number ");
+				serialPrintln(i);
 
 				internalError(ERROR_MCP_FAULT_1 + i);
 			}

@@ -5,11 +5,11 @@ uint8_t lastError = ERROR_NONE;
 // bringt den Chip in den Fehler-Modus und blockiert ihn 
 void error(const char* tag, const char* message, boolean blinkFast)
 {
-	Serial.print(F("error(tag = "));
-	Serial.print(tag);
-	Serial.print(F(", message = "));
-	Serial.print(message);
-	Serial.println(F(")"));
+	serialPrintF("error(tag = ");
+	serialPrint(tag);
+	serialPrintF(", message = ");
+	serialPrint(message);
+	serialPrintlnF(")");
 
 	while (true) {
 		toogleRedLed();
@@ -29,9 +29,10 @@ void internalError()
 
 void internalError(uint8_t error)
 {
-	Serial.print(F("Error(error = "));
-	Serial.print(error);
-	Serial.println(")");
+	wdt_yield();
+	serialPrintF("Error(error = ");
+	serialPrint(error);
+	serialPrintlnF(")");
 
 	lastError = error;
 	blinkRedLedShort(true);
@@ -39,9 +40,10 @@ void internalError(uint8_t error)
 
 void protocolError(uint8_t error)
 {
-	Serial.print(F("protocolError(error = "));
-	Serial.print(error);
-	Serial.println(")");
+	wdt_yield();
+	serialPrintF("protocolError(error = ");
+	serialPrint(error);
+	serialPrintlnF(")");
 
 	lastError = error;
 	blinkRedLedShort(true);
