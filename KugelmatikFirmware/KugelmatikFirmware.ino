@@ -41,6 +41,13 @@ void setup()
 	serialPrintF("Kugelmatik Firmware booting up, version: ");
 	serialPrintln(BUILD_VERSION);
 
+	for (int i = 0; i < 200; i++)
+		writeEEPROM((uint8_t)'A');
+
+	initEEPROM();
+
+	writeEEPROM("Kugelmatik");
+
 	setupLeds();
 	turnGreenLedOn();
 
@@ -52,6 +59,8 @@ void setup()
 
 	wdt_yield();
 	serialPrintlnF("Done booting! Ready.");
+
+	writeEEPROM("ready");
 }
 
 void loop()

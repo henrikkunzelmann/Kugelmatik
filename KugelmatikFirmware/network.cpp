@@ -20,6 +20,7 @@ boolean stopBusyCommand = false;
 uint8_t dummyBuffer[1];
 PacketBuffer packet(dummyBuffer, sizeof(dummyBuffer));
 
+char hostName[32];
 Config newConfig;
 
 // gibt true zurück wenn revision neuer ist als lastRevision
@@ -35,6 +36,8 @@ void initNetwork()
 	serialPrintlnF("initNetwork()");
 	serialPrintlnF("ether.begin()");
 
+	writeEEPROM("begin");
+
 	uint8_t rev = ether.begin(sizeof(Ethernet::buffer), ethernetMac, 28);
 	if (rev == 0)
 	{
@@ -44,6 +47,8 @@ void initNetwork()
 
 	wdt_yield();
 	serialPrintlnF("Waiting for link...");
+
+	writeEEPROM("link");
 
 	// warten bis Ethernet Kabel verbunden ist
 	while (!ether.isLinkUp())
@@ -55,12 +60,13 @@ void initNetwork()
 
 	turnGreenLedOn();
 
+	writeEEPROM("host");
+
 	uint8_t lanID = ether.mymac[5];
-	delay(lanID * 20); // Init verzögern damit das Netzwerk nicht überlastet wird
+	//delay(lanID * 20); // Init verzögern damit das Netzwerk nicht überlastet wird
 
 	// Hostname generieren (die 00 wird durch die lanID in hex ersetzt)
 	// #define DHCP_HOSTNAME_MAX_LEN 32
-	char hostName[32];
 	memset(hostName, 0, sizeof(hostName));
 	strncpy(hostName, "Kugelmatik-00", sizeof(hostName));
 	hostName[strlen(hostName) - 2] = getHexChar(lanID >> 4);
@@ -71,15 +77,23 @@ void initNetwork()
 	serialPrintln(hostName);
 	wdt_yield();
 
+
+	writeEEPROM(hostName);
+	writeEEPROM("dhcp");
+
 	if (!ether.dhcpSetup(hostName, true)) 
 	{
 		error("init", "dhcp failed", false);
 		return;
 	}
 
+	writeEEPROM("ok");
+
 	serialPrintlnF("Network boot done!");
 	ether.udpServerListenOnPort(&onPacketReceive, PROTOCOL_PORT);
 	wdt_yield();
+
+	writeEEPROM("done");
 }
 
 boolean loopNetwork() {
@@ -189,7 +203,7 @@ void sendInfo(int32_t revision) {
 	packet.write(currentBusyCommand);
 	packet.write(highestRevision);
 	packet.write(lastError);
-	packet.write((uint64_t)freeRam());
+	packet.write((uint32_t)freeRam());
 
 	packet.write((uint16_t)sizeof(Config));
 	packet.write((uint8_t*)&config, sizeof(Config));

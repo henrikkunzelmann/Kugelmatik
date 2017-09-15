@@ -7,6 +7,8 @@
 #include "constants.h"
 #include "serial.h"
 
+#define ENABLE_EEPROM_LOG 0
+
 extern uint8_t lastError;
 
 // bringt den Chip in den Fehler-Modus und blockiert ihn 
@@ -33,4 +35,10 @@ void startTime(uint8_t index);
 int32_t endTime(uint8_t index);
 
 // gibt den freien SRAM in Bytes zurück
-uint64_t freeRam();
+uint32_t freeRam();
+
+extern uint32_t logPosition;
+
+void initEEPROM();
+void writeEEPROM(uint8_t value);
+void writeEEPROM(const char* str);

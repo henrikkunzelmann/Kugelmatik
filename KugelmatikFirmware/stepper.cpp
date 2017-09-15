@@ -4,6 +4,8 @@ MCPData mcps[MCP_COUNT];
 
 void initAllMCPs()
 {
+	writeEEPROM("initMcps");
+
 	serialPrintlnF("initAllMCPs()");
 
 	for (uint8_t i = 0; i < MCP_COUNT; i++)
@@ -12,6 +14,9 @@ void initAllMCPs()
 
 void initMCP(uint8_t index)
 {
+	writeEEPROM("mcp");
+	writeEEPROM(index);
+
 	serialPrintF("Init mcp number ");
 	serialPrintln(index);
 

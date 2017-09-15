@@ -8,7 +8,7 @@
 #define BINARY_NEED_SWAPPING 0
 #endif*/
 
-#define BINARY_NEED_SWAPPING 1
+#define BINARY_NEED_SWAPPING 0
 
 class BinaryHelper
 {
