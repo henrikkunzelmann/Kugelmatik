@@ -1,6 +1,7 @@
 #include "stepper.h"
 
 MCPData mcps[MCP_COUNT];
+StepperData stepperData[MCP_STEPPER_COUNT];
 
 void initAllMCPs()
 {
@@ -176,6 +177,9 @@ void updateSteppers(boolean isUsedByBusyCommand)
 
 		MCPData* mcp = &mcps[i];
 
+		// StepperData sichern um bei Fehler wieder zurückzusetzen
+		memcpy(stepperData, mcp->steppers, sizeof(stepperData));
+
 		for (uint8_t j = 0; j < MCP_STEPPER_COUNT; j++)
 		{
 			StepperData* stepper = &mcp->steppers[j];
@@ -293,6 +297,10 @@ void updateSteppers(boolean isUsedByBusyCommand)
 			}
 #endif
 		}
+
+		// Stepper zurücksetzen
+		if (!mcp->isOK)
+			memcpy(mcp->steppers, stepperData, sizeof(mcp->steppers));
 
 		wdt_yield();
 	}
