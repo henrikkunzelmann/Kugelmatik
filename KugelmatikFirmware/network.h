@@ -3,7 +3,7 @@
 #include <Arduino.h>
 
 #include <limits.h>
-#include <WiFi.h>
+#include <ESP8266WiFi.h>
 #include <WiFiUdp.h>
 
 #include "util.h"

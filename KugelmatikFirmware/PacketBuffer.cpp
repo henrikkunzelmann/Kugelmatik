@@ -274,13 +274,6 @@ char* PacketBuffer::readString() {
 	return str;
 }
 
-void PacketBuffer::write(boolean value) {
-	if (value)
-		write(uint8_t(1));
-	else
-		write(uint8_t(0));
-}
-
 void PacketBuffer::write(char value) {
 	if (assertPositionWrite(sizeof(value)))
 		data[addPosition(sizeof(value))] = value;
