@@ -5,8 +5,7 @@ int32_t networkTime = 0;
 int32_t maxNetworkTime = 0;
 int32_t stepperTime = 0;
 
-const static uint8_t ethernetMac[] = { 0x74, 0x69, 0x69, 0x2D, 0x30, LAN_ID }; // Mac-Adresse des Boards
-uint8_t Ethernet::buffer[ETHERNET_BUFFER_SIZE];	
+const static uint8_t networkMac[] = { 0x74, 0x69, 0x69, 0x2D, 0x30, LAN_ID }; // Mac-Adresse des Boards
 
 int32_t configRevision = 0;		// die letzte Revision des Config-Packets
 int32_t setDataRevision = 0;	// die letzte Revision des SetData-Packets
@@ -17,8 +16,10 @@ boolean stopBusyCommand = false;
 
 // PacketBuffer benutzt später den gleichen Buffer wie die Ethernetklasse
 // daher wird hier nur ein dummyBuffer gesetzt
-uint8_t dummyBuffer[1];
-PacketBuffer packet(dummyBuffer, sizeof(dummyBuffer));
+uint8_t packetBuffer[NETWORK_BUFFER_SIZE];
+PacketBuffer packet(packetBuffer, sizeof(packetBuffer));
+
+WiFiUDP* udp;
 
 char hostName[32];
 Config newConfig;
@@ -38,31 +39,31 @@ void initNetwork()
 
 	writeEEPROM("begin");
 
-	uint8_t rev = ether.begin(sizeof(Ethernet::buffer), ethernetMac, 28);
-	if (rev == 0)
-	{
-		error("init", "ethernet begin failed", true);
-		return; // wird niemals passieren da error() in eine Endloschleife geht
-	}
-
 	wdt_yield();
 	serialPrintlnF("Waiting for link...");
 
 	writeEEPROM("link");
 
-	// warten bis Ethernet Kabel verbunden ist
-	while (!ether.isLinkUp())
-	{
+	//WiFi.setHostname(hostName);
+	//WiFi.softAPsetHostname(hostName);
+
+	Serial.println(F("Waiting for link..."));
+
+	// warten bis Verbindung steht
+	/*WiFi.mode(WIFI_STA);
+	WiFi.begin("SSID", "password");
+	while (!WiFi.isConnected()) {
 		toogleGreenLed();
 		delay(300);
-		wdt_yield();
-	}
+	}*/
+	WiFi.mode(WIFI_AP);
+	WiFi.softAP("Kugelmatik-10", "Kugelmatik");
 
 	turnGreenLedOn();
 
 	writeEEPROM("host");
 
-	uint8_t lanID = ether.mymac[5];
+	uint8_t lanID = networkMac[5];
 	//delay(lanID * 20); // Init verzögern damit das Netzwerk nicht überlastet wird
 
 	// Hostname generieren (die 00 wird durch die lanID in hex ersetzt)
@@ -79,18 +80,13 @@ void initNetwork()
 
 
 	writeEEPROM(hostName);
-	writeEEPROM("dhcp");
-
-	if (!ether.dhcpSetup(hostName, true)) 
-	{
-		error("init", "dhcp failed", false);
-		return;
-	}
-
+	
+	udp = new WiFiUDP();
+	if (!udp->begin(PROTOCOL_PORT))
+		serialPrintlnF("udp->begin() failed");
 	writeEEPROM("ok");
 
 	serialPrintlnF("Network boot done!");
-	ether.udpServerListenOnPort(&onPacketReceive, PROTOCOL_PORT);
 	wdt_yield();
 
 	writeEEPROM("done");
@@ -101,9 +97,25 @@ boolean loopNetwork() {
 	wdt_yield();
 
 	// Paket abfragen
-	ether.packetLoop(ether.packetReceive());
+	int32_t size = udp->parsePacket();
 
-	boolean linkUp = ether.isLinkUp();
+	if (size > 0) {
+		if (size <= packet.getBufferSize()) {
+			packet.getError(); // Fehler löschen
+			packet.resetPosition();
+			packet.setSize(size);
+			udp->read(packet.getBuffer(), size);
+			udp->flush();
+
+			onPacketReceive();
+		}
+		else {
+			protocolError(ERROR_PACKET_SIZE_BUFFER_OVERFLOW);
+			Serial.println("Received packet too large to fit into the buffer");
+		}
+	}
+
+	boolean linkUp = WiFi.getMode() == WIFI_AP || WiFi.isConnected();
 	if (!linkUp) 	// wenn Netzwerk Verbindung getrennt wurde
 		stopMove(); // stoppen
 
@@ -117,7 +129,9 @@ void sendPacket()
 {
 	if (packet.getError())
 		return;
-	ether.makeUdpReply((char*)packet.getBuffer(), packet.getPosition(), PROTOCOL_PORT);
+	udp->beginPacket(udp->remoteIP(), udp->remotePort());
+	udp->write(packet.getBuffer(), packet.getPosition());
+	udp->endPacket();
 	wdt_yield();
 }
 
@@ -171,7 +185,7 @@ void sendData(int32_t revision)
 		{
 			StepperData* stepper = getStepper(x, y);
 
-			packet.write((uint16_t)max(0, stepper->CurrentSteps));
+			packet.write((uint16_t)_max(0, stepper->CurrentSteps));
 			packet.write(stepper->WaitTime);
 		}
 	}
@@ -224,28 +238,25 @@ void sendInfo(int32_t revision) {
 	wdt_yield();
 }
 
-void onPacketReceive(uint16_t dest_port, uint8_t src_ip[4], uint16_t src_port, const char* data, uint16_t len)
+void onPacketReceive()
 {
-	if (data == NULL)
-		return internalError();
-
-	// alle Kugelmatik V3 Pakete
-	// sind mindestens HEADER_SIZE Bytes lang
-	// und fangen mit "KKS" an
-	if (len < HEADER_SIZE || data[0] != 'K' || data[1] != 'K' || data[2] != 'S')
-		return;
-
 	wdt_yield();
 
 	// Fehler aus dem PacketBuffer löschen
 	if (packet.getError())
 		serialPrintlnF("packet.getError() == true");
 
-	// data ist unser Etherner Buffer (verschoben um die UDP Header Länge)
-	// wir nutzen den selben Buffer zum Lesen und zum Schreiben
-	packet.setBuffer((uint8_t*)data, ETHERNET_BUFFER_SIZE - 28); // 28 Bytes für IP + UDP Header abziehen
-	packet.setSize(len);
-	packet.seek(3); 
+	// alle Kugelmatik V3 Pakete
+	// sind mindestens HEADER_SIZE Bytes lang
+	// und fangen mit "KKS" an
+	if (packet.getSize() < HEADER_SIZE)
+		return;
+	if (packet.readUint8() != 'K')
+		return;
+	if (packet.readUint8() != 'K')
+		return;
+	if (packet.readUint8() != 'S')
+		return;
 
 	boolean isGuaranteed = packet.readBoolean();
 
@@ -274,7 +285,10 @@ void handlePacket(uint8_t packetType, int32_t revision)
 	switch (packetType)
 	{
 	case PacketPing:
-		ether.makeUdpReply((char*)packet.getBuffer(), packet.getSize(), PROTOCOL_PORT); // das Ping-Packet funktioniert gleichzeitig auch als Echo-Funktion
+		// das Ping-Packet funktioniert gleichzeitig auch als Echo-Funktion#
+		udp->beginPacket(udp->remoteIP(), udp->remotePort());
+		udp->write(packet.getBuffer(), packet.getSize());
+		udp->endPacket();
 		break;
 	case PacketStepper:
 	{

@@ -1,25 +1,16 @@
-// Kugelmatik V3.1
+// Kugelmatik V3.1 (ESP32)
 // Firmware
 //  Henrik Kunzelmann 2016 - 2017
 //  Rainer Wieland
 
 // Hardware
-//  AVR-NET-I/O mit ATmega32 und ENC28J60
+//  ESP32
 //  MCP23S17
 //  L293DNE
 
-// Project Defines
-// #define ETHERCARD_TCPCLIENT 0
-// #define ETHERCARD_TCPSERVER 0
-// #define ETHERCARD_STASH 0
-// #define SERIAL_TX_BUFFER_SIZE 8
-// #define SERIAL_RX_BUFFER_SIZE 8
-
 // Includes
 #include <limits.h>
-#include <EtherCard.h>
-#include <I2C.h>
-#include <MCP23017.h>
+#include <NewMCP23017.h>
 
 #include "constants.h"
 #include "util.h"

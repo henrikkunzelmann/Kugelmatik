@@ -1,7 +1,7 @@
 #pragma once
 
-#define ENABLE_SERIAL 0
-#define SERIAL_BAUDRATE 1200
+#define ENABLE_SERIAL 1
+#define SERIAL_BAUDRATE 115200
 
 #if ENABLE_SERIAL
 #define serialBegin() do { Serial.begin(SERIAL_BAUDRATE); } while (0)

@@ -4,8 +4,8 @@
 
 #include "watchdog.h"
 
-#define LED_GREEN 2		// Port für grüne LED (Pin 4 SUBD)
-#define LED_RED 3		// Port für rote LED (Pin 5 SUBD)
+#define LED_GREEN 18	// Pin für grüne LED 
+#define LED_RED 19		// Pin für rote LED
 
 #define TIME_FAST 150
 #define TIME_SLOW 500
