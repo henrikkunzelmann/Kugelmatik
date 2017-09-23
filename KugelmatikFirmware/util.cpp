@@ -66,13 +66,13 @@ char getHexChar(int32_t x)
 	return '0' + x;
 }
 
-unsigned long time[TIMER_COUNT];
+unsigned long timersData[TIMER_COUNT];
 
 void startTime(uint8_t index) {
 	if (index >= TIMER_COUNT)
 		return internalError(ERROR_INTERNAL_INVALID_TIMER);
 
-	time[index] = micros();
+	timersData[index] = micros();
 }
 
 int32_t endTime(uint8_t index) {
@@ -82,8 +82,8 @@ int32_t endTime(uint8_t index) {
 	}
 
 	unsigned long end = micros();
-	if (end > time[index])
-		return end - time[index];
+	if (end > timersData[index])
+		return end - timersData[index];
 	return 0;
 }
 
@@ -114,7 +114,7 @@ void writeEEPROM(const char * str)
 {
 	uint32_t len = strlen(str);
 
-	for (int i = 0; i < len; i++)
+	for (uint32_t i = 0; i < len; i++)
 		writeEEPROM((uint8_t)str[i]);
 
 	writeEEPROM((uint8_t)' ');
