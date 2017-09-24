@@ -90,6 +90,7 @@
     <ClInclude Include="leds.h" />
     <ClInclude Include="network.h" />
     <ClInclude Include="PacketBuffer.h" />
+    <ClInclude Include="serial.h" />
     <ClInclude Include="stepper.h" />
     <ClInclude Include="tick.h" />
     <ClInclude Include="util.h" />
