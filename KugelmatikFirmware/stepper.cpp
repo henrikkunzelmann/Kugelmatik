@@ -48,6 +48,7 @@ void initMCP(uint8_t index)
 
 		internalError(ERROR_MCP_FAULT_1 + index);
 
+#if BLINK_MCP_FAULTS
 		turnRedLedOn();
 		for (uint8_t i = 0; i <= index; i++)
 		{
@@ -57,6 +58,7 @@ void initMCP(uint8_t index)
 			delay(TIME_SLOW);
 		}
 		turnRedLedOff();
+#endif
 	}
 #else
 	serialPrintlnF("IGNORE_MCP_FAULTS is set to true, skipping MCP boot test");
