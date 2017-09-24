@@ -11,6 +11,7 @@
 // Includes
 #include <limits.h>
 #include <NewMCP23017.h>
+#include <Wire.h>
 
 #include "constants.h"
 #include "util.h"
@@ -29,15 +30,14 @@ void setup()
 	disable_wdt();
 
 	serialBegin();
-	serialPrintF("Kugelmatik Firmware booting up, version: ");
+	serialPrintF("Kugelmatik Firmware (ESP32) booting up, version: ");
 	serialPrintln(BUILD_VERSION);
 
-	for (int i = 0; i < 200; i++)
-		writeEEPROM((uint8_t)'A');
+	serialPrintlnF("Wire.begin()");
+	Wire.begin(SDA, SCL, 400000);
 
 	initEEPROM();
-
-	writeEEPROM("Kugelmatik");
+	writeEEPROM("Kugelmatik32");
 
 	setupLeds();
 	turnGreenLedOn();
