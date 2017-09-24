@@ -35,31 +35,22 @@ boolean checkRevision(int32_t lastRevision, int32_t revision)
 void initNetwork()
 {
 	serialPrintlnF("initNetwork()");
-	serialPrintlnF("ether.begin()");
-
 	writeEEPROM("begin");
 
 	wdt_yield();
-	serialPrintlnF("Waiting for link...");
-
-	writeEEPROM("link");
-
-	//WiFi.setHostname(hostName);
-	//WiFi.softAPsetHostname(hostName);
-
-	Serial.println(F("Waiting for link..."));
 
 	// warten bis Verbindung steht
-	/*WiFi.mode(WIFI_STA);
+	/*
+	serialPrintlnF("Waiting for network link...");
+	writeEEPROM("link");
+	WiFi.mode(WIFI_STA);
 	WiFi.begin("SSID", "password");
 	while (!WiFi.isConnected()) {
 		toogleGreenLed();
 		delay(300);
-	}*/
-	WiFi.mode(WIFI_AP);
-	WiFi.softAP("Kugelmatik-10", "Kugelmatik");
-
+	}
 	turnGreenLedOn();
+	*/
 
 	writeEEPROM("host");
 
@@ -73,22 +64,26 @@ void initNetwork()
 	hostName[strlen(hostName) - 2] = getHexChar(lanID >> 4);
 	hostName[strlen(hostName) - 1] = getHexChar(lanID);
 
+	serialPrintlnF("Opening own AP");
+	WiFi.mode(WIFI_AP);
+	WiFi.softAP(hostName, "Kugelmatik");
+
+	// ESP32 crasht beim setzen
+	// WiFi.setHostname(hostName);
+	// WiFi.softAPsetHostname(hostName);
+
 	serialPrintlnF("Link up...");
-	serialPrintF("ether.dhcpSetup(), using hostname: ");
+	serialPrintF("Using hostname: ");
 	serialPrintln(hostName);
-	wdt_yield();
-
-
 	writeEEPROM(hostName);
+	wdt_yield();
 	
 	udp = new WiFiUDP();
 	if (!udp->begin(PROTOCOL_PORT))
 		serialPrintlnF("udp->begin() failed");
-	writeEEPROM("ok");
 
 	serialPrintlnF("Network boot done!");
 	wdt_yield();
-
 	writeEEPROM("done");
 }
 
@@ -111,7 +106,7 @@ boolean loopNetwork() {
 		}
 		else {
 			protocolError(ERROR_PACKET_SIZE_BUFFER_OVERFLOW);
-			Serial.println("Received packet too large to fit into the buffer");
+			serialPrintlnF("Received packet too large to fit into the buffer");
 		}
 	}
 
