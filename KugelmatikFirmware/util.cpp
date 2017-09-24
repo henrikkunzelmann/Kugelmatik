@@ -94,11 +94,17 @@ uint32_t freeRam() {
 	return ((int32_t)&v - (__brkval == 0 ? (int32_t)&__heap_start : (int32_t)__brkval));
 }
 
-uint32_t logPosition = 16;
+#define DEFAULT_LOG_POSITION 16
+
+uint32_t logPosition = DEFAULT_LOG_POSITION;
 
 void initEEPROM()
 {
-	logPosition = 16;
+	// Clear EEPROM
+	logPosition = DEFAULT_LOG_POSITION;
+	for (int i = 0; i < 200; i++)
+		writeEEPROM((uint8_t)'?');
+	logPosition = DEFAULT_LOG_POSITION;
 }
 
 void writeEEPROM(uint8_t value)
