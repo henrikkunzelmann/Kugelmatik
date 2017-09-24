@@ -1,10 +1,10 @@
-// Kugelmatik V3.1 (ESP32)
+// Kugelmatik V3.1 (ESP8266)
 // Firmware
 //  Henrik Kunzelmann 2016 - 2017
 //  Rainer Wieland
 
 // Hardware
-//  ESP32
+//  ESP8266
 //  MCP23S17
 //  L293DNE
 
@@ -30,14 +30,15 @@ void setup()
 	disable_wdt();
 
 	serialBegin();
-	serialPrintF("Kugelmatik Firmware (ESP32) booting up, version: ");
+	serialPrintF("Kugelmatik Firmware (ESP8266) booting up, version: ");
 	serialPrintln(BUILD_VERSION);
 
 	serialPrintlnF("Wire.begin()");
-	Wire.begin(SDA, SCL, 400000);
+	Wire.begin(SDA, SCL);
+	Wire.setClock(400000);
 
 	initEEPROM();
-	writeEEPROM("Kugelmatik32");
+	writeEEPROM("Kugelmatik8266");
 
 	setupLeds();
 	turnGreenLedOn();
