@@ -14,8 +14,7 @@ int32_t clearErrorRevision = 0; // die letzte Revision des ClearError-Packets
 uint8_t currentBusyCommand = BUSY_NONE;
 boolean stopBusyCommand = false;
 
-// PacketBuffer benutzt später den gleichen Buffer wie die Ethernetklasse
-// daher wird hier nur ein dummyBuffer gesetzt
+// PacketBuffer
 uint8_t packetBuffer[NETWORK_BUFFER_SIZE];
 PacketBuffer packet(packetBuffer, sizeof(packetBuffer));
 
@@ -38,20 +37,6 @@ void initNetwork()
 	writeEEPROM("begin");
 
 	wdt_yield();
-
-	// warten bis Verbindung steht
-	/*
-	serialPrintlnF("Waiting for network link...");
-	writeEEPROM("link");
-	WiFi.mode(WIFI_STA);
-	WiFi.begin("SSID", "password");
-	while (!WiFi.isConnected()) {
-		toogleGreenLed();
-		delay(300);
-	}
-	turnGreenLedOn();
-	*/
-
 	writeEEPROM("host");
 
 	uint8_t lanID = networkMac[5];
@@ -64,15 +49,28 @@ void initNetwork()
 	hostName[strlen(hostName) - 2] = getHexChar(lanID >> 4);
 	hostName[strlen(hostName) - 1] = getHexChar(lanID);
 
-	serialPrintlnF("Opening own AP");
-	WiFi.mode(WIFI_AP);
-	WiFi.softAP(hostName, "Kugelmatik");
+	// WiFi Einstellungen setzen
+	WiFi.persistent(false);
+	WiFi.hostname(hostName);
+	WiFi.setAutoReconnect(true);
 
-	// ESP32 crasht beim setzen
-	// WiFi.setHostname(hostName);
-	// WiFi.softAPsetHostname(hostName);
+	// Versuchen mit dem Kugelmatik Netzwerk zu verbinden
+	WiFi.mode(WIFI_STA);
+	if (WiFi.begin(KUGELMATIK_NETWORK_SSID, KUGELMATIK_NETWORK_PASSWORD) == WL_CONNECT_FAILED)
+		serialPrintlnF("WiFi.begin() failed");
 
-	serialPrintlnF("Link up...");
+	// auf Verbindung warten
+	boolean isConnected = WiFi.waitForConnectResult() == WL_CONNECTED;
+
+	// keine Verbindung vorhanden? AP öffnen
+	if (!isConnected) {
+		serialPrintlnF("Opening own AP");
+		WiFi.mode(WIFI_AP);
+		WiFi.softAP(hostName, AP_PASSWORD);
+	}
+	else
+		serialPrintlnF("Connected to network");
+
 	serialPrintF("Using hostname: ");
 	serialPrintln(hostName);
 	writeEEPROM(hostName);

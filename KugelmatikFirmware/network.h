@@ -20,6 +20,10 @@
 #define NETWORK_BUFFER_SIZE 350		// Größe des Netzwerk Buffers in Bytes	
 #define HEADER_SIZE 9				// Größe des Paket-Headers in Bytes
 
+#define KUGELMATIK_NETWORK_SSID "Kugelmatik"
+#define KUGELMATIK_NETWORK_PASSWORD "12345678"
+#define AP_PASSWORD "Kugelmatik"
+
 extern int32_t loopTime;
 extern int32_t networkTime;
 extern int32_t maxNetworkTime;
