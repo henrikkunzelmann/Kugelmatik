@@ -7,8 +7,8 @@
 #define serialBegin() do { Serial.begin(SERIAL_BAUDRATE); } while (0)
 #define serialPrint(val) do { Serial.print(val); } while (0)
 #define serialPrintln(val) do { Serial.println(val); } while (0)
-#define serialPrintF(val) do { Serial.print(F(val)); } while (0)
-#define serialPrintlnF(val) do { Serial.println(F(val)); } while (0)
+#define serialPrintF(val) do { Serial.print(val); } while (0)
+#define serialPrintlnF(val) do { Serial.println(val); } while (0)
 #else
 #define serialBegin() do { } while (0)
 #define serialPrint(val) do { } while (0)
