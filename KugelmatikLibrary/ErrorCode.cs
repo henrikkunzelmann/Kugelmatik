@@ -24,6 +24,7 @@
         McpFault6 = 18,
         McpFault7 = 19,
         McpFault8 = 20,
+        OTAFailed = 21,
 
         InternalWrongParameter = 251,
         InternalWrongLoopValues = 252,

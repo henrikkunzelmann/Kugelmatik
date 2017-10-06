@@ -619,6 +619,7 @@ void handlePacket(uint8_t packetType, int32_t revision)
 
 		switch (ret) {
 		case HTTP_UPDATE_FAILED:
+			protocolError(ERROR_OTA_FAILED);
 			Serial.printf("HTTP_UPDATE_FAILED! Error (%d): %s", ESPhttpUpdate.getLastError(), ESPhttpUpdate.getLastErrorString().c_str());
 			Serial.println();
 			break;
