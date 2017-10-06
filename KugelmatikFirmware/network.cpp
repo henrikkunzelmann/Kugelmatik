@@ -595,10 +595,44 @@ void handlePacket(uint8_t packetType, int32_t revision)
 		if (!checkRevision(clearErrorRevision, revision))
 			break;
 
+		serialPrintF("Clear error... was: ");
+		serialPrintln(lastError);
+
 		clearErrorRevision = revision;
 		lastError = ERROR_NONE;
 		sendInfo(revision);
 		break;
+	case PacketRestart:
+		serialPrintlnF("Restarting...");
+		ESP.restart();
+		break;
+	case PacketStartOTA:
+	{
+		char* otaFile = packet.readString();
+		if (packet.getError())
+			return;
+
+		Serial.printf("Starting OTA with file: %s", otaFile);
+		Serial.println();
+
+		t_httpUpdate_return ret = ESPhttpUpdate.update(otaFile);
+
+		switch (ret) {
+		case HTTP_UPDATE_FAILED:
+			Serial.printf("HTTP_UPDATE_FAILED! Error (%d): %s", ESPhttpUpdate.getLastError(), ESPhttpUpdate.getLastErrorString().c_str());
+			Serial.println();
+			break;
+
+		case HTTP_UPDATE_NO_UPDATES:
+			Serial.println("ret: HTTP_UPDATE_NO_UPDATES");
+			break;
+
+		case HTTP_UPDATE_OK:
+			Serial.println("ret: HTTP_UPDATE_OK");
+			break;
+		}
+		break;
+	}
 	default:
 		return protocolError(ERROR_UNKNOWN_PACKET);
 	}

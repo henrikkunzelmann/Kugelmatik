@@ -2,7 +2,7 @@
 
 #include <Arduino.h>
 
-#define BUILD_VERSION 21
+#define BUILD_VERSION 22
 
 #define PacketPing 1
 #define PacketAck 2
@@ -32,8 +32,10 @@
 
 #define PacketSetData 20
 
-#define PacketConfig2 21
+#define PacketConfig2	 21
 #define PacketClearError 22
+#define PacketRestart	 23
+#define PacketStartOTA   24
 
 #define BUSY_NONE 0
 #define BUSY_HOME 1

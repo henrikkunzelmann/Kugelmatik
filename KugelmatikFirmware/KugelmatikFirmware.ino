@@ -13,6 +13,10 @@
 #include <limits.h>
 #include <NewMCP23017.h>
 #include <Wire.h>
+#include <ESP8266WiFi.h>
+#include <WiFiUdp.h>
+#include <ESP8266HTTPClient.h>
+#include <ESP8266httpUpdate.h>
 
 #include "constants.h"
 #include "util.h"
