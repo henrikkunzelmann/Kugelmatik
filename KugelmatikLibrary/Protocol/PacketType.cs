@@ -31,6 +31,8 @@
 
         SetData = 20,
         Config2 = 21,
-        ClearError = 22
+        ClearError = 22,
+        Restart = 23,
+        StartOTA = 24
     }
 }

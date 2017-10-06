@@ -43,6 +43,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BinaryStringHelper.cs" />
     <Compile Include="BrakeMode.cs" />
     <Compile Include="BusyCommand.cs" />
     <Compile Include="Choreographies\Direction.cs" />
@@ -81,6 +82,8 @@
     <Compile Include="Protocol\IPacket.cs" />
     <Compile Include="Protocol\PacketClearError.cs" />
     <Compile Include="Protocol\PacketConfig2.cs" />
+    <Compile Include="Protocol\PacketStartOTA.cs" />
+    <Compile Include="Protocol\PacketRestart.cs" />
     <Compile Include="Protocol\PacketSetData.cs" />
     <Compile Include="Protocol\PacketAllSteppersArray.cs" />
     <Compile Include="Protocol\PacketAllSteppers.cs" />

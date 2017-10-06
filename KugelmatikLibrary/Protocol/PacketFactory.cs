@@ -37,7 +37,10 @@ namespace KugelmatikLibrary.Protocol
             { PacketType.BlinkRed, typeof(PacketBlinkRed) },
             { PacketType.Stop, typeof(PacketStop) },
             { PacketType.SetData, typeof(PacketSetData) },
-            { PacketType.Config2, typeof(PacketConfig2) }
+            { PacketType.Config2, typeof(PacketConfig2) },
+            { PacketType.ClearError, typeof(PacketClearError) },
+            { PacketType.Restart, typeof(PacketRestart) },
+            { PacketType.StartOTA, typeof(PacketStartOTA) }
         };
     }
 }
