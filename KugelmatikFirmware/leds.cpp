@@ -1,26 +1,30 @@
 #include "leds.h"
 #include "watchdog.h"
 
-boolean ledStateGreen = false;	// Status der LED für LED_Green (grüne LED)
-boolean ledStateRed = false;	// Status der LED für LED_Red (rote LED)
+boolean ledStateGreen = LED_STATE_OFF;	// Status der LED für LED_Green (grüne LED)
+boolean ledStateRed = LED_STATE_OFF;	// Status der LED für LED_Red (rote LED)
 
 void setupLeds()
 {
 	pinMode(LED_GREEN, OUTPUT);
 	pinMode(LED_RED, OUTPUT);
+
+	// LEDs ausschalten
+	turnGreenLedOff();
+	turnRedLedOff();
 }
 
 // setzt die grüne LED an
 void turnGreenLedOn()
 {
-	ledStateGreen = true;
+	ledStateGreen = LED_STATE_ON;
 	digitalWrite(LED_GREEN, ledStateGreen);
 }
 
 // setzt die grüne LED aus
 void turnGreenLedOff()
 {
-	ledStateGreen = false;
+	ledStateGreen = LED_STATE_OFF;
 	digitalWrite(LED_GREEN, ledStateGreen);
 }
 
@@ -34,14 +38,14 @@ void toogleGreenLed()
 // stellt die rote LED an
 void turnRedLedOn()
 {
-	ledStateRed = true;
+	ledStateRed = LED_STATE_ON;
 	digitalWrite(LED_RED, ledStateRed);
 }
 
 // stellt die rote LED aus
 void turnRedLedOff()
 {
-	ledStateRed = false;
+	ledStateRed = LED_STATE_OFF;
 	digitalWrite(LED_RED, ledStateRed);
 }
 

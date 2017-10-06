@@ -4,9 +4,13 @@
 
 #include "watchdog.h"
 
-#define LED_GREEN 18	// Pin für grüne LED 
-#define LED_RED 19		// Pin für rote LED
+#define LED_GREEN 2		// Pin für grüne LED 
+#define LED_RED 16		// Pin für rote LED
 
+#define LED_STATE_ON false // NodeMCU LEDs leuchtet bei LOW
+#define LED_STATE_OFF (!LED_STATE_ON)
+
+// Zeit in Millisekunden für schnelles blinken
 #define TIME_FAST 150
 #define TIME_SLOW 500
 
