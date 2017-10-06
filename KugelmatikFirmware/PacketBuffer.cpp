@@ -108,6 +108,7 @@ uint32_t PacketBuffer::addPosition(size_t length) {
 }
 
 void PacketBuffer::errorMemory() {
+	serialPrintlnF("errorMemory()");
 	writeEEPROM("memError");
 	internalError();
 	error = true;
