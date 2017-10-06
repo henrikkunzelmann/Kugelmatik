@@ -14,14 +14,14 @@ void setupLeds()
 	turnRedLedOff();
 }
 
-// setzt die grüne LED an
+// lässt die grüne LED leuchten
 void turnGreenLedOn()
 {
 	ledStateGreen = LED_STATE_ON;
 	digitalWrite(LED_GREEN, ledStateGreen);
 }
 
-// setzt die grüne LED aus
+// lässt die grüne LED nicht mehr leuchten
 void turnGreenLedOff()
 {
 	ledStateGreen = LED_STATE_OFF;
@@ -35,14 +35,14 @@ void toogleGreenLed()
 	digitalWrite(LED_GREEN, ledStateGreen);
 }
 
-// stellt die rote LED an
+// lässt die rote LED leuchten
 void turnRedLedOn()
 {
 	ledStateRed = LED_STATE_ON;
 	digitalWrite(LED_RED, ledStateRed);
 }
 
-// stellt die rote LED aus
+// lässt die rote LED nicht mehr leuchten
 void turnRedLedOff()
 {
 	ledStateRed = LED_STATE_OFF;
@@ -56,7 +56,7 @@ void toogleRedLed()
 	digitalWrite(LED_RED, ledStateRed);
 }
 
-// lässt die grüne Led kurzzeitig blinken
+// lässt die grüne LED kurzzeitig blinken
 void blinkGreenLedShort(boolean fast)
 {
 	uint32_t time = fast ? TIME_FAST : TIME_SLOW;
@@ -70,7 +70,7 @@ void blinkGreenLedShort(boolean fast)
 	}
 }
 
-// läst die rote Led kurzzeitig blinken
+// lässt die rote LED kurzzeitig blinken
 void blinkRedLedShort(boolean fast)
 {
 	uint32_t time = fast ? TIME_FAST : TIME_SLOW;
