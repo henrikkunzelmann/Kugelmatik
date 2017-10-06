@@ -3,7 +3,7 @@
     public enum ErrorCode
     {
         None = 0,
-        TooShort = 1,
+        PacketTooShort = 1,
         InvalidX = 2,
         InvalidY = 3,
         InvalidMagic = 4,
