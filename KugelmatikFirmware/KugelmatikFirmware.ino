@@ -5,7 +5,8 @@
 
 // Hardware
 //  ESP8266
-//  MCP23S17
+//  NodeMCU DEVKIT 1.0, ESP-12E
+//  MCP23017
 //  L293DNE
 
 // Includes
@@ -30,6 +31,8 @@ void setup()
 	disable_wdt();
 
 	serialBegin();
+	serialPrintlnF("");
+	serialPrintlnF("");
 	serialPrintF("Kugelmatik Firmware (ESP8266) booting up, version: ");
 	serialPrintln(BUILD_VERSION);
 
