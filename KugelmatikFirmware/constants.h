@@ -2,7 +2,7 @@
 
 #include <Arduino.h>
 
-#define BUILD_VERSION 22
+#define BUILD_VERSION 40
 
 #define PacketPing 1
 #define PacketAck 2
