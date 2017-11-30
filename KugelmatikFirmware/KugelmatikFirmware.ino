@@ -1,25 +1,22 @@
-// Kugelmatik V3.1
+// Kugelmatik V3.1 (ESP8266)
 // Firmware
 //  Henrik Kunzelmann 2016 - 2017
 //  Rainer Wieland
 
 // Hardware
-//  AVR-NET-I/O mit ATmega32 und ENC28J60
-//  MCP23S17
+//  ESP8266
+//  NodeMCU DEVKIT 1.0, ESP-12E
+//  MCP23017
 //  L293DNE
-
-// Project Defines
-// #define ETHERCARD_TCPCLIENT 0
-// #define ETHERCARD_TCPSERVER 0
-// #define ETHERCARD_STASH 0
-// #define SERIAL_TX_BUFFER_SIZE 8
-// #define SERIAL_RX_BUFFER_SIZE 8
 
 // Includes
 #include <limits.h>
-#include <EtherCard.h>
-#include <I2C.h>
-#include <MCP23017.h>
+#include <NewMCP23017.h>
+#include <Wire.h>
+#include <ESP8266WiFi.h>
+#include <WiFiUdp.h>
+#include <ESP8266HTTPClient.h>
+#include <ESP8266httpUpdate.h>
 
 #include "constants.h"
 #include "util.h"
@@ -38,11 +35,17 @@ void setup()
 	disable_wdt();
 
 	serialBegin();
-	serialPrintF("Kugelmatik Firmware booting up, version: ");
+	serialPrintlnF("");
+	serialPrintlnF("");
+	serialPrintF("Kugelmatik Firmware (ESP8266) booting up, version: ");
 	serialPrintln(BUILD_VERSION);
 
+	serialPrintlnF("Wire.begin()");
+	Wire.begin(SDA, SCL);
+	Wire.setClock(400000);
+
 	initEEPROM();
-	writeEEPROM("Kugelmatik");
+	writeEEPROM("Kugelmatik8266");
 
 	setupLeds();
 	turnGreenLedOn();

@@ -88,10 +88,7 @@ int32_t endTime(uint8_t index) {
 }
 
 uint32_t freeRam() {
-	// siehe http://playground.arduino.cc/Code/AvailableMemory
-	extern int32_t __heap_start, *__brkval;
-	int32_t v;
-	return ((int32_t)&v - (__brkval == 0 ? (int32_t)&__heap_start : (int32_t)__brkval));
+	return ESP.getFreeHeap();
 }
 
 #define DEFAULT_LOG_POSITION 16

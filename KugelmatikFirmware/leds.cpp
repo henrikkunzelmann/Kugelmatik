@@ -1,26 +1,30 @@
 #include "leds.h"
 #include "watchdog.h"
 
-boolean ledStateGreen = false;	// Status der LED für LED_Green (grüne LED)
-boolean ledStateRed = false;	// Status der LED für LED_Red (rote LED)
+boolean ledStateGreen = LED_STATE_OFF;	// Status der LED für LED_Green (grüne LED)
+boolean ledStateRed = LED_STATE_OFF;	// Status der LED für LED_Red (rote LED)
 
 void setupLeds()
 {
 	pinMode(LED_GREEN, OUTPUT);
 	pinMode(LED_RED, OUTPUT);
+
+	// LEDs ausschalten
+	turnGreenLedOff();
+	turnRedLedOff();
 }
 
-// setzt die grüne LED an
+// lässt die grüne LED leuchten
 void turnGreenLedOn()
 {
-	ledStateGreen = true;
+	ledStateGreen = LED_STATE_ON;
 	digitalWrite(LED_GREEN, ledStateGreen);
 }
 
-// setzt die grüne LED aus
+// lässt die grüne LED nicht mehr leuchten
 void turnGreenLedOff()
 {
-	ledStateGreen = false;
+	ledStateGreen = LED_STATE_OFF;
 	digitalWrite(LED_GREEN, ledStateGreen);
 }
 
@@ -31,17 +35,17 @@ void toogleGreenLed()
 	digitalWrite(LED_GREEN, ledStateGreen);
 }
 
-// stellt die rote LED an
+// lässt die rote LED leuchten
 void turnRedLedOn()
 {
-	ledStateRed = true;
+	ledStateRed = LED_STATE_ON;
 	digitalWrite(LED_RED, ledStateRed);
 }
 
-// stellt die rote LED aus
+// lässt die rote LED nicht mehr leuchten
 void turnRedLedOff()
 {
-	ledStateRed = false;
+	ledStateRed = LED_STATE_OFF;
 	digitalWrite(LED_RED, ledStateRed);
 }
 
@@ -52,7 +56,7 @@ void toogleRedLed()
 	digitalWrite(LED_RED, ledStateRed);
 }
 
-// lässt die grüne Led kurzzeitig blinken
+// lässt die grüne LED kurzzeitig blinken
 void blinkGreenLedShort(boolean fast)
 {
 	uint32_t time = fast ? TIME_FAST : TIME_SLOW;
@@ -66,7 +70,7 @@ void blinkGreenLedShort(boolean fast)
 	}
 }
 
-// läst die rote Led kurzzeitig blinken
+// lässt die rote LED kurzzeitig blinken
 void blinkRedLedShort(boolean fast)
 {
 	uint32_t time = fast ? TIME_FAST : TIME_SLOW;

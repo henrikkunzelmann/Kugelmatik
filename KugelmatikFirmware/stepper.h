@@ -1,7 +1,7 @@
 #pragma once
 
 #include <Arduino.h>
-#include <MCP23017.h>
+#include <NewMCP23017.h>
 
 #include "util.h"
 #include "config.h"

@@ -2,7 +2,7 @@
 
 #include <Arduino.h>
 
-#define BUILD_VERSION 21
+#define BUILD_VERSION 40
 
 #define PacketPing 1
 #define PacketAck 2
@@ -32,8 +32,10 @@
 
 #define PacketSetData 20
 
-#define PacketConfig2 21
+#define PacketConfig2	 21
 #define PacketClearError 22
+#define PacketRestart	 23
+#define PacketStartOTA   24
 
 #define BUSY_NONE 0
 #define BUSY_HOME 1
@@ -61,6 +63,7 @@
 #define ERROR_MCP_FAULT_6 18
 #define ERROR_MCP_FAULT_7 19
 #define ERROR_MCP_FAULT_8 20
+#define ERROR_OTA_FAILED  21
 
 #define ERROR_INTERNAL_WRONG_PARAMETER 251
 #define ERROR_INTERNAL_LOOP_VALUES_WRONG 252

@@ -35,9 +35,9 @@ void initMCP(uint8_t index)
 	data->mcpChip.begin(index);
 
 	// alle Pins (0xFFFF) auf OUTPUT stellen
-	data->mcpChip.setPinDirOUT(0xFFFFu);
+	data->mcpChip.setPinsOutput(0xFFFFu);
 
-	data->isOK = (data->mcpChip.writeGPIOS(0) == 0);
+	data->isOK = (data->mcpChip.writeGPIO(0) == 0);
 	data->lastGPIOValue = 0;
 
 #if !IGNORE_MCP_FAULTS
@@ -198,14 +198,14 @@ void updateSteppers(boolean isUsedByBusyCommand)
 			if (diff != 0)
 			{
 				if (config.stepMode == StepBoth) 
-					stepSize = min(2, diff);		// schauen ob Full oder Half Step gemacht werden soll
+					stepSize = _min(2, diff);		// schauen ob Full oder Half Step gemacht werden soll
 				else if (diff >= config.stepMode)	
 					stepSize = config.stepMode;	    // Half oder Full Step machen
 			}
 
 			// immer HalfStep machen
 			if (isUsedByBusyCommand)
-				stepSize = min(stepSize, 1);
+				stepSize = _min(stepSize, 1);
 
 			boolean waitStep = stepper->TickCount > 0;
 			if (stepper->TickCount > 0)
@@ -285,7 +285,7 @@ void updateSteppers(boolean isUsedByBusyCommand)
 
 		if (!mcp->isOK || mcp->lastGPIOValue != gpioValue) {
 			boolean wasOK = mcp->isOK;
-			mcp->isOK = (mcp->mcpChip.writeGPIOS(gpioValue) == 0);
+			mcp->isOK = (mcp->mcpChip.writeGPIO(gpioValue) == 0);
 
 			if (mcp->isOK)
 				mcp->lastGPIOValue = gpioValue;

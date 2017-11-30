@@ -108,6 +108,7 @@ uint32_t PacketBuffer::addPosition(size_t length) {
 }
 
 void PacketBuffer::errorMemory() {
+	serialPrintlnF("errorMemory()");
 	writeEEPROM("memError");
 	internalError();
 	error = true;
@@ -272,13 +273,6 @@ char* PacketBuffer::readString() {
 
 	str[size] = '\0';
 	return str;
-}
-
-void PacketBuffer::write(boolean value) {
-	if (value)
-		write(uint8_t(1));
-	else
-		write(uint8_t(0));
 }
 
 void PacketBuffer::write(char value) {

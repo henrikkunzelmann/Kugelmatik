@@ -72,7 +72,6 @@ public:
 
 	char* readString();
 
-	void write(boolean value);
 	void write(char value);
 	void write(int8_t value);
 	void write(uint8_t value);

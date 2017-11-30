@@ -5,6 +5,6 @@
 #define wdt_yield() do { wdt_reset(); } while (0)
 #define disable_wdt() do { wdt_disable(); } while (0)
 #else
-#define wdt_yield() do {} while(0)
+#define wdt_yield() do { yield(); } while(0)
 #define disable_wdt() do {} while(0)
 #endif
